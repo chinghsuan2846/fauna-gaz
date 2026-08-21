@@ -1,9 +1,11 @@
 import react from '@astrojs/react'
 import sanity from '@sanity/astro'
 import { defineConfig } from 'astro/config'
+import { loadEnv } from 'vite'
 
-const projectId = process.env.PUBLIC_SANITY_PROJECT_ID || 'replace-me'
-const dataset = process.env.PUBLIC_SANITY_DATASET || 'production'
+const env = loadEnv(process.env.NODE_ENV || 'development', process.cwd(), '')
+const projectId = env.PUBLIC_SANITY_PROJECT_ID || 'replace-me'
+const dataset = env.PUBLIC_SANITY_DATASET || 'production'
 
 export default defineConfig({
   output: 'static',
@@ -14,7 +16,7 @@ export default defineConfig({
       dataset,
       apiVersion: '2026-03-01',
       useCdn: false,
-      token: process.env.SANITY_API_READ_TOKEN || undefined,
+      token: env.SANITY_API_READ_TOKEN || undefined,
     }),
   ],
 })
