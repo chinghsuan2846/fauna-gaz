@@ -1,0 +1,23 @@
+---
+const { value = [] } = Astro.props
+
+const textFromBlock = (block) =>
+  block.children?.map((child) => child.text ?? '').join('') ?? ''
+
+const tagForStyle = (style) => {
+  if (style === 'h1' || style === 'h2' || style === 'h3' || style === 'blockquote') {
+    return style
+  }
+
+  return 'p'
+}
+---
+
+<div class="portable-text">
+  {value.map((block) => {
+    if (block._type !== 'block') return null
+
+    const Tag = tagForStyle(block.style)
+    return <Tag>{textFromBlock(block)}</Tag>
+  })}
+</div>

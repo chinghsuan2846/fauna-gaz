@@ -1,0 +1,14 @@
+---
+import { sanityClient } from 'sanity:client'
+import DesktopExperience from '../components/DesktopExperience.jsx'
+import BaseLayout from '../layouts/BaseLayout.astro'
+import { articleListQuery } from '../lib/queries.js'
+import '../styles/global.css'
+
+const hasSanityConfig = Boolean(import.meta.env.PUBLIC_SANITY_PROJECT_ID)
+const articles = hasSanityConfig ? await sanityClient.fetch(articleListQuery) : []
+---
+
+<BaseLayout title="Fauna Gaz" description="Fauna Gaz — a quarterly journal for animal behaviour.">
+  <DesktopExperience client:load articles={articles} />
+</BaseLayout>

@@ -1,0 +1,59 @@
+---
+import { toHTML } from '@portabletext/to-html'
+import { sanityClient } from 'sanity:client'
+import BaseLayout from '../../layouts/BaseLayout.astro'
+import { articleBySlugQuery, articleSlugsQuery } from '../../lib/queries.js'
+import { sanityImageUrl } from '../../lib/sanityImage.js'
+import '../../styles/global.css'
+
+export async function getStaticPaths() {
+  if (!import.meta.env.PUBLIC_SANITY_PROJECT_ID) return []
+
+  const articles = await sanityClient.fetch(articleSlugsQuery)
+
+  return articles.map(({ slug }) => ({
+    params: { slug },
+    props: { slug },
+  }))
+}
+
+const { slug } = Astro.props
+const article = await sanityClient.fetch(articleBySlugQuery, { slug })
+
+if (!article) {
+  throw new Error(`Article not found for slug: ${slug}`)
+}
+
+const description = article.excerpt || 'Fauna Gaz quarterly journal article.'
+const bodyHtml = toHTML(article.body || [])
+const coverImageUrl = sanityImageUrl(article.coverImage, { width: 1600 })
+---
+
+<BaseLayout
+  title={`${article.title} — Fauna Gaz`}
+  description={description}
+  image={coverImageUrl}
+>
+  <main class="article-page">
+    <a class="article-page__back" href="/">← Fauna Gaz</a>
+    <article>
+      <p class="article-page__eyebrow">
+        {article.issue?.year} · {article.issue?.quarter}
+      </p>
+      <h1>{article.title}</h1>
+      {article.excerpt && <p class="article-page__excerpt">{article.excerpt}</p>}
+      {coverImageUrl && (
+        <img
+          class="article-page__cover"
+          src={coverImageUrl}
+          alt={article.coverImage.alt || article.title}
+          loading="eager"
+        />
+      )}
+      <p class="article-page__date">
+        {article.publishedAt && new Date(article.publishedAt).toLocaleDateString('zh-TW')}
+      </p>
+      <div class="portable-text" set:html={bodyHtml} />
+    </article>
+  </main>
+</BaseLayout>

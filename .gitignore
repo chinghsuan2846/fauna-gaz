@@ -3,6 +3,9 @@ node_modules/
 
 # Build output
 dist/
+.astro/
+studio/dist/
+studio/.sanity/
 
 # Local environment files and secrets
 .env
