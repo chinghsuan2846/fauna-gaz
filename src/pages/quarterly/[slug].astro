@@ -34,26 +34,26 @@ const coverImageUrl = sanityImageUrl(article.coverImage, { width: 1600 })
   description={description}
   image={coverImageUrl}
 >
-  <main class="article-page">
-    <a class="article-page__back" href="/">← Fauna Gaz</a>
-    <article>
-      <p class="article-page__eyebrow">
+  <main class="min-h-screen bg-window-surface px-space-md py-space-2xl font-body text-body text-ink-primary sm:px-space-xl lg:px-space-2xl">
+    <a class="font-ui text-action-link underline decoration-action-link underline-offset-2" href="/">← Fauna Gaz</a>
+    <article class="mx-auto mt-space-2xl w-full max-w-3xl">
+      <p class="font-ui text-body text-ink-secondary">
         {article.issue?.year} · {article.issue?.quarter}
       </p>
-      <h1>{article.title}</h1>
-      {article.excerpt && <p class="article-page__excerpt">{article.excerpt}</p>}
+      <h1 class="mt-space-md max-w-[15ch] text-headline font-medium">{article.title}</h1>
+      {article.excerpt && <p class="mt-space-md max-w-2xl text-lead text-ink-primary">{article.excerpt}</p>}
       {coverImageUrl && (
         <img
-          class="article-page__cover"
+          class="my-space-xl block h-auto w-full"
           src={coverImageUrl}
           alt={article.coverImage.alt || article.title}
           loading="eager"
         />
       )}
-      <p class="article-page__date">
+      <p class="font-ui text-caption text-ink-muted">
         {article.publishedAt && new Date(article.publishedAt).toLocaleDateString('zh-TW')}
       </p>
-      <div class="portable-text" set:html={bodyHtml} />
+      <div class="portable-text mt-space-xl" set:html={bodyHtml} />
     </article>
   </main>
 </BaseLayout>

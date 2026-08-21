@@ -1,112 +1,35 @@
-:root {
-  font-family: system-ui, sans-serif;
-  color: #242424;
-  background: #f4f1e8;
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    @apply scroll-smooth;
+  }
+
+  body {
+    @apply m-0 min-h-screen bg-window-surface font-body text-body text-ink-primary;
+  }
+
+  button,
+  a {
+    @apply font-ui;
+  }
 }
 
-* {
-  box-sizing: border-box;
-}
+@layer components {
+  .portable-text {
+    @apply font-body text-body text-ink-primary;
+  }
 
-body {
-  min-width: 320px;
-  min-height: 100vh;
-  margin: 0;
-}
+  .portable-text p {
+    @apply my-space-md;
+  }
 
-button,
-a {
-  font: inherit;
-}
-
-.desktop-experience {
-  min-height: 100vh;
-  padding: 2rem;
-}
-
-.desktop-experience--welcome {
-  display: grid;
-  place-content: center;
-  gap: 1rem;
-  text-align: center;
-}
-
-.desktop-experience--welcome button,
-.desktop-dock button,
-.desktop-window button {
-  cursor: pointer;
-}
-
-.desktop-dock {
-  display: flex;
-  gap: 0.75rem;
-}
-
-.desktop-window {
-  width: min(42rem, 100%);
-  margin: 2rem auto 0;
-  padding: 1rem;
-  border: 1px solid currentColor;
-  background: #f4f1e8;
-}
-
-.desktop-window header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.desktop-window h2 {
-  margin: 0;
-}
-
-.article-page {
-  width: min(48rem, calc(100% - 2rem));
-  margin: 0 auto;
-  padding: 3rem 0 6rem;
-}
-
-.article-page article {
-  margin-top: 3rem;
-}
-
-.article-page h1 {
-  max-width: 15ch;
-  font-size: clamp(2rem, 5vw, 4rem);
-  line-height: 1.05;
-}
-
-.article-page__eyebrow,
-.article-page__date {
-  color: #68645c;
-}
-
-.article-page__excerpt {
-  max-width: 42rem;
-  font-size: 1.25rem;
-  line-height: 1.6;
-}
-
-.article-page__cover {
-  display: block;
-  width: 100%;
-  height: auto;
-  margin: 2rem 0;
-}
-
-.portable-text {
-  line-height: 1.8;
-}
-
-.portable-text p {
-  margin: 1.25rem 0;
-}
-
-.portable-text h1,
-.portable-text h2,
-.portable-text h3,
-.portable-text blockquote {
-  margin-top: 2rem;
+  .portable-text h1,
+  .portable-text h2,
+  .portable-text h3,
+  .portable-text blockquote {
+    @apply mt-space-xl;
+  }
 }
