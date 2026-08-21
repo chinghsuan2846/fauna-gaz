@@ -36,12 +36,17 @@ export default {
         small: ['0.875rem', { lineHeight: '1.25rem' }],
         body: ['1rem', { lineHeight: '1.75rem' }],
         lead: ['1.125rem', { lineHeight: '1.75rem' }],
+        button: ['1.375rem', { lineHeight: '1.75rem' }],
         title: ['1.5rem', { lineHeight: '2rem' }],
         headline: ['clamp(2rem, 5vw, 4rem)', { lineHeight: '1.05' }],
+        display: ['clamp(2.75rem, 6.5vw, 5rem)', { lineHeight: '1' }],
       },
       fontWeight: {
         regular: '400',
         medium: '500',
+      },
+      letterSpacing: {
+        display: '0.12em',
       },
       lineHeight: {
         compact: '1rem',
@@ -58,6 +63,7 @@ export default {
         'space-2xl': '3rem',
         'space-3xl': '4rem',
         'space-4xl': '6rem',
+        'entry-line': '6.875rem',
       },
       boxShadow: {
         window: '0 0.25rem 0.5rem rgb(0 0 0 / 25%)',
