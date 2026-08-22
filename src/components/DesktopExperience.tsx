@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { buildIssueTree } from '../lib/issueTree.js'
 import QuarterlyContent, { type QuarterlyContentArticle } from '../stories/component/QuarterlyContent'
 import QuarterlySidebar, { type QuarterlySidebarYear } from '../stories/component/QuarterlySidebar'
-import { Button } from '../stories/component/Button'
+import { Button, PixelIcon } from '../stories/component/Button'
 import Window from '../stories/component/Window'
 import PixelForest from './PixelForest'
 import PixelGridTransition from './PixelGridTransition'
@@ -178,16 +178,17 @@ function DesktopExperience({ articles = [] }: DesktopExperienceProps) {
           <section className="relative z-10 grid justify-items-center px-space-md">
             <h1 className="text-display font-medium">動物公報</h1>
             <p className="mt-space-md text-lead">一本動物行為學季刊</p>
-            <Button
-              appearance="text"
-              label="點擊進入"
-              size="large"
-              textSize="body"
-              state={isLoading ? 'loading' : 'default'}
-              ariaLabel="點擊進入"
-              className="entry-enter-button mt-space-2xl tracking-display font-medium focus-visible:outline-2 focus-visible:outline-line"
+            <button
+              className="entry-enter-button mt-space-2xl inline-flex items-center justify-center gap-space-xs px-space-md py-space-sm text-button lg:text-title font-medium text-ink-primary focus-visible:outline-2 focus-visible:outline-line"
+              type="button"
               onClick={startExperience}
-            />
+              disabled={isLoading}
+              aria-busy={isLoading}
+            >
+              {isLoading ? <PixelIcon name="loading" size="small" className="animate-pulse" /> : null}
+              <span className="entry-enter-label tracking-display">點擊進入</span>
+              <span className="entry-enter-line" aria-hidden="true" />
+            </button>
           </section>
         </main>
       ) : null}
