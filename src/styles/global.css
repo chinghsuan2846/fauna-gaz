@@ -18,8 +18,73 @@
 }
 
 @layer components {
+  .experience-shell {
+    @apply relative min-h-screen overflow-hidden bg-window-surface;
+    min-height: 100svh;
+  }
+
+  .experience-background {
+    @apply pointer-events-none absolute inset-0 z-0 overflow-hidden;
+    opacity: 1;
+  }
+
+  .experience-background--desktop {
+    opacity: 0.75;
+  }
+
+  .experience-desktop {
+    @apply absolute inset-0 overflow-auto;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .experience-desktop--visible {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  .pixel-grid-transition {
+    @apply pointer-events-none fixed inset-0 z-50 overflow-hidden;
+  }
+
+  .pixel-grid-transition--idle {
+    visibility: hidden;
+  }
+
+  .pixel-grid-transition--idle .pixel-grid-transition__cell {
+    opacity: 0;
+  }
+
+  .pixel-grid-transition__cell {
+    @apply absolute block bg-black;
+    /* Overlap neighboring cells by 1px so the background cannot leak through
+       at fractional device-pixel ratios during the transition. */
+    top: calc(var(--transition-row) * var(--transition-cell-size) - 0.5px);
+    left: calc(var(--transition-column) * var(--transition-cell-size) - 0.5px);
+    width: calc(var(--transition-cell-size) + 1px);
+    height: calc(var(--transition-cell-size) + 1px);
+  }
+
+  .pixel-grid-transition--covering .pixel-grid-transition__cell {
+    opacity: 0;
+    animation: pixel-grid-cell-cover 90ms steps(1, end) both;
+    animation-delay: var(--transition-cover-delay);
+  }
+
+  .pixel-grid-transition--revealing .pixel-grid-transition__cell {
+    opacity: 1;
+    animation: pixel-grid-cell-reveal 90ms steps(1, end) both;
+    animation-delay: var(--transition-reveal-delay);
+  }
+
   .entry-screen {
     min-height: 100svh;
+  }
+
+  .entry-screen--loading {
+    z-index: 60;
   }
 
   .entry-forest {
@@ -66,6 +131,14 @@
     @apply relative;
   }
 
+  .entry-enter-label {
+    transition: text-shadow 120ms ease;
+  }
+
+  .entry-enter-button:hover .entry-enter-label {
+    text-shadow: 0.125rem 0.125rem 0.375rem rgb(0 0 0 / 25%);
+  }
+
   .entry-enter-line {
     @apply absolute bottom-0 left-1/2 block -translate-x-1/2 bg-line;
     width: theme('spacing.entry-line');
@@ -76,6 +149,150 @@
 
   .portable-text {
     @apply font-body text-body text-ink-primary;
+  }
+
+  .window-footer,
+  .window-divider {
+    position: relative;
+    border-top: theme('borderWidth.thin') solid theme('colors.line.strong');
+  }
+
+  .window-footer::after,
+  .window-divider::after {
+    position: absolute;
+    top: theme('borderWidth.thin');
+    right: 0;
+    left: 0;
+    height: theme('borderWidth.thin');
+    background: theme('colors.ink.inverse');
+    content: '';
+  }
+
+  .sidebar-full-bleed {
+    width: calc(100% + theme('spacing.space-sm') + theme('spacing.space-sm'));
+    margin-right: calc(-1 * theme('spacing.space-sm'));
+    margin-left: calc(-1 * theme('spacing.space-sm'));
+  }
+
+  .window-header-sidebar-button {
+    background-color: transparent !important;
+    color: theme('colors.ink.inverse') !important;
+  }
+
+  .window-header-sidebar-button > svg {
+    width: theme('spacing.space-sidebar-icon');
+    height: theme('spacing.space-sidebar-icon');
+  }
+
+  .window-header-sidebar-button:hover,
+  .window-header-sidebar-button--preview-hover {
+    background-color: theme('colors.window.header-hover') !important;
+    color: theme('colors.ink.inverse') !important;
+  }
+
+  .window-header-sidebar-button--selected,
+  .window-header-sidebar-button--selected:hover {
+    background-color: theme('colors.window.header-hover') !important;
+    color: theme('colors.ink.inverse') !important;
+  }
+
+  @supports not selector(::-webkit-scrollbar) {
+    .retroScrollArea,
+    html,
+    body {
+      scrollbar-color: theme('colors.scrollbar.track') theme('colors.window.surface');
+      scrollbar-width: thin;
+    }
+  }
+
+  .retroScrollArea::-webkit-scrollbar,
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar {
+    background: theme('colors.window.surface');
+    border: theme('borderWidth.thin') solid theme('colors.line.strong');
+    border-radius: 0 !important;
+    width: theme('spacing.space-md');
+    height: theme('spacing.space-md');
+  }
+
+  .retroScrollArea::-webkit-scrollbar-button,
+  html::-webkit-scrollbar-button,
+  body::-webkit-scrollbar-button {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+  }
+
+  .retroScrollArea::-webkit-scrollbar-button:single-button,
+  html::-webkit-scrollbar-button:single-button,
+  body::-webkit-scrollbar-button:single-button,
+  .retroScrollArea::-webkit-scrollbar-button:vertical:start:decrement,
+  .retroScrollArea::-webkit-scrollbar-button:vertical:end:increment,
+  .retroScrollArea::-webkit-scrollbar-button:horizontal:start:decrement,
+  .retroScrollArea::-webkit-scrollbar-button:horizontal:end:increment,
+  html::-webkit-scrollbar-button:vertical:start:decrement,
+  html::-webkit-scrollbar-button:vertical:end:increment,
+  html::-webkit-scrollbar-button:horizontal:start:decrement,
+  html::-webkit-scrollbar-button:horizontal:end:increment,
+  body::-webkit-scrollbar-button:vertical:start:decrement,
+  body::-webkit-scrollbar-button:vertical:end:increment,
+  body::-webkit-scrollbar-button:horizontal:start:decrement,
+  body::-webkit-scrollbar-button:horizontal:end:increment {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+
+  .retroScrollArea::-webkit-scrollbar-track,
+  html::-webkit-scrollbar-track,
+  body::-webkit-scrollbar-track {
+    background: theme('colors.window.surface');
+    border: theme('borderWidth.thin') solid theme('colors.line.strong');
+    border-radius: 0 !important;
+    box-shadow: inset theme('borderWidth.thin') 0 0 theme('colors.scrollbar.shadow') !important;
+  }
+
+  .retroScrollArea::-webkit-scrollbar-track:horizontal,
+  html::-webkit-scrollbar-track:horizontal,
+  body::-webkit-scrollbar-track:horizontal {
+    box-shadow: inset 0 theme('borderWidth.thin') 0 theme('colors.scrollbar.shadow') !important;
+  }
+
+  .retroScrollArea::-webkit-scrollbar-thumb,
+  html::-webkit-scrollbar-thumb,
+  body::-webkit-scrollbar-thumb {
+    background: theme('colors.scrollbar.track');
+    border: theme('borderWidth.thin') solid theme('colors.line.strong');
+    border-radius: 0 !important;
+    box-shadow:
+      inset theme('borderWidth.thin') theme('borderWidth.thin') 0 theme('colors.scrollbar.highlight'),
+      inset calc(-1 * theme('borderWidth.thin')) calc(-1 * theme('borderWidth.thin')) 0 theme('colors.scrollbar.shadow') !important;
+  }
+
+  .retroScrollArea::-webkit-scrollbar-thumb:hover,
+  html::-webkit-scrollbar-thumb:hover,
+  body::-webkit-scrollbar-thumb:hover {
+    background: color-mix(in srgb, theme('colors.scrollbar.track') 75%, theme('colors.window.surface'));
+  }
+
+  .retroScrollArea::-webkit-scrollbar-thumb:active,
+  html::-webkit-scrollbar-thumb:active,
+  body::-webkit-scrollbar-thumb:active {
+    background: color-mix(in srgb, theme('colors.scrollbar.track') 55%, theme('colors.window.surface'));
+    box-shadow:
+      inset theme('borderWidth.thin') theme('borderWidth.thin') 0 theme('colors.scrollbar.shadow'),
+      inset calc(-1 * theme('borderWidth.thin')) calc(-1 * theme('borderWidth.thin')) 0 theme('colors.scrollbar.highlight') !important;
+  }
+
+  .retroScrollArea::-webkit-scrollbar-corner,
+  html::-webkit-scrollbar-corner,
+  body::-webkit-scrollbar-corner {
+    background: theme('colors.window.surface');
+    border: theme('borderWidth.thin') solid theme('colors.line.strong');
+    border-radius: 0 !important;
   }
 
   .portable-text p {
@@ -140,5 +357,25 @@
   100% {
     opacity: 0;
     transform: translate3d(calc(var(--fall-x) * 1.15), calc(var(--fall-y) * 1.15), 0) rotate(0deg);
+  }
+}
+
+@keyframes pixel-grid-cell-cover {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes pixel-grid-cell-reveal {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
   }
 }

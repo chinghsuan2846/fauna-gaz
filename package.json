@@ -8,7 +8,9 @@
     "build": "astro build",
     "preview": "astro preview",
     "studio:dev": "npm --prefix studio run dev",
-    "studio:build": "npm --prefix studio run build"
+    "studio:build": "npm --prefix studio run build",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "dependencies": {
     "@portabletext/to-html": "^6.0.0",
@@ -21,8 +23,23 @@
   },
   "devDependencies": {
     "@astrojs/react": "^6.0.4",
+    "@chromatic-com/storybook": "latest",
+    "@storybook/addon-a11y": "^10.5.10",
+    "@storybook/addon-docs": "^10.5.10",
+    "@storybook/addon-mcp": "latest",
+    "@storybook/addon-vitest": "^10.5.10",
+    "@storybook/react-vite": "^10.5.10",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
+    "@vitest/browser-playwright": "latest",
+    "@vitest/coverage-v8": "latest",
     "autoprefixer": "^10.5.4",
+    "playwright": "latest",
     "postcss": "^8.5.26",
-    "tailwindcss": "^3.4.17"
+    "prop-types": "latest",
+    "storybook": "^10.5.10",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^7.0.2",
+    "vitest": "latest"
   }
 }

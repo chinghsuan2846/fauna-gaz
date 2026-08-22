@@ -6,9 +6,11 @@ export default {
         window: {
           surface: '#E6DED1',
           header: '#8699A7',
+          'header-hover': 'rgb(255 255 255 / 15%)',
         },
         ink: {
           primary: '#38342E',
+          'primary-hover': 'rgb(56 52 46 / 20%)',
           secondary: '#988F7F',
           muted: '#A49D93',
           inverse: '#FFFFFF',
@@ -23,8 +25,13 @@ export default {
           highlight: '#FFFFFF',
           shadow: '#D8CDBA',
         },
+        sidebar: {
+          active: 'rgb(125 144 158 / 40%)',
+          folder: '#F2C94C',
+        },
         action: {
           link: '#002BFF',
+          'close-hover': '#F79685',
         },
       },
       fontFamily: {
@@ -40,6 +47,14 @@ export default {
         title: ['1.5rem', { lineHeight: '2rem' }],
         headline: ['clamp(2rem, 5vw, 4rem)', { lineHeight: '1.05' }],
         display: ['clamp(2.75rem, 6.5vw, 5rem)', { lineHeight: '1' }],
+      },
+      maxWidth: {
+        sidebar: '16rem',
+        'viewport-tablet': '48rem',
+        'viewport-mobile': '24.375rem',
+      },
+      minHeight: {
+        'viewport-mobile': '100vh',
       },
       fontWeight: {
         regular: '400',
@@ -63,7 +78,10 @@ export default {
         'space-2xl': '3rem',
         'space-3xl': '4rem',
         'space-4xl': '6rem',
-        'entry-line': '6.875rem',
+        'space-button-lg-x': '0.75rem',
+        'space-button-footer-h': '2.25rem',
+        'space-sidebar-icon': '1.25rem',
+        'entry-line': '8rem',
       },
       boxShadow: {
         window: '0 0.25rem 0.5rem rgb(0 0 0 / 25%)',

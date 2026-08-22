@@ -1,5 +1,15 @@
 import { useEffect, useState } from 'react'
 
+type PixelForestMarkup = {
+  flicker: string
+  falling: string
+  grass: string
+}
+
+type PixelForestProps = {
+  src: string
+}
+
 const leafClasses = new Set([
   'cls-1',
   'cls-2',
@@ -20,11 +30,11 @@ const leafClasses = new Set([
   'cls-26',
 ])
 
-function getAttribute(tag, attribute) {
+function getAttribute(tag: string, attribute: string) {
   return tag.match(new RegExp(`${attribute}="([^"]*)"`))?.[1] ?? ''
 }
 
-function getPixelData(tag) {
+function getPixelData(tag: string) {
   const classes = getAttribute(tag, 'class').split(/\s+/)
   const y = Number.parseFloat(getAttribute(tag, 'y') || '0')
   const x = Number.parseFloat(getAttribute(tag, 'x') || '0')
@@ -39,12 +49,12 @@ function getPixelData(tag) {
   return { isCanopyLeaf, seed, coverageSeed }
 }
 
-function isFlickerCandidate(tag) {
+function isFlickerCandidate(tag: string) {
   const { isCanopyLeaf, coverageSeed } = getPixelData(tag)
   return isCanopyLeaf && coverageSeed % 2 === 0 && !isFallingCandidate(tag)
 }
 
-function isFallingCandidate(tag) {
+function isFallingCandidate(tag: string) {
   const { isCanopyLeaf, seed } = getPixelData(tag)
   const width = Number.parseFloat(getAttribute(tag, 'width') || '0')
   const height = Number.parseFloat(getAttribute(tag, 'height') || '0')
@@ -53,7 +63,7 @@ function isFallingCandidate(tag) {
   return isCanopyLeaf && isSinglePixel && seed % 23 === 0
 }
 
-function isGrassCandidate(tag) {
+function isGrassCandidate(tag: string) {
   const { isCanopyLeaf, coverageSeed } = getPixelData(tag)
   const y = Number.parseFloat(getAttribute(tag, 'y') || '0')
   const width = Number.parseFloat(getAttribute(tag, 'width') || '0')
@@ -64,7 +74,7 @@ function isGrassCandidate(tag) {
   return !isCanopyLeaf && y > 760 && isSmallGrass && leafClasses.has(classes[0]) && coverageSeed % 3 !== 1
 }
 
-function addAnimationClass(tag, className, style) {
+function addAnimationClass(tag: string, className: string, style: string) {
   const classAttribute = tag.match(/class="[^"]*"/)
   const animatedClass = classAttribute
     ? classAttribute[0].replace(/"$/, ` ${className}"`)
@@ -76,14 +86,14 @@ function addAnimationClass(tag, className, style) {
   return animatedTag.replace(/\s*\/>$/, ` style="${style}" />`)
 }
 
-function createOverlaySvg(svg, rects) {
+function createOverlaySvg(svg: string, rects: string[]) {
   const openingTag = svg.match(/<svg\b[^>]*>/i)?.[0] ?? ''
   const defs = svg.match(/<defs>[\s\S]*?<\/defs>/i)?.[0] ?? ''
 
   return `${openingTag}${defs}<g shape-rendering="crispEdges">${rects.join('')}</g></svg>`
 }
 
-function preparePixelForest(source) {
+function preparePixelForest(source: string): PixelForestMarkup {
   const svg = source
     .replace(/<\?xml[\s\S]*?\?>\s*/i, '')
     .replace(/<!DOCTYPE[\s\S]*?>\s*/i, '')
@@ -98,9 +108,9 @@ function preparePixelForest(source) {
   let flickerIndex = 0
   let fallingIndex = 0
   let grassIndex = 0
-  const flickerRects = []
-  const fallingRects = []
-  const grassRects = []
+  const flickerRects: string[] = []
+  const fallingRects: string[] = []
+  const grassRects: string[] = []
 
   rectTags.forEach((tag) => {
     if (isFallingCandidate(tag)) {
@@ -112,11 +122,13 @@ function preparePixelForest(source) {
       const fallY = 210 + (seed % 5) * 24
       fallingIndex += 1
 
-      fallingRects.push(addAnimationClass(
-        tag,
-        'forest-fall',
-        `--fall-delay:${fallDelay}s;--fall-duration:${fallDuration}s;--fall-x:${fallX}px;--fall-y:${fallY}px`,
-      ))
+      fallingRects.push(
+        addAnimationClass(
+          tag,
+          'forest-fall',
+          `--fall-delay:${fallDelay}s;--fall-duration:${fallDuration}s;--fall-x:${fallX}px;--fall-y:${fallY}px`,
+        ),
+      )
       return
     }
 
@@ -127,11 +139,13 @@ function preparePixelForest(source) {
       const grassX = (seed % 2 === 0 ? 1 : -1) * 1.5
       grassIndex += 1
 
-      grassRects.push(addAnimationClass(
-        tag,
-        'forest-grass',
-        `--grass-delay:${grassDelay}s;--grass-duration:${grassDuration}s;--grass-x:${grassX}px`,
-      ))
+      grassRects.push(
+        addAnimationClass(
+          tag,
+          'forest-grass',
+          `--grass-delay:${grassDelay}s;--grass-duration:${grassDuration}s;--grass-x:${grassX}px`,
+        ),
+      )
       return
     }
 
@@ -151,8 +165,8 @@ function preparePixelForest(source) {
   }
 }
 
-function PixelForest({ src }) {
-  const [markup, setMarkup] = useState({ flicker: '', falling: '', grass: '' })
+function PixelForest({ src }: PixelForestProps) {
+  const [markup, setMarkup] = useState<PixelForestMarkup>({ flicker: '', falling: '', grass: '' })
 
   useEffect(() => {
     let active = true
@@ -166,7 +180,7 @@ function PixelForest({ src }) {
         if (active) setMarkup(preparePixelForest(source))
       })
       .catch(() => {
-        if (active) setMarkup('')
+        if (active) setMarkup({ flicker: '', falling: '', grass: '' })
       })
 
     return () => {
