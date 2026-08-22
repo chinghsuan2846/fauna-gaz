@@ -19,7 +19,7 @@ export type WindowHeaderProps = {
 }
 
 function WindowHeader({
-  title = 'Contact',
+  title = '',
   mobile = false,
   showSidebar = false,
   sidebarOpen = false,

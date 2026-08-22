@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import type { PointerEvent as ReactPointerEvent, ReactNode } from 'react'
 
+import type { ContactInfo } from '../../lib/contentAdapter'
 import type { ButtonProps } from './Button'
 import { Button } from './Button'
 import WindowHeader from './WindowHeader'
@@ -10,7 +11,7 @@ export type WindowMode = 'desktop' | 'tablet' | 'mobile'
 export type WindowProps = {
   mode?: WindowMode
   title?: string
-  email?: string
+  contact?: ContactInfo
   children?: ReactNode
   className?: string
   showSidebar?: boolean
@@ -40,8 +41,8 @@ type ResizeState = {
 }
 
 function Window({
-  title = 'Contact',
-  email = 'service@faunagaz.com',
+  title = '',
+  contact,
   onClose,
   onSupport,
   mode = 'desktop',
@@ -140,6 +141,13 @@ function Window({
   const contentTextClass = isMobile ? 'text-small' : 'text-body'
   const contentPaddingClass = isMobile ? 'p-space-md' : 'p-space-lg'
   const interactionCursor = isMobile ? '' : isDragging ? 'cursor-grabbing' : 'cursor-grab'
+  const renderCopy = (copy: string) =>
+    copy.split(/\r?\n/).map((line, index, lines) => (
+      <span key={`${line}-${index}`}>
+        {line}
+        {index < lines.length - 1 && <br />}
+      </span>
+    ))
 
   return (
     <article
@@ -148,7 +156,7 @@ function Window({
       className={`relative flex w-full flex-col overflow-hidden border-thin border-ink-primary bg-window-surface shadow-window ${className}`}
     >
       <WindowHeader
-        title={title}
+        title={contact?.title ?? title}
         mobile={isMobile}
         showSidebar={showSidebar}
         sidebarOpen={sidebarOpen}
@@ -163,45 +171,38 @@ function Window({
       />
       {hasCustomContent ? (
         <div className="flex min-h-0 min-w-0 flex-1 flex-col font-body text-ink-primary">{children}</div>
-      ) : (
+      ) : contact ? (
         <div className={`flex min-h-0 min-w-0 flex-1 flex-col font-body ${contentTextClass} text-ink-primary`}>
           <div className="retroScrollArea min-h-0 min-w-0 flex-1 overflow-x-auto overflow-y-auto">
             <div className={`grid min-w-0 gap-space-md ${contentPaddingClass} break-words`}>
-              <p>
-                有任何問題、合作提案，
-                <br />
-                或只是想和我們打聲招呼嗎？
-              </p>
-              <a className="w-fit max-w-full break-words font-body text-action-link underline" href={`mailto:${email}`}>
-                {email}
+              <p>{renderCopy(contact.contactCopy)}</p>
+              <a className="w-fit max-w-full break-words font-body text-action-link underline" href={`mailto:${contact.email}`}>
+                {contact.email}
               </a>
 
               <div role="separator" className="border-t-thin border-dashed border-line-subtle" />
 
-              <p>
-                喜歡這份刊物嗎？
-                <br />
-                歡迎支持下一期，
-                <br />
-                讓故事繼續發生。
-              </p>
+              <p>{renderCopy(contact.supportCopy)}</p>
             </div>
           </div>
 
           <div className={`window-footer flex shrink-0 justify-end ${contentPaddingClass}`}>
             <Button
               appearance="outline"
-              label="請我喝杯咖啡"
+              label={contact.supportLinkText}
+              href={contact.supportLinkUrl}
               icon="coffee"
               iconPosition="right"
               iconSize="small"
               size={isMobile ? 'small' : 'large'}
               textSize={isMobile ? 'caption' : 'body'}
-              ariaLabel="請我喝杯咖啡"
+              ariaLabel={contact.supportLinkText}
               onClick={onSupport}
             />
           </div>
         </div>
+      ) : (
+        <div className="flex min-h-0 min-w-0 flex-1" aria-hidden="true" />
       )}
       {!isMobile && (
         <button

@@ -38,6 +38,7 @@ export type ButtonProps = {
   size?: ButtonSize
   state?: ButtonState
   ariaLabel?: string
+  href?: string
   className?: string
   onClick?: MouseEventHandler<HTMLButtonElement>
 }
@@ -233,6 +234,7 @@ export function Button({
   size = 'large',
   state = 'default',
   ariaLabel,
+  href,
   className = '',
   onClick,
 }: ButtonProps) {
@@ -255,6 +257,31 @@ export function Button({
     className,
   ].join(' ')
 
+  const content = (
+    <>
+      {showIcon && resolvedIconPosition === 'left' && (
+        <PixelIcon name={resolvedIcon} size={resolvedIconSize} className={isLoading ? 'animate-pulse' : ''} />
+      )}
+      {!iconOnly && label}
+      {showIcon && resolvedIconPosition === 'right' && (
+        <PixelIcon name={resolvedIcon} size={resolvedIconSize} className={isLoading ? 'animate-pulse' : ''} />
+      )}
+    </>
+  )
+
+  if (href) {
+    return (
+      <a
+        href={href}
+        className={classes}
+        aria-disabled={isUnavailable || undefined}
+        aria-label={iconOnly ? ariaLabel || label : undefined}
+      >
+        {content}
+      </a>
+    )
+  }
+
   return (
     <button
       type="button"
@@ -264,13 +291,7 @@ export function Button({
       aria-label={iconOnly ? ariaLabel || label : undefined}
       onClick={onClick}
     >
-      {showIcon && resolvedIconPosition === 'left' && (
-        <PixelIcon name={resolvedIcon} size={resolvedIconSize} className={isLoading ? 'animate-pulse' : ''} />
-      )}
-      {!iconOnly && label}
-      {showIcon && resolvedIconPosition === 'right' && (
-        <PixelIcon name={resolvedIcon} size={resolvedIconSize} className={isLoading ? 'animate-pulse' : ''} />
-      )}
+      {content}
     </button>
   )
 }

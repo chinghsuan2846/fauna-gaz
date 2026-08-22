@@ -27,6 +27,7 @@ const colorTokens: readonly ColorToken[] = [
   { label: 'line', value: '#38342E', className: 'bg-line' },
   { label: 'line-strong', value: '#988F7F', className: 'bg-line-strong' },
   { label: 'line-subtle', value: '#A49D93', className: 'bg-line-subtle' },
+  { label: 'overlay-scrim', value: 'rgb(0 0 0 / 25%)', className: 'bg-overlay-scrim' },
   { label: 'scrollbar-track', value: '#F3ECE1', className: 'bg-scrollbar-track' },
   { label: 'scrollbar-highlight', value: '#FFFFFF', className: 'bg-scrollbar-highlight' },
   { label: 'scrollbar-shadow', value: '#D8CDBA', className: 'bg-scrollbar-shadow' },

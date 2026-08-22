@@ -1,7 +1,7 @@
 import type { ButtonProps } from './Button'
 import { Button } from './Button'
 
-export type QuarterlyContentSegmentKind = 'text' | 'strong' | 'quote'
+export type QuarterlyContentSegmentKind = 'text' | 'strong' | 'quote' | 'emphasis'
 
 export type QuarterlyContentSegment = {
   kind?: QuarterlyContentSegmentKind
@@ -20,8 +20,7 @@ export type QuarterlyContentNavigationItem = {
 
 export type QuarterlyContentArticle = {
   id: string
-  year: string
-  quarter: string
+  breadcrumb: readonly string[]
   title: string
   paragraphs: readonly QuarterlyContentParagraph[]
   previous?: QuarterlyContentNavigationItem | null
@@ -30,6 +29,8 @@ export type QuarterlyContentArticle = {
 
 export type QuarterlyContentProps = {
   article?: QuarterlyContentArticle
+  borderless?: boolean
+  mobile?: boolean
   onPrevious?: ButtonProps['onClick']
   onNext?: ButtonProps['onClick']
   className?: string
@@ -92,8 +93,7 @@ const selfArticleParagraphs: readonly QuarterlyContentParagraph[] = [
 
 export const quarterlyContentMockArticle: QuarterlyContentArticle = {
   id: '2026-autumn-self-awareness',
-  year: '2026',
-  quarter: '秋季號（創刊號）',
+  breadcrumb: ['2026', '秋季號（創刊號）', '如何證明「自我」的存在？'],
   title: '如何證明「自我」的存在？',
   paragraphs: selfArticleParagraphs,
   previous: { id: '2026-autumn-introduction', title: '創刊序' },
@@ -103,6 +103,7 @@ export const quarterlyContentMockArticle: QuarterlyContentArticle = {
 export const quarterlyContentFirstArticle: QuarterlyContentArticle = {
   ...quarterlyContentMockArticle,
   id: '2026-autumn-introduction',
+  breadcrumb: ['2026', '秋季號（創刊號）', '創刊序'],
   title: '創刊序',
   previous: null,
 }
@@ -110,6 +111,7 @@ export const quarterlyContentFirstArticle: QuarterlyContentArticle = {
 export const quarterlyContentLastArticle: QuarterlyContentArticle = {
   ...quarterlyContentMockArticle,
   id: '2026-autumn-dog',
+  breadcrumb: ['2026', '秋季號（創刊號）', '狗'],
   title: '狗',
   next: null,
 }
@@ -117,33 +119,43 @@ export const quarterlyContentLastArticle: QuarterlyContentArticle = {
 function renderSegment(segment: QuarterlyContentSegment) {
   if (segment.kind === 'strong') return <strong className="font-medium">{segment.text}</strong>
   if (segment.kind === 'quote') return <q>{segment.text}</q>
+  if (segment.kind === 'emphasis') return <em>{segment.text}</em>
   return segment.text
 }
 
 function QuarterlyContent({
   article = quarterlyContentMockArticle,
+  borderless = false,
+  mobile = false,
   onPrevious,
   onNext,
   className = '',
 }: QuarterlyContentProps) {
+  const articleSpacingClass = mobile ? 'p-space-md' : 'p-space-lg'
+  const titleMarginClass = mobile ? 'mt-space-md' : 'mt-space-lg'
+  const paragraphSpacingClass = mobile ? 'mt-space-md gap-space-md' : 'mt-space-lg gap-space-lg'
+
   return (
     <section
       aria-label={`文章內容：${article.title}`}
-      className={`flex h-full min-h-0 min-w-0 flex-col overflow-hidden border-thin border-line-strong bg-window-surface font-body text-ink-primary ${className}`}
+      className={`flex h-full min-h-0 min-w-0 flex-col overflow-hidden bg-window-surface font-body text-ink-primary${
+        borderless ? '' : ' border-thin border-line-strong'
+      } ${className}`}
     >
       <div className="retroScrollArea min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto">
-        <article className="min-w-0 p-space-lg font-body text-body break-words">
-          <nav aria-label="文章位置" className="flex flex-wrap items-center gap-space-xs text-caption text-ink-muted">
-            <span>{article.year}</span>
-            <span aria-hidden="true">›</span>
-            <span>{article.quarter}</span>
-            <span aria-hidden="true">›</span>
-            <span>{article.title}</span>
+        <article className={`min-w-0 break-words font-body text-body ${articleSpacingClass}`}>
+          <nav aria-label="文章位置" className="flex min-w-0 flex-wrap items-center gap-space-xs text-caption text-ink-muted">
+            {article.breadcrumb.map((item, index) => (
+              <span key={`${item}-${index}`} className="inline-flex min-w-0 max-w-full items-center gap-space-xs break-words">
+                {index > 0 && <span aria-hidden="true">›</span>}
+                <span className="min-w-0 break-words">{item}</span>
+              </span>
+            ))}
           </nav>
 
-          <h1 className="mt-space-lg text-title font-regular text-ink-primary">{article.title}</h1>
+          <h1 className={`${titleMarginClass} break-words text-title font-regular text-ink-primary`}>{article.title}</h1>
 
-          <div className="mt-space-lg grid gap-space-lg">
+          <div className={`${paragraphSpacingClass} grid`}>
             {article.paragraphs.map((paragraph) => (
               <p key={paragraph.id}>{paragraph.segments.map((segment, index) => <span key={`${paragraph.id}-${index}`}>{renderSegment(segment)}</span>)}</p>
             ))}

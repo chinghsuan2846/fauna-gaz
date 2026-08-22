@@ -30,8 +30,13 @@ export const articleSlugsQuery = `*[
   "slug": slug.current
 }`
 
-export const articleBySlugQuery = `*[
-  _type == "article" && slug.current == $slug
+export const siteSettingsQuery = `*[
+  _type == "siteSettings"
 ][0]{
-  ${articleProjection}
+  title,
+  contactCopy,
+  supportCopy,
+  email,
+  supportLinkText,
+  supportLinkUrl
 }`

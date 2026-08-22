@@ -34,6 +34,7 @@ export type QuarterlySidebarProps = {
   initialSelectedArticleId?: string
   previewArticleId?: string
   previewState?: QuarterlySidebarPreviewState
+  borderless?: boolean
   onArticleSelect?: (article: QuarterlySidebarArticle) => void
   className?: string
 }
@@ -184,6 +185,7 @@ function QuarterlySidebar({
   initialSelectedArticleId,
   previewArticleId,
   previewState = 'none',
+  borderless = false,
   onArticleSelect,
   className = '',
 }: QuarterlySidebarProps) {
@@ -217,7 +219,9 @@ function QuarterlySidebar({
   return (
     <aside
       aria-label="季刊文章目錄"
-      className={`h-full min-h-0 min-w-0 w-full overflow-hidden border-thin border-line-strong bg-window-surface font-ui text-small text-ink-primary ${className}`}
+      className={`h-full min-h-0 min-w-0 w-full overflow-hidden bg-window-surface font-ui text-small text-ink-primary${
+        borderless ? '' : ' border-thin border-line-strong'
+      } ${className}`}
     >
       <div className="retroScrollArea h-full min-h-0 min-w-0 w-full overflow-x-hidden overflow-y-auto">
         <div className="min-w-0 p-space-sm">

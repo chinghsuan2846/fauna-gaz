@@ -1,55 +1,20 @@
 import { useEffect, useRef, useState } from 'react'
-import { buildIssueTree } from '../lib/issueTree.js'
-import QuarterlyContent, { type QuarterlyContentArticle } from '../stories/component/QuarterlyContent'
-import QuarterlySidebar, { type QuarterlySidebarYear } from '../stories/component/QuarterlySidebar'
+import {
+  toQuarterlyContentArticle,
+  toQuarterlySidebarData,
+  type ContactInfo,
+  type SanityArticle,
+} from '../lib/contentAdapter'
+import QuarterlyContent from '../stories/component/QuarterlyContent'
+import QuarterlySidebar from '../stories/component/QuarterlySidebar'
 import { Button, PixelIcon } from '../stories/component/Button'
 import Window from '../stories/component/Window'
 import PixelForest from './PixelForest'
 import PixelGridTransition from './PixelGridTransition'
 
-type ArticleCategory = {
-  slug: string
-  title: string
-}
-
-type Article = {
-  _id: string
-  slug: string
-  title: string
-  excerpt?: string
-  body?: ArticleBodyBlock[]
-  issue?: {
-    year?: string | number
-    quarter?: string
-  }
-  categories?: ArticleCategory[]
-}
-
-type ArticleBodyBlock = {
-  _type?: string
-  children?: Array<{
-    text?: string
-    marks?: string[]
-  }>
-}
-
-type IssueTreeCategory = {
-  label: string
-  articles: Article[]
-}
-
-type IssueTreeQuarter = {
-  label: string
-  categories: IssueTreeCategory[]
-}
-
-type IssueTreeYear = {
-  label: string
-  quarters: IssueTreeQuarter[]
-}
-
 type DesktopExperienceProps = {
-  articles?: Article[]
+  articles?: SanityArticle[]
+  contact?: ContactInfo | null
 }
 
 type ExperienceState = 'entry' | 'covering' | 'revealing' | 'desktop'
@@ -57,51 +22,7 @@ type ActiveWindow = 'quarterly' | 'contact' | null
 
 const LOADING_PREVIEW_DURATION = 120
 
-function toQuarterlySidebarData(issueTree: readonly IssueTreeYear[]): readonly QuarterlySidebarYear[] {
-  return issueTree.map((year) => ({
-    id: year.label,
-    label: year.label,
-    quarters: year.quarters.map((quarter) => ({
-      id: `${year.label}-${quarter.label}`,
-      label: quarter.label,
-      groups: quarter.categories.map((category) => ({
-        id: `${year.label}-${quarter.label}-${category.label}`,
-        label: category.label,
-        articles: category.articles.map((article) => ({
-          id: article._id,
-          title: article.title,
-        })),
-      })),
-    })),
-  }))
-}
-
-function toQuarterlyContentArticle(article: Article, previous?: Article, next?: Article): QuarterlyContentArticle {
-  const paragraphs = (article.body ?? [])
-    .filter((block) => block._type === 'block')
-    .map((block, index) => ({
-      id: `${article._id}-paragraph-${index}`,
-      segments: (block.children ?? [])
-        .filter((child) => child.text)
-        .map((child) => ({
-          ...(child.marks?.includes('strong') ? { kind: 'strong' as const } : {}),
-          text: child.text ?? '',
-        })),
-    }))
-    .filter((paragraph) => paragraph.segments.length > 0)
-
-  return {
-    id: article._id,
-    year: String(article.issue?.year ?? ''),
-    quarter: article.issue?.quarter ?? '',
-    title: article.title,
-    paragraphs,
-    previous: previous ? { id: previous._id, title: previous.title } : null,
-    next: next ? { id: next._id, title: next.title } : null,
-  }
-}
-
-function DesktopExperience({ articles = [] }: DesktopExperienceProps) {
+function DesktopExperience({ articles = [], contact }: DesktopExperienceProps) {
   const [experienceState, setExperienceState] = useState<ExperienceState>('entry')
   const [activeWindow, setActiveWindow] = useState<ActiveWindow>(null)
   const [selectedArticleId, setSelectedArticleId] = useState<string | null>(articles[0]?._id ?? null)
@@ -109,8 +30,7 @@ function DesktopExperience({ articles = [] }: DesktopExperienceProps) {
   const [isLoading, setIsLoading] = useState(false)
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const loadingTimerRef = useRef<number | null>(null)
-  const issueTree = buildIssueTree(articles) as IssueTreeYear[]
-  const quarterlySidebarData = toQuarterlySidebarData(issueTree)
+  const quarterlySidebarData = toQuarterlySidebarData(articles)
   const selectedArticleIndex = articles.findIndex((article) => article._id === selectedArticleId)
   const selectedArticle = selectedArticleIndex >= 0 ? articles[selectedArticleIndex] : undefined
   const quarterlyContentArticle = selectedArticle
@@ -253,7 +173,7 @@ function DesktopExperience({ articles = [] }: DesktopExperienceProps) {
 
         {activeWindow === 'contact' && (
           <div className="mx-auto mt-space-lg w-full max-w-viewport-mobile">
-            <Window mode="desktop" onClose={() => setActiveWindow(null)} />
+            <Window mode="desktop" contact={contact ?? undefined} onClose={() => setActiveWindow(null)} />
           </div>
         )}
       </main>

@@ -33,6 +33,9 @@ export default {
           link: '#002BFF',
           'close-hover': '#F79685',
         },
+        overlay: {
+          scrim: 'rgb(0 0 0 / 25%)',
+        },
       },
       fontFamily: {
         ui: ['"Cubic 11"', 'ui-monospace', 'monospace'],

@@ -1,20 +1,11 @@
 ---
 import { sanityClient } from 'sanity:client'
 import BaseLayout from '../../layouts/BaseLayout.astro'
-import { articleBySlugQuery, articleSlugsQuery } from '../../lib/queries.js'
+import { toQuarterlyContentArticle } from '../../lib/contentAdapter'
+import { articleListQuery, articleSlugsQuery } from '../../lib/queries.js'
 import { sanityImageUrl } from '../../lib/sanityImage.js'
-import QuarterlyContent, { type QuarterlyContentArticle } from '../../stories/component/QuarterlyContent'
+import QuarterlyContent from '../../stories/component/QuarterlyContent'
 import '../../styles/global.css'
-
-type BodySpan = {
-  text?: string
-  marks?: string[]
-}
-
-type BodyBlock = {
-  _type?: string
-  children?: BodySpan[]
-}
 
 export async function getStaticPaths() {
   if (!import.meta.env.PUBLIC_SANITY_PROJECT_ID) return []
@@ -28,7 +19,8 @@ export async function getStaticPaths() {
 }
 
 const { slug } = Astro.props
-const article = await sanityClient.fetch(articleBySlugQuery, { slug })
+const allArticles = await sanityClient.fetch(articleListQuery)
+const article = allArticles.find((candidate) => candidate.slug === slug)
 
 if (!article) {
   throw new Error(`Article not found for slug: ${slug}`)
@@ -36,27 +28,8 @@ if (!article) {
 
 const description = article.excerpt || 'Fauna Gaz quarterly journal article.'
 const coverImageUrl = sanityImageUrl(article.coverImage, { width: 1600 })
-const bodyBlocks = (article.body || []) as BodyBlock[]
-const contentArticle: QuarterlyContentArticle = {
-  id: article._id,
-  year: String(article.issue?.year ?? ''),
-  quarter: article.issue?.quarter || '',
-  title: article.title,
-  paragraphs: bodyBlocks
-    .filter((block) => block._type === 'block')
-    .map((block, index) => ({
-      id: `${article._id}-paragraph-${index}`,
-      segments: (block.children || [])
-        .filter((span) => span.text)
-        .map((span) => ({
-          ...(span.marks?.includes('strong') ? { kind: 'strong' as const } : {}),
-          text: span.text || '',
-        })),
-    }))
-    .filter((paragraph) => paragraph.segments.length > 0),
-  previous: null,
-  next: null,
-}
+const articleIndex = allArticles.findIndex((candidate) => candidate._id === article._id)
+const contentArticle = toQuarterlyContentArticle(article, allArticles[articleIndex - 1], allArticles[articleIndex + 1])
 ---
 
 <BaseLayout

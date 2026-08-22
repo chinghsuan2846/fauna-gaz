@@ -4,7 +4,8 @@
 const config = {
   "stories": [
     "../src/stories/foundation/**/*.stories.@(js|jsx|mjs|ts|tsx)",
-    "../src/stories/component/**/*.stories.@(js|jsx|mjs|ts|tsx)"
+    "../src/stories/component/**/*.stories.@(js|jsx|mjs|ts|tsx)",
+    "../src/stories/patterns/**/*.stories.@(js|jsx|mjs|ts|tsx)"
   ],
   "staticDirs": ["../public"],
   "addons": [
