@@ -53,6 +53,9 @@ export default {
         'viewport-tablet': '48rem',
         'viewport-mobile': '24.375rem',
       },
+      width: {
+        sidebar: '16rem',
+      },
       minHeight: {
         'viewport-mobile': '100vh',
       },

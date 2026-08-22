@@ -1,10 +1,20 @@
 ---
-import { toHTML } from '@portabletext/to-html'
 import { sanityClient } from 'sanity:client'
 import BaseLayout from '../../layouts/BaseLayout.astro'
 import { articleBySlugQuery, articleSlugsQuery } from '../../lib/queries.js'
 import { sanityImageUrl } from '../../lib/sanityImage.js'
+import QuarterlyContent, { type QuarterlyContentArticle } from '../../stories/component/QuarterlyContent'
 import '../../styles/global.css'
+
+type BodySpan = {
+  text?: string
+  marks?: string[]
+}
+
+type BodyBlock = {
+  _type?: string
+  children?: BodySpan[]
+}
 
 export async function getStaticPaths() {
   if (!import.meta.env.PUBLIC_SANITY_PROJECT_ID) return []
@@ -25,8 +35,28 @@ if (!article) {
 }
 
 const description = article.excerpt || 'Fauna Gaz quarterly journal article.'
-const bodyHtml = toHTML(article.body || [])
 const coverImageUrl = sanityImageUrl(article.coverImage, { width: 1600 })
+const bodyBlocks = (article.body || []) as BodyBlock[]
+const contentArticle: QuarterlyContentArticle = {
+  id: article._id,
+  year: String(article.issue?.year ?? ''),
+  quarter: article.issue?.quarter || '',
+  title: article.title,
+  paragraphs: bodyBlocks
+    .filter((block) => block._type === 'block')
+    .map((block, index) => ({
+      id: `${article._id}-paragraph-${index}`,
+      segments: (block.children || [])
+        .filter((span) => span.text)
+        .map((span) => ({
+          ...(span.marks?.includes('strong') ? { kind: 'strong' as const } : {}),
+          text: span.text || '',
+        })),
+    }))
+    .filter((paragraph) => paragraph.segments.length > 0),
+  previous: null,
+  next: null,
+}
 ---
 
 <BaseLayout
@@ -34,26 +64,10 @@ const coverImageUrl = sanityImageUrl(article.coverImage, { width: 1600 })
   description={description}
   image={coverImageUrl}
 >
-  <main class="min-h-screen bg-window-surface px-space-md py-space-2xl font-body text-body text-ink-primary sm:px-space-xl lg:px-space-2xl">
-    <a class="font-ui text-action-link underline decoration-action-link underline-offset-2" href="/">← Fauna Gaz</a>
-    <article class="mx-auto mt-space-2xl w-full max-w-3xl">
-      <p class="font-ui text-body text-ink-secondary">
-        {article.issue?.year} · {article.issue?.quarter}
-      </p>
-      <h1 class="mt-space-md max-w-[15ch] text-headline font-medium">{article.title}</h1>
-      {article.excerpt && <p class="mt-space-md max-w-2xl text-lead text-ink-primary">{article.excerpt}</p>}
-      {coverImageUrl && (
-        <img
-          class="my-space-xl block h-auto w-full"
-          src={coverImageUrl}
-          alt={article.coverImage.alt || article.title}
-          loading="eager"
-        />
-      )}
-      <p class="font-ui text-caption text-ink-muted">
-        {article.publishedAt && new Date(article.publishedAt).toLocaleDateString('zh-TW')}
-      </p>
-      <div class="portable-text mt-space-xl" set:html={bodyHtml} />
-    </article>
+  <main class="flex h-screen min-h-0 flex-col gap-space-md overflow-hidden bg-window-surface p-space-md font-body text-body text-ink-primary sm:p-space-xl lg:p-space-2xl">
+    <a class="shrink-0 font-ui text-action-link underline decoration-action-link underline-offset-2" href="/">← Fauna Gaz</a>
+    <div class="mx-auto flex min-h-0 w-full max-w-viewport-tablet flex-1">
+      <QuarterlyContent client:load article={contentArticle} />
+    </div>
   </main>
 </BaseLayout>

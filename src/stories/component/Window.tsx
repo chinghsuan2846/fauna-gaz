@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import type { PointerEvent as ReactPointerEvent } from 'react'
+import type { PointerEvent as ReactPointerEvent, ReactNode } from 'react'
 
 import type { ButtonProps } from './Button'
 import { Button } from './Button'
@@ -11,6 +11,12 @@ export type WindowProps = {
   mode?: WindowMode
   title?: string
   email?: string
+  children?: ReactNode
+  className?: string
+  showSidebar?: boolean
+  sidebarOpen?: boolean
+  sidebarPreviewState?: 'none' | 'hover'
+  onSidebarToggle?: ButtonProps['onClick']
   onClose?: ButtonProps['onClick']
   onSupport?: ButtonProps['onClick']
 }
@@ -39,8 +45,15 @@ function Window({
   onClose,
   onSupport,
   mode = 'desktop',
+  children,
+  className = '',
+  showSidebar = false,
+  sidebarOpen = false,
+  sidebarPreviewState = 'none',
+  onSidebarToggle,
 }: WindowProps) {
   const isMobile = mode === 'mobile'
+  const hasCustomContent = children !== undefined
   const windowRef = useRef<HTMLElement>(null)
   const dragRef = useRef<DragState | null>(null)
   const resizeRef = useRef<ResizeState | null>(null)
@@ -132,56 +145,64 @@ function Window({
     <article
       ref={windowRef}
       style={windowStyle}
-      className="relative flex w-full flex-col overflow-hidden border-thin border-ink-primary bg-window-surface shadow-window"
+      className={`relative flex w-full flex-col overflow-hidden border-thin border-ink-primary bg-window-surface shadow-window ${className}`}
     >
       <WindowHeader
         title={title}
         mobile={isMobile}
+        showSidebar={showSidebar}
+        sidebarOpen={sidebarOpen}
+        sidebarPreviewState={sidebarPreviewState}
         onClose={onClose}
+        onSidebarToggle={onSidebarToggle}
         className={`${interactionCursor} touch-none select-none`}
         onPointerDown={startDrag}
         onPointerMove={moveDrag}
         onPointerUp={endDrag}
         onPointerCancel={endDrag}
       />
-      <div className={`flex min-h-0 min-w-0 flex-1 flex-col font-body ${contentTextClass} text-ink-primary`}>
-        <div className="retroScrollArea min-h-0 min-w-0 flex-1 overflow-x-auto overflow-y-auto">
-          <div className={`grid min-w-0 gap-space-md ${contentPaddingClass} break-words`}>
-            <p>
-              有任何問題、合作提案，
-              <br />
-              或只是想和我們打聲招呼嗎？
-            </p>
-            <a className="w-fit max-w-full break-words font-body text-action-link underline" href={`mailto:${email}`}>
-              {email}
-            </a>
+      {hasCustomContent ? (
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col font-body text-ink-primary">{children}</div>
+      ) : (
+        <div className={`flex min-h-0 min-w-0 flex-1 flex-col font-body ${contentTextClass} text-ink-primary`}>
+          <div className="retroScrollArea min-h-0 min-w-0 flex-1 overflow-x-auto overflow-y-auto">
+            <div className={`grid min-w-0 gap-space-md ${contentPaddingClass} break-words`}>
+              <p>
+                有任何問題、合作提案，
+                <br />
+                或只是想和我們打聲招呼嗎？
+              </p>
+              <a className="w-fit max-w-full break-words font-body text-action-link underline" href={`mailto:${email}`}>
+                {email}
+              </a>
 
-            <div role="separator" className="border-t-thin border-dashed border-line-subtle" />
+              <div role="separator" className="border-t-thin border-dashed border-line-subtle" />
 
-            <p>
-              喜歡這份刊物嗎？
-              <br />
-              歡迎支持下一期，
-              <br />
-              讓故事繼續發生。
-            </p>
+              <p>
+                喜歡這份刊物嗎？
+                <br />
+                歡迎支持下一期，
+                <br />
+                讓故事繼續發生。
+              </p>
+            </div>
+          </div>
+
+          <div className={`window-footer flex shrink-0 justify-end ${contentPaddingClass}`}>
+            <Button
+              appearance="outline"
+              label="請我喝杯咖啡"
+              icon="coffee"
+              iconPosition="right"
+              iconSize="small"
+              size={isMobile ? 'small' : 'large'}
+              textSize={isMobile ? 'caption' : 'body'}
+              ariaLabel="請我喝杯咖啡"
+              onClick={onSupport}
+            />
           </div>
         </div>
-
-        <div className={`window-footer flex shrink-0 justify-end ${contentPaddingClass}`}>
-          <Button
-            appearance="outline"
-            label="請我喝杯咖啡"
-            icon="coffee"
-            iconPosition="right"
-            iconSize="small"
-            size={isMobile ? 'small' : 'large'}
-            textSize={isMobile ? 'caption' : 'body'}
-            ariaLabel="請我喝杯咖啡"
-            onClick={onSupport}
-          />
-        </div>
-      </div>
+      )}
       {!isMobile && (
         <button
           type="button"
