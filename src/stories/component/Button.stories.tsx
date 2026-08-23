@@ -182,6 +182,7 @@ const meta = {
       control: 'select',
       options: [
         'menu',
+        'message',
         'chevron-left',
         'chevron-right',
         'coffee',

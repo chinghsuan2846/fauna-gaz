@@ -10,7 +10,8 @@
     "studio:dev": "npm --prefix studio run dev",
     "studio:build": "npm --prefix studio run build",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "sanity:seed": "node scripts/seed-sanity.mjs"
   },
   "dependencies": {
     "@portabletext/to-html": "^6.0.0",

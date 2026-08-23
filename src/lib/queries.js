@@ -40,3 +40,29 @@ export const siteSettingsQuery = `*[
   supportLinkText,
   supportLinkUrl
 }`
+
+export const characterProjection = `
+  _id,
+  name,
+  role,
+  species,
+  characterType,
+  "slug": slug.current,
+  "imageUrl": image.asset->url,
+  "imageAlt": image.alt,
+  dialogueStart,
+  dialogue[]{
+    id,
+    text,
+    options[]{
+      label,
+      nextNode
+    }
+  }
+`
+
+export const characterListQuery = `*[
+  _type == "character" && defined(slug.current)
+] | order(name asc){
+  ${characterProjection}
+}`

@@ -13,6 +13,11 @@ const meta = {
       control: 'text',
       description: 'Window title.',
     },
+    icon: {
+      control: 'select',
+      options: ['menu', 'message', 'chevron-left', 'chevron-right', 'coffee', 'music-on', 'music-off', 'volume-on', 'volume-off', 'close', 'loading'],
+      description: 'Optional pixel icon shown before the title.',
+    },
     showSidebar: {
       control: 'boolean',
       description: 'Show the pixel sidebar toggle.',
@@ -49,6 +54,14 @@ export const Contact = {
   name: 'Contact',
   args: {
     title: 'Contact',
+  },
+} satisfies Story
+
+export const Message = {
+  name: 'Message',
+  args: {
+    title: 'Message from : Mortimer',
+    icon: 'message',
   },
 } satisfies Story
 

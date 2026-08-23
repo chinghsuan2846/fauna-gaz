@@ -35,6 +35,7 @@ export default {
         },
         overlay: {
           scrim: 'rgb(0 0 0 / 25%)',
+          label: 'rgb(0 0 0 / 30%)',
         },
       },
       fontFamily: {
@@ -55,6 +56,12 @@ export default {
         sidebar: '16rem',
         'viewport-tablet': '48rem',
         'viewport-mobile': '24.375rem',
+        'chat-bubble-mobile': '85%',
+        'chat-bubble': '28rem',
+      },
+      gridTemplateColumns: {
+        'chat-desktop': '12rem 1fr',
+        'chat-tablet': '10rem 1fr',
       },
       width: {
         sidebar: '16rem',
@@ -88,6 +95,7 @@ export default {
         'space-button-footer-h': '2.25rem',
         'space-sidebar-icon': '1.25rem',
         'entry-line': '8rem',
+        'avatar-full': '8.75rem',
       },
       boxShadow: {
         window: '0 0.25rem 0.5rem rgb(0 0 0 / 25%)',

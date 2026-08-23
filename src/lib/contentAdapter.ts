@@ -60,6 +60,30 @@ export type SanitySiteSettings = {
   supportLinkUrl?: string
 }
 
+export type SanityDialogueOption = {
+  label?: string
+  nextNode?: string
+}
+
+export type SanityDialogueNode = {
+  id?: string
+  text?: string
+  options?: SanityDialogueOption[]
+}
+
+export type SanityCharacter = {
+  _id: string
+  slug: string
+  name: string
+  role: string
+  species: string
+  characterType: 'bird' | 'cat' | 'mouse'
+  imageUrl?: string
+  imageAlt?: string
+  dialogueStart?: string
+  dialogue?: SanityDialogueNode[]
+}
+
 export type ContactInfo = {
   title: string
   contactCopy: string
@@ -200,4 +224,30 @@ export function toContactInfo(settings?: SanitySiteSettings | null): ContactInfo
   }
 
   return Object.values(contact).every(Boolean) ? contact : null
+}
+
+export type CharacterDialogue = {
+  startNodeId: string
+  nodes: Array<{
+    id: string
+    text: string
+    options: Array<{ label: string; nextNodeId?: string }>
+  }>
+}
+
+export function toCharacterDialogue(character: SanityCharacter): CharacterDialogue {
+  const nodes = (character.dialogue ?? [])
+    .map((node) => ({
+      id: textValue(node.id),
+      text: textValue(node.text),
+      options: (node.options ?? [])
+        .map((option) => ({ label: textValue(option.label), nextNodeId: textValue(option.nextNode) || undefined }))
+        .filter((option) => option.label),
+    }))
+    .filter((node) => node.id && node.text)
+
+  return {
+    startNodeId: textValue(character.dialogueStart) || nodes[0]?.id || '',
+    nodes,
+  }
 }

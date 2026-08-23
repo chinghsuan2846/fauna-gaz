@@ -2,7 +2,7 @@ import { useRef, useState } from 'react'
 import type { PointerEvent as ReactPointerEvent, ReactNode } from 'react'
 
 import type { ContactInfo } from '../../lib/contentAdapter'
-import type { ButtonProps } from './Button'
+import type { ButtonProps, PixelIconName } from './Button'
 import { Button } from './Button'
 import WindowHeader from './WindowHeader'
 
@@ -11,12 +11,14 @@ export type WindowMode = 'desktop' | 'tablet' | 'mobile'
 export type WindowProps = {
   mode?: WindowMode
   title?: string
+  headerIcon?: PixelIconName
   contact?: ContactInfo
   children?: ReactNode
   className?: string
   showSidebar?: boolean
   sidebarOpen?: boolean
   sidebarPreviewState?: 'none' | 'hover'
+  showClose?: boolean
   onSidebarToggle?: ButtonProps['onClick']
   onClose?: ButtonProps['onClick']
   onSupport?: ButtonProps['onClick']
@@ -42,6 +44,7 @@ type ResizeState = {
 
 function Window({
   title = '',
+  headerIcon,
   contact,
   onClose,
   onSupport,
@@ -51,6 +54,7 @@ function Window({
   showSidebar = false,
   sidebarOpen = false,
   sidebarPreviewState = 'none',
+  showClose = true,
   onSidebarToggle,
 }: WindowProps) {
   const isMobile = mode === 'mobile'
@@ -157,10 +161,12 @@ function Window({
     >
       <WindowHeader
         title={contact?.title ?? title}
+        icon={headerIcon}
         mobile={isMobile}
         showSidebar={showSidebar}
         sidebarOpen={sidebarOpen}
         sidebarPreviewState={sidebarPreviewState}
+        showClose={showClose}
         onClose={onClose}
         onSidebarToggle={onSidebarToggle}
         className={`${interactionCursor} touch-none select-none`}

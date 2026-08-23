@@ -9,11 +9,15 @@ export type FooterProps = {
   mode?: FooterMode
   currentTime?: string
   currentDate?: string
+  onHome?: ButtonProps['onClick']
+  privacyHref?: string
+  termsHref?: string
 }
 
 type FooterCopy = {
   brand: string
-  policy: string
+  privacy: string
+  terms: string
   language: string
   musicOn: string
   musicOff: string
@@ -24,7 +28,8 @@ type FooterCopy = {
 const copy: Record<FooterLanguage, FooterCopy> = {
   zh: {
     brand: '動物公報',
-    policy: '政策和條款',
+    privacy: '隱私權政策',
+    terms: '使用條款',
     language: '中文',
     musicOn: '音樂開啟',
     musicOff: '音樂關閉',
@@ -33,7 +38,8 @@ const copy: Record<FooterLanguage, FooterCopy> = {
   },
   en: {
     brand: 'Fauna Gaz',
-    policy: 'Policies & Terms',
+    privacy: 'Privacy Policy',
+    terms: 'Terms of Use',
     language: 'English',
     musicOn: 'Music on',
     musicOff: 'Music off',
@@ -42,7 +48,14 @@ const copy: Record<FooterLanguage, FooterCopy> = {
   },
 }
 
-function Footer({ mode = 'responsive', currentTime = '22:53', currentDate = '2026/8/18' }: FooterProps) {
+function Footer({
+  mode = 'responsive',
+  currentTime = '22:53',
+  currentDate = '2026/8/18',
+  onHome,
+  privacyHref = '/privacy-policy',
+  termsHref = '/terms-of-use',
+}: FooterProps) {
   const [language, setLanguage] = useState<FooterLanguage>('zh')
   const [musicEnabled, setMusicEnabled] = useState(true)
   const labels = copy[language]
@@ -70,14 +83,26 @@ function Footer({ mode = 'responsive', currentTime = '22:53', currentDate = '202
           padding="footer"
           textSize={footerTextSize}
           className="shrink-0"
+          onClick={onHome}
         />
 
         <Button
-          label={labels.policy}
+          label={labels.privacy}
           appearance="text"
           size="large"
           padding="footer"
           textSize={footerTextSize}
+          href={privacyHref}
+          className="whitespace-nowrap"
+          ariaLabel={labels.navigation}
+        />
+        <Button
+          label={labels.terms}
+          appearance="text"
+          size="large"
+          padding="footer"
+          textSize={footerTextSize}
+          href={termsHref}
           className="whitespace-nowrap border-r-thin border-ink-primary"
           ariaLabel={labels.navigation}
         />

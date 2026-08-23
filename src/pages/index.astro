@@ -3,16 +3,21 @@ import { sanityClient } from 'sanity:client'
 import DesktopExperience from '../components/DesktopExperience'
 import BaseLayout from '../layouts/BaseLayout.astro'
 import { toContactInfo } from '../lib/contentAdapter'
-import { articleListQuery, siteSettingsQuery } from '../lib/queries.js'
+import { demoArticles, demoCharacters, demoSiteSettings } from '../lib/demoContent'
+import { articleListQuery, characterListQuery, siteSettingsQuery } from '../lib/queries.js'
 import '../styles/global.css'
 
 const hasSanityConfig = Boolean(import.meta.env.PUBLIC_SANITY_PROJECT_ID)
-const [articles, siteSettings] = hasSanityConfig
-  ? await Promise.all([sanityClient.fetch(articleListQuery), sanityClient.fetch(siteSettingsQuery)])
-  : [[], null]
+const [articles, siteSettings, characters] = hasSanityConfig
+  ? await Promise.all([
+      sanityClient.fetch(articleListQuery),
+      sanityClient.fetch(siteSettingsQuery),
+      sanityClient.fetch(characterListQuery),
+    ])
+  : [demoArticles, demoSiteSettings, demoCharacters]
 const contact = toContactInfo(siteSettings)
 ---
 
 <BaseLayout title="Fauna Gaz" description="Fauna Gaz — a quarterly journal for animal behaviour.">
-  <DesktopExperience client:load articles={articles} contact={contact} />
+  <DesktopExperience client:load articles={articles} characters={characters} contact={contact} />
 </BaseLayout>

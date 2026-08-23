@@ -8,6 +8,7 @@ type ColorToken = {
 
 type FontSizeToken = readonly [label: string, className: string, value: string]
 type SpacingToken = readonly [label: string, value: string]
+type MaxWidthToken = readonly [label: string, value: string]
 
 type FoundationPageProps = {
   eyebrow: string
@@ -28,6 +29,7 @@ const colorTokens: readonly ColorToken[] = [
   { label: 'line-strong', value: '#988F7F', className: 'bg-line-strong' },
   { label: 'line-subtle', value: '#A49D93', className: 'bg-line-subtle' },
   { label: 'overlay-scrim', value: 'rgb(0 0 0 / 25%)', className: 'bg-overlay-scrim' },
+  { label: 'overlay-label', value: 'rgb(0 0 0 / 30%)', className: 'bg-overlay-label' },
   { label: 'scrollbar-track', value: '#F3ECE1', className: 'bg-scrollbar-track' },
   { label: 'scrollbar-highlight', value: '#FFFFFF', className: 'bg-scrollbar-highlight' },
   { label: 'scrollbar-shadow', value: '#D8CDBA', className: 'bg-scrollbar-shadow' },
@@ -61,6 +63,14 @@ const spacingTokens: readonly SpacingToken[] = [
   ['space-button-footer-h', '2.25rem'],
   ['space-sidebar-icon', '1.25rem'],
   ['entry-line', '8rem'],
+  ['avatar-full', '8.75rem'],
+]
+
+const maxWidthTokens: readonly MaxWidthToken[] = [
+  ['viewport-tablet', '48rem'],
+  ['viewport-mobile', '24.375rem'],
+  ['chat-bubble-mobile', '85%'],
+  ['chat-bubble', '28rem'],
 ]
 
 function FoundationPage({ eyebrow, title, children }: FoundationPageProps) {
@@ -168,6 +178,22 @@ export function SpaceFoundation() {
           <div key={label} className="grid grid-cols-[8rem_1fr_auto] items-center gap-space-sm">
             <code className="text-caption text-ink-secondary">{label}</code>
             <div className="h-space-sm bg-window-header" style={{ width: value }} aria-hidden="true" />
+            <code className="text-caption text-ink-secondary">{value}</code>
+          </div>
+        ))}
+      </div>
+    </FoundationPage>
+  )
+}
+
+export function MaxWidthFoundation() {
+  return (
+    <FoundationPage eyebrow="Max width" title="Max-width tokens">
+      <div className="grid gap-space-sm border-thin border-line bg-window-surface p-space-md">
+        {maxWidthTokens.map(([label, value]) => (
+          <div key={label} className="grid grid-cols-[12rem_1fr_auto] items-center gap-space-sm">
+            <code className="text-caption text-ink-secondary">{label}</code>
+            <div className="h-space-sm max-w-full bg-window-header" style={{ width: value }} aria-hidden="true" />
             <code className="text-caption text-ink-secondary">{value}</code>
           </div>
         ))}

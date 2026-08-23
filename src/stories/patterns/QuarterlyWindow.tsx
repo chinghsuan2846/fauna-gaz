@@ -34,6 +34,12 @@ type Point = {
 type DragState = Point & {
   pointerId: number
   origin: Point
+  bounds: {
+    left: number
+    top: number
+    width: number
+    height: number
+  }
 }
 
 type ResizeState = {
@@ -106,11 +112,15 @@ function QuarterlyWindow({
 
     event.preventDefault()
     event.currentTarget.setPointerCapture(event.pointerId)
+    const bounds = windowRef.current?.getBoundingClientRect()
+    if (!bounds) return
+
     dragRef.current = {
       pointerId: event.pointerId,
       x: event.clientX,
       y: event.clientY,
       origin: position,
+      bounds,
     }
     setIsDragging(true)
   }
@@ -119,9 +129,20 @@ function QuarterlyWindow({
     const drag = dragRef.current
     if (!drag || drag.pointerId !== event.pointerId) return
 
+    const viewportWidth = document.documentElement.clientWidth || window.innerWidth
+    const viewportHeight = document.documentElement.clientHeight || window.innerHeight
+    const nextLeft = Math.min(
+      Math.max(drag.bounds.left + event.clientX - drag.x, 0),
+      Math.max(0, viewportWidth - drag.bounds.width),
+    )
+    const nextTop = Math.min(
+      Math.max(drag.bounds.top + event.clientY - drag.y, 0),
+      Math.max(0, viewportHeight - drag.bounds.height),
+    )
+
     setPosition({
-      x: drag.origin.x + event.clientX - drag.x,
-      y: drag.origin.y + event.clientY - drag.y,
+      x: drag.origin.x + nextLeft - drag.bounds.left,
+      y: drag.origin.y + nextTop - drag.bounds.top,
     })
   }
 

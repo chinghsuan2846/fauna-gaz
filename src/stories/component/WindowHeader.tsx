@@ -1,14 +1,16 @@
 import type { PointerEventHandler } from 'react'
 
-import type { ButtonProps } from './Button'
-import { Button } from './Button'
+import type { ButtonProps, PixelIconName } from './Button'
+import { Button, PixelIcon } from './Button'
 
 export type WindowHeaderProps = {
   title?: string
+  icon?: PixelIconName
   mobile?: boolean
   showSidebar?: boolean
   sidebarOpen?: boolean
   sidebarPreviewState?: 'none' | 'hover'
+  showClose?: boolean
   onClose?: ButtonProps['onClick']
   onSidebarToggle?: ButtonProps['onClick']
   className?: string
@@ -20,10 +22,12 @@ export type WindowHeaderProps = {
 
 function WindowHeader({
   title = '',
+  icon,
   mobile = false,
   showSidebar = false,
   sidebarOpen = false,
   sidebarPreviewState = 'none',
+  showClose = true,
   onClose,
   onSidebarToggle,
   className = '',
@@ -59,18 +63,21 @@ function WindowHeader({
             onClick={onSidebarToggle}
           />
         )}
+        {icon && <PixelIcon name={icon} size="small" className="text-ink-inverse" />}
         <h2 className={`${headerTextSize} font-regular leading-compact text-ink-inverse`}>{title}</h2>
       </div>
-      <Button
-        icon="close"
-        iconOnly
-        iconSize="small"
-        size="small"
-        padding={mobile ? 'close-mobile' : 'close'}
-        tone="close"
-        ariaLabel="Close window"
-        onClick={onClose}
-      />
+      {showClose && (
+        <Button
+          icon="close"
+          iconOnly
+          iconSize="small"
+          size="small"
+          padding={mobile ? 'close-mobile' : 'close'}
+          tone="close"
+          ariaLabel="Close window"
+          onClick={onClose}
+        />
+      )}
     </header>
   )
 }

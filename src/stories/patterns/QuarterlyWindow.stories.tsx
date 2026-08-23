@@ -14,12 +14,12 @@ function QuarterlyWindowPreview({ viewport, ...args }: QuarterlyWindowPreviewPro
   const frameClassName = isMobile
     ? 'h-[844px] w-[390px] max-w-full border-thin border-line'
     : isTablet
-      ? 'h-[1024px] w-[768px] max-w-full'
-      : 'h-[calc(100vh-4rem)] min-h-[36rem] w-full max-w-[52rem]'
+      ? 'h-[calc(100vh-4rem)] min-h-0 w-full max-w-viewport-tablet'
+      : 'h-[calc(100vh-4rem)] min-h-0 w-full max-w-[52rem]'
 
   return (
-    <div className={`flex min-h-screen justify-center overflow-hidden bg-window-surface ${isMobile ? 'p-space-md' : 'p-space-xl'}`}>
-      <div className={`mx-auto overflow-hidden ${frameClassName}`}>
+    <div className={`flex min-h-screen justify-center overflow-visible bg-window-surface ${isMobile ? 'p-space-md' : 'p-space-xl'}`}>
+      <div className={`mx-auto overflow-visible ${frameClassName}`}>
         <QuarterlyWindow {...args} responsiveMode={isMobile ? 'mobile' : 'desktop'} />
       </div>
     </div>
