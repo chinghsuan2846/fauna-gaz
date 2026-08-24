@@ -68,9 +68,9 @@ function CompactProfile({ name, role, species }: Pick<CharacterProfileProps, 'na
     <div className="grid gap-space-xs pt-space-xs">
       <div className="flex flex-wrap items-baseline gap-x-space-md gap-y-space-xs">
         <h2 className="font-ui text-small font-medium text-ink-primary">{name}</h2>
-        <p className="font-ui text-caption text-ink-secondary">{role}</p>
+        <p className="font-ui text-small text-ink-secondary">{role}</p>
       </div>
-      <p className="font-ui text-caption text-ink-primary">{species}</p>
+      <p className="font-ui text-small text-ink-primary">{species}</p>
     </div>
   )
 }

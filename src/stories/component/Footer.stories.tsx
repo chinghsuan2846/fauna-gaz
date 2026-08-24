@@ -12,11 +12,11 @@ const viewportFrameClasses = {
 
 function FooterPreview(args: ComponentProps<typeof Footer>) {
   const frameClass = viewportFrameClasses[args.mode ?? 'responsive']
-  const stageClass = args.mode === 'mobile' ? 'min-h-viewport-mobile' : 'min-h-screen'
+  const stageClass = args.mode === 'mobile' ? 'flex min-h-viewport-mobile flex-col' : 'flex min-h-screen flex-col'
 
   return (
     <div className={`${stageClass} bg-ink-inverse p-space-md`}>
-      <div className={frameClass}>
+      <div className={`${frameClass} mt-auto`}>
         <Footer {...args} />
       </div>
     </div>

@@ -4,7 +4,7 @@ import { Button } from './Button'
 import type { WindowMode, WindowProps } from './Window'
 import Window from './Window'
 
-export type LegalDocument = 'privacy' | 'terms'
+export type LegalDocument = 'privacy' | 'terms' | 'faq'
 
 export type LegalWindowProps = {
   mode?: WindowMode
@@ -23,6 +23,11 @@ const documentCopy: Record<LegalDocument, { label: string; title: string; body: 
     label: '使用條款',
     title: '使用條款',
     body: '這是動物公報預留的使用條款內容。正式上線前，請由內容管理者補上完整條款內容。',
+  },
+  faq: {
+    label: 'FAQ',
+    title: '常見問題',
+    body: '動物公報是什麼？\n動物公報是一份以動物行為學為主題的季刊。\n\n要如何閱讀季刊？\n點選桌面上的「季刊」圖示，即可瀏覽目前收錄的文章。\n\n可以投稿或聯絡編輯嗎？\n可以，請從「聯絡我」視窗寄信給我們。',
   },
 }
 
@@ -43,7 +48,7 @@ function LegalWindow({
       className={`h-full min-h-0 ${className}`}
       onClose={onClose}
     >
-      <div className="flex min-h-0 min-w-0 flex-1 flex-col font-body text-ink-primary">
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col text-ink-primary">
         <nav
           className="flex shrink-0 flex-wrap gap-space-xs border-b-thin border-line-strong bg-window-surface p-space-sm"
           aria-label="法律文件"
@@ -58,7 +63,7 @@ function LegalWindow({
                 label={document.label}
                 appearance={isSelected ? 'outline' : 'text'}
                 size="small"
-                textSize={isMobile ? 'caption' : 'small'}
+                textSize="small"
                 ariaLabel={`查看${document.label}`}
                 onClick={() => setActiveDocument(documentId)}
               />
@@ -67,9 +72,9 @@ function LegalWindow({
         </nav>
 
         <div className="retroScrollArea min-h-0 min-w-0 flex-1 overflow-y-auto p-space-md">
-          <article className="grid gap-space-md">
-            <h3 className="font-ui text-title font-regular">{selectedDocument.title}</h3>
-            <p className="text-body">{selectedDocument.body}</p>
+          <article className={`site-info-content grid gap-space-md font-body${isMobile ? ' text-small' : ''}`}>
+            <h3 className="font-body font-regular">{selectedDocument.title}</h3>
+            <p className="whitespace-pre-wrap">{selectedDocument.body}</p>
           </article>
         </div>
       </div>

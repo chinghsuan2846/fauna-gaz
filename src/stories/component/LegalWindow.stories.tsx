@@ -15,7 +15,7 @@ const meta = {
     },
     initialDocument: {
       control: 'inline-radio',
-      options: ['privacy', 'terms'],
+      options: ['privacy', 'terms', 'faq'],
     },
     className: {
       table: {
@@ -77,6 +77,20 @@ export const Mobile = {
   render: (args) => (
     <div className={frameClasses.mobile}>
       <LegalWindow {...args} />
+    </div>
+  ),
+} satisfies Story
+
+export const FAQ = {
+  args: {
+    mode: 'desktop',
+    initialDocument: 'faq',
+  },
+  render: (args) => (
+    <div className={frameClasses.desktop}>
+      <div className="mx-auto h-[32rem] w-full max-w-viewport-mobile">
+        <LegalWindow {...args} />
+      </div>
     </div>
   ),
 } satisfies Story

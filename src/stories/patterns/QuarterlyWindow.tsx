@@ -50,7 +50,7 @@ type ResizeState = {
   startHeight: number
 }
 
-const mobileBreakpointQuery = '(max-width: 767px)'
+const mobileBreakpointQuery = '(max-width: 599px)'
 
 function getIsMobileViewport() {
   return typeof window !== 'undefined' && window.matchMedia(mobileBreakpointQuery).matches
@@ -198,14 +198,15 @@ function QuarterlyWindow({
   }
   const interactionCursor = isMobileViewport ? '' : isDragging ? 'cursor-grabbing' : 'cursor-grab'
   const windowClassName = isMobileViewport
-    ? `relative flex h-full min-h-0 min-w-0 flex-col overflow-hidden border-0 bg-window-surface shadow-none ${className}`
-    : `relative flex h-full min-h-0 min-w-0 flex-col overflow-hidden border-0 bg-window-surface shadow-none md:border-thin md:border-ink-primary md:shadow-window ${className}`
+    ? `relative flex h-full min-h-0 min-w-0 flex-col overflow-hidden border-thin border-ink-primary bg-window-surface shadow-window ${className}`
+    : `relative flex h-full min-h-0 min-w-0 flex-col overflow-hidden border-thin border-ink-primary bg-window-surface shadow-window ${className}`
   const sidebar = (
     <QuarterlySidebar
       data={data}
       initialOpenYearIds={['2026']}
       initialOpenQuarterIds={['2026-autumn']}
       initialSelectedArticleId={selectedArticleId}
+      mobile={isMobileViewport}
       borderless
       onArticleSelect={selectArticle}
     />

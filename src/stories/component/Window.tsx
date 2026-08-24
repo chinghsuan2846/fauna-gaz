@@ -201,7 +201,7 @@ function Window({
               iconPosition="right"
               iconSize="small"
               size="small"
-              textSize={isMobile ? 'caption' : 'small'}
+              textSize="small"
               ariaLabel={contact.supportLinkText}
               onClick={onSupport}
             />

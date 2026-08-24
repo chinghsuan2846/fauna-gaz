@@ -24,7 +24,7 @@
   }
 
   .experience-background {
-    @apply pointer-events-none absolute inset-0 z-0 overflow-hidden;
+    @apply pointer-events-none absolute inset-0 z-0 overflow-hidden bg-window-surface;
     opacity: 1;
   }
 
@@ -32,8 +32,27 @@
     opacity: 0.75;
   }
 
+  .experience-background--wide .entry-forest-image,
+  .experience-background--wide .entry-forest-pixels,
+  .experience-background--wide .entry-forest-falling-pixels,
+  .experience-background--wide .entry-forest-grass-pixels {
+    transform: none;
+  }
+
+  .experience-background--wide .entry-forest-image {
+    object-position: center 75%;
+  }
+
+  .experience-background--wide .entry-forest-pixels,
+  .experience-background--wide .entry-forest-falling-pixels,
+  .experience-background--wide .entry-forest-grass-pixels {
+    --forest-cover-overflow-y: max(0px, calc(100vw * 0.64867548 - 100svh));
+    transform: translateY(calc(var(--forest-cover-overflow-y) * -0.25));
+  }
+
   .experience-desktop {
-    @apply absolute inset-0 z-10 flex h-screen min-h-0 flex-col overflow-auto;
+    @apply absolute inset-0 z-10 flex h-screen min-h-0 flex-col overflow-hidden;
+    height: 100svh;
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
@@ -46,7 +65,7 @@
   }
 
   .desktop-workspace {
-    @apply relative min-h-0 flex-1 overflow-visible p-space-md;
+    @apply relative min-h-0 flex-1 overflow-hidden p-space-md;
   }
 
   .desktop-icon-layer {
@@ -54,7 +73,9 @@
   }
 
   .desktop-icon-group {
-    @apply pointer-events-none absolute flex flex-wrap gap-space-md;
+    @apply pointer-events-none absolute flex flex-wrap;
+    --desktop-icon-gap: clamp(theme('spacing.space-lg'), 5vw, theme('spacing.space-4xl'));
+    gap: var(--desktop-icon-gap);
   }
 
   .desktop-icon-group > * {
@@ -68,16 +89,41 @@
   }
 
   .desktop-icon-group--grass {
-    right: theme('spacing.space-2xl');
+    left: clamp(theme('spacing.space-4xl'), 12vw, 10rem);
+    right: clamp(theme('spacing.space-4xl'), 12vw, 10rem);
     bottom: theme('spacing.space-2xl');
-    max-width: theme('maxWidth.viewport-tablet');
-    justify-content: flex-end;
+    max-width: none;
+    justify-content: space-between;
   }
 
   .desktop-icon-group--quarterly {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+  }
+
+  @media (min-width: 64rem) {
+    .desktop-icon-group--leaf {
+      left: clamp(18rem, 26vw, 34rem);
+      max-width: none;
+      --desktop-icon-gap: clamp(theme('spacing.space-4xl'), 7vw, 10rem);
+    }
+
+    .desktop-icon-group--quarterly {
+      left: calc(clamp(theme('spacing.space-4xl'), 12vw, 10rem) + 3.5rem);
+    }
+  }
+
+  @media (min-width: 37.5rem) and (max-width: 63.999rem) {
+    .desktop-icon-group--leaf {
+      left: clamp(6rem, calc(40% - 8.5rem), 16rem);
+      max-width: none;
+      --desktop-icon-gap: clamp(2rem, 6vw, 5rem);
+    }
+
+    .desktop-icon-group--quarterly {
+      left: calc(clamp(theme('spacing.space-4xl'), 12vw, 10rem) + 3.5rem);
+    }
   }
 
   .desktop-window-stack {
@@ -122,7 +168,17 @@
     height: 60%;
   }
 
-  @media (max-width: 47.999rem) {
+  .site-info-content {
+    font-size: clamp(0.75rem, 1.35vw, 0.9375rem);
+    line-height: 1.65;
+  }
+
+  .site-info-content h3 {
+    font-size: clamp(1rem, 2vw, 1.25rem);
+    line-height: 1.35;
+  }
+
+  @media (max-width: 37.499rem) {
     .experience-desktop {
       height: 100svh;
       min-height: 100svh;
@@ -136,12 +192,30 @@
 
     .desktop-icon-group--leaf {
       top: theme('spacing.space-4xl');
-      left: theme('spacing.space-md');
+      left: clamp(2rem, calc(40% - 7.5rem), 8rem);
+      max-width: none;
+    }
+
+    .desktop-icon-group {
+      --desktop-icon-gap: clamp(theme('spacing.space-sm'), 2vw, theme('spacing.space-lg'));
+    }
+
+    .desktop-icon-group--leaf {
+      --desktop-icon-gap: clamp(1rem, 4vw, 2rem);
     }
 
     .desktop-icon-group--grass {
+      left: auto;
       right: theme('spacing.space-md');
       bottom: theme('spacing.space-xl');
+      max-width: theme('maxWidth.viewport-tablet');
+      justify-content: flex-end;
+    }
+
+    .desktop-icon-group--quarterly {
+      left: auto;
+      right: calc(theme('spacing.space-md') + 7rem + 7rem + var(--desktop-icon-gap) + var(--desktop-icon-gap));
+      transform: translateY(-50%);
     }
 
     .desktop-window-shell--contact,
@@ -212,7 +286,8 @@
   }
 
   .entry-forest-image {
-    @apply block h-full w-full;
+    @apply absolute inset-0 block h-full w-full;
+    image-rendering: pixelated;
     object-fit: cover;
     object-position: center center;
   }
@@ -221,6 +296,7 @@
   .entry-forest-falling-pixels svg,
   .entry-forest-grass-pixels svg {
     @apply block h-full w-full;
+    shape-rendering: crispEdges;
   }
 
   .entry-forest-pixels .forest-flicker {

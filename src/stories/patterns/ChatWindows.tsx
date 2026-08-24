@@ -205,7 +205,7 @@ function ChatWindowsContent({
                 appearance="outline"
                 label={quickReply.label}
                 size="small"
-                textSize={isMobile ? 'caption' : 'small'}
+                textSize="small"
                 onClick={quickReply.onSelect}
               />
             ))}

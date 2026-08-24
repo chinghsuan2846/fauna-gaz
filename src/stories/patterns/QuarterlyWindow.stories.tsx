@@ -20,7 +20,7 @@ function QuarterlyWindowPreview({ viewport, ...args }: QuarterlyWindowPreviewPro
   const isMobile = viewport === 'mobile'
   const isTablet = viewport === 'tablet'
   const frameClassName = isMobile
-    ? 'h-[844px] w-[390px] max-w-full border-thin border-line'
+    ? 'h-[844px] w-[390px] max-w-full'
     : isTablet
       ? 'h-[calc(100vh-4rem)] min-h-0 w-full max-w-viewport-tablet'
       : 'h-[calc(100vh-4rem)] min-h-0 w-full max-w-[52rem]'

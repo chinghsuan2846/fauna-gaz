@@ -34,6 +34,7 @@ export type QuarterlySidebarProps = {
   initialSelectedArticleId?: string
   previewArticleId?: string
   previewState?: QuarterlySidebarPreviewState
+  mobile?: boolean
   borderless?: boolean
   onArticleSelect?: (article: QuarterlySidebarArticle) => void
   className?: string
@@ -185,6 +186,7 @@ function QuarterlySidebar({
   initialSelectedArticleId,
   previewArticleId,
   previewState = 'none',
+  mobile = false,
   borderless = false,
   onArticleSelect,
   className = '',
@@ -273,7 +275,7 @@ function QuarterlySidebar({
                                   key={group.id}
                                   className={groupIndex === 0 ? '' : 'window-divider mt-space-sm pt-space-sm'}
                                 >
-                                  <p className="sidebar-full-bleed px-space-sm pl-space-2xl text-caption text-ink-secondary">{group.label}</p>
+                                  <p className={`sidebar-full-bleed px-space-sm pl-space-2xl ${mobile ? 'text-small' : 'text-caption'} text-ink-secondary`}>{group.label}</p>
                                   <ul className="mt-space-xs grid" role="group">
                                     {group.articles.map((article) => {
                                       const isSelected = selectedArticleId === article.id

@@ -15,13 +15,13 @@ const contactMock = {
 
 const stageClasses: Record<WindowMode, string> = {
   desktop: 'min-h-screen w-full bg-window-surface p-space-xl',
-  tablet: 'min-h-screen w-full max-w-viewport-tablet bg-window-surface p-space-lg',
+  tablet: 'min-h-screen w-full bg-window-surface p-space-lg',
   mobile: 'min-h-viewport-mobile w-full max-w-viewport-mobile bg-window-surface',
 }
 
 const frameClasses: Record<WindowMode, string> = {
-  desktop: 'mx-auto w-full max-w-viewport-mobile',
-  tablet: 'mx-auto w-full max-w-viewport-mobile',
+  desktop: 'ml-auto w-full max-w-viewport-mobile',
+  tablet: 'ml-auto w-full max-w-viewport-mobile',
   mobile: 'w-full',
 }
 

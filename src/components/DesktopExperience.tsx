@@ -33,10 +33,11 @@ type DesktopWindow =
 const LOADING_PREVIEW_DURATION = 120
 const CONTACT_WINDOW: DesktopWindow = { id: 'contact', type: 'contact' }
 const LEGAL_WINDOW: DesktopWindow = { id: 'legal', type: 'legal' }
+const GRASS_CHARACTER_ORDER: DesktopIconName[] = ['老莫', '一號', '二號']
 
 function resolveViewportMode(): WindowMode {
   if (typeof window === 'undefined') return 'desktop'
-  if (window.innerWidth < 768) return 'mobile'
+  if (window.innerWidth < 600) return 'mobile'
   if (window.innerWidth < 1024) return 'tablet'
   return 'desktop'
 }
@@ -61,6 +62,11 @@ function iconNameForCharacter(character: SanityCharacter): DesktopIconName {
   return '老莫'
 }
 
+function grassCharacterOrder(character: SanityCharacter) {
+  const order = GRASS_CHARACTER_ORDER.indexOf(iconNameForCharacter(character))
+  return order === -1 ? GRASS_CHARACTER_ORDER.length : order
+}
+
 function DesktopExperience({ articles = [], characters = [], contact }: DesktopExperienceProps) {
   const [experienceState, setExperienceState] = useState<ExperienceState>('entry')
   const [openWindows, setOpenWindows] = useState<DesktopWindow[]>([CONTACT_WINDOW])
@@ -78,6 +84,7 @@ function DesktopExperience({ articles = [], characters = [], contact }: DesktopE
   const isDesktopVisible = experienceState === 'revealing' || experienceState === 'desktop'
   const transitionStage = experienceState === 'covering' || experienceState === 'revealing' ? experienceState : null
   const isMobileViewport = viewportMode === 'mobile'
+  const backgroundFit = 'cover'
 
   const tryStartAudio = () => {
     audioRef.current?.play().catch(() => {})
@@ -160,9 +167,12 @@ function DesktopExperience({ articles = [], characters = [], contact }: DesktopE
     <div className="experience-shell">
       {backgroundAudio}
 
-      <div className={`experience-background${isDesktopVisible ? ' experience-background--desktop' : ''}`} aria-hidden="true">
+      <div
+        className={`experience-background${viewportMode === 'desktop' ? ' experience-background--wide' : ''}${isDesktopVisible ? ' experience-background--desktop' : ''}`}
+        aria-hidden="true"
+      >
         <img className="entry-forest-image" src="/assets/forest_pixel.svg" alt="" />
-        <PixelForest src="/assets/forest_pixel.svg" />
+        <PixelForest src="/assets/forest_pixel.svg" fit={backgroundFit} />
       </div>
 
       {experienceState === 'entry' || experienceState === 'covering' ? (
@@ -214,6 +224,7 @@ function DesktopExperience({ articles = [], characters = [], contact }: DesktopE
             <div className="desktop-icon-group desktop-icon-group--grass">
               {characters
                 .filter((character) => character.characterType === 'cat' || character.characterType === 'mouse')
+                .sort((left, right) => grassCharacterOrder(left) - grassCharacterOrder(right))
                 .map((character) => (
                   <DesktopIcon
                     key={character._id}

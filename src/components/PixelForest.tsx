@@ -8,6 +8,7 @@ type PixelForestMarkup = {
 
 type PixelForestProps = {
   src: string
+  fit?: 'cover' | 'fill'
 }
 
 const leafClasses = new Set([
@@ -93,11 +94,15 @@ function createOverlaySvg(svg: string, rects: string[]) {
   return `${openingTag}${defs}<g shape-rendering="crispEdges">${rects.join('')}</g></svg>`
 }
 
-function preparePixelForest(source: string): PixelForestMarkup {
+function preparePixelForest(source: string, fit: 'cover' | 'fill'): PixelForestMarkup {
+  const preserveAspectRatio = fit === 'fill' ? 'none' : 'xMidYMid slice'
   const svg = source
     .replace(/<\?xml[\s\S]*?\?>\s*/i, '')
     .replace(/<!DOCTYPE[\s\S]*?>\s*/i, '')
-    .replace(/<svg\b/, '<svg preserveAspectRatio="xMidYMid slice"')
+    .replace(/<svg\b([^>]*)>/i, (_match, attributes: string) => {
+      const withoutExistingAspectRatio = attributes.replace(/\s+preserveAspectRatio="[^"]*"/i, '')
+      return `<svg${withoutExistingAspectRatio} preserveAspectRatio="${preserveAspectRatio}">`
+    })
 
   const rectTags = [...svg.matchAll(/<rect\b[^>]*>/g)].map(([tag]) => tag)
   const flickerCount = rectTags.filter(isFlickerCandidate).length
@@ -165,7 +170,7 @@ function preparePixelForest(source: string): PixelForestMarkup {
   }
 }
 
-function PixelForest({ src }: PixelForestProps) {
+function PixelForest({ src, fit = 'cover' }: PixelForestProps) {
   const [markup, setMarkup] = useState<PixelForestMarkup>({ flicker: '', falling: '', grass: '' })
 
   useEffect(() => {
@@ -177,7 +182,7 @@ function PixelForest({ src }: PixelForestProps) {
         return response.text()
       })
       .then((source) => {
-        if (active) setMarkup(preparePixelForest(source))
+        if (active) setMarkup(preparePixelForest(source, fit))
       })
       .catch(() => {
         if (active) setMarkup({ flicker: '', falling: '', grass: '' })
@@ -186,7 +191,7 @@ function PixelForest({ src }: PixelForestProps) {
     return () => {
       active = false
     }
-  }, [src])
+  }, [src, fit])
 
   return (
     <>

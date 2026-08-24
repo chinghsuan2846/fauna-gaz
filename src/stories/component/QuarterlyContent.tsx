@@ -134,6 +134,7 @@ function QuarterlyContent({
   const articleSpacingClass = mobile ? 'p-space-md' : 'p-space-lg'
   const titleMarginClass = mobile ? 'mt-space-md' : 'mt-space-lg'
   const paragraphSpacingClass = mobile ? 'mt-space-md gap-space-md' : 'mt-space-lg gap-space-lg'
+  const articleTextClass = mobile ? 'text-small' : 'text-body'
 
   return (
     <section
@@ -143,7 +144,7 @@ function QuarterlyContent({
       } ${className}`}
     >
       <div className="retroScrollArea min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto">
-        <article className={`min-w-0 break-words font-body text-body ${articleSpacingClass}`}>
+        <article className={`min-w-0 break-words font-body ${articleTextClass} ${articleSpacingClass}`}>
           <nav aria-label="文章位置" className="flex min-w-0 flex-wrap items-center gap-space-xs text-caption text-ink-muted">
             {article.breadcrumb.map((item, index) => (
               <span key={`${item}-${index}`} className="inline-flex min-w-0 max-w-full items-center gap-space-xs break-words">
