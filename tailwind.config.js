@@ -56,6 +56,7 @@ export default {
         sidebar: '16rem',
         'viewport-tablet': '48rem',
         'viewport-mobile': '24.375rem',
+        'viewport-chat': '40rem',
         'chat-bubble-mobile': '85%',
         'chat-bubble': '28rem',
       },

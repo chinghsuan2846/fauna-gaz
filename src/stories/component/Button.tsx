@@ -1,7 +1,7 @@
 import type { MouseEventHandler, ReactNode } from 'react'
 
 export type ButtonAppearance = 'outline' | 'text'
-export type ButtonPadding = 'default' | 'footer' | 'close' | 'close-mobile'
+export type ButtonPadding = 'default' | 'footer' | 'footer-hug' | 'close' | 'close-mobile'
 export type ButtonSize = 'large' | 'small'
 export type ButtonState = 'default' | 'hover' | 'disabled' | 'loading'
 export type ButtonTextSize = 'body' | 'small' | 'caption'
@@ -225,6 +225,7 @@ const sizeClasses: Record<ButtonSize, string> = {
 const paddingClasses: Record<ButtonPadding, string> = {
   default: '',
   footer: 'min-h-space-button-footer-h px-space-md py-space-sm',
+  'footer-hug': 'px-space-md py-space-sm',
   close: 'px-space-sm py-space-sm',
   'close-mobile': 'px-space-xs py-space-xs',
 }

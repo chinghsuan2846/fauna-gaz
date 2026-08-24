@@ -108,6 +108,11 @@ const submit = {
   submitLabel: '送出',
 }
 
+const quickReplies = [
+  { label: '你最近在觀察什麼？' },
+  { label: '可以分享一個冷知識嗎？' },
+]
+
 const stageClasses: Record<PreviewViewport, string> = {
   desktop: 'flex min-h-screen w-full justify-center overflow-hidden bg-window-surface p-space-xl',
   tablet: 'flex min-h-screen w-full justify-center overflow-hidden bg-window-surface p-space-lg',
@@ -178,6 +183,7 @@ const sharedArgs = {
   title: 'Message from : Mortimer',
   profile: mortimerProfile,
   messages: chatMessages,
+  quickReplies,
   submit,
 }
 

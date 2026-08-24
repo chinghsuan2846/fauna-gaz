@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   toCharacterDialogue,
   toQuarterlyContentArticle,
@@ -8,12 +8,12 @@ import {
   type SanityCharacter,
 } from '../lib/contentAdapter'
 import ChatWindows from '../stories/patterns/ChatWindows'
-import QuarterlyContent from '../stories/component/QuarterlyContent'
-import QuarterlySidebar from '../stories/component/QuarterlySidebar'
+import QuarterlyWindow from '../stories/patterns/QuarterlyWindow'
 import Footer from '../stories/component/Footer'
 import DesktopIcon, { desktopIconNames, type DesktopIconName } from '../stories/component/DesktopIcon'
-import { Button, PixelIcon } from '../stories/component/Button'
-import Window from '../stories/component/Window'
+import LegalWindow from '../stories/component/LegalWindow'
+import { PixelIcon } from '../stories/component/Button'
+import Window, { type WindowMode } from '../stories/component/Window'
 import PixelForest from './PixelForest'
 import PixelGridTransition from './PixelGridTransition'
 
@@ -24,12 +24,35 @@ type DesktopExperienceProps = {
 }
 
 type ExperienceState = 'entry' | 'covering' | 'revealing' | 'desktop'
-type ActiveWindow =
-  | { type: 'quarterly' }
-  | { type: 'chat'; characterId: string }
-  | null
+type DesktopWindow =
+  | { id: 'contact'; type: 'contact' }
+  | { id: 'legal'; type: 'legal' }
+  | { id: 'quarterly'; type: 'quarterly' }
+  | { id: string; type: 'chat'; characterId: string }
 
 const LOADING_PREVIEW_DURATION = 120
+const CONTACT_WINDOW: DesktopWindow = { id: 'contact', type: 'contact' }
+const LEGAL_WINDOW: DesktopWindow = { id: 'legal', type: 'legal' }
+
+function resolveViewportMode(): WindowMode {
+  if (typeof window === 'undefined') return 'desktop'
+  if (window.innerWidth < 768) return 'mobile'
+  if (window.innerWidth < 1024) return 'tablet'
+  return 'desktop'
+}
+
+function useViewportMode() {
+  const [viewportMode, setViewportMode] = useState<WindowMode>('desktop')
+
+  useEffect(() => {
+    const updateViewportMode = () => setViewportMode(resolveViewportMode())
+    updateViewportMode()
+    window.addEventListener('resize', updateViewportMode)
+    return () => window.removeEventListener('resize', updateViewportMode)
+  }, [])
+
+  return viewportMode
+}
 
 function iconNameForCharacter(character: SanityCharacter): DesktopIconName {
   if (desktopIconNames.includes(character.name as DesktopIconName)) return character.name as DesktopIconName
@@ -40,11 +63,10 @@ function iconNameForCharacter(character: SanityCharacter): DesktopIconName {
 
 function DesktopExperience({ articles = [], characters = [], contact }: DesktopExperienceProps) {
   const [experienceState, setExperienceState] = useState<ExperienceState>('entry')
-  const [activeWindow, setActiveWindow] = useState<ActiveWindow>(null)
-  const [isContactOpen, setIsContactOpen] = useState(false)
+  const [openWindows, setOpenWindows] = useState<DesktopWindow[]>([CONTACT_WINDOW])
   const [selectedArticleId, setSelectedArticleId] = useState<string | null>(articles[0]?._id ?? null)
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true)
   const [isLoading, setIsLoading] = useState(false)
+  const viewportMode = useViewportMode()
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const loadingTimerRef = useRef<number | null>(null)
   const quarterlySidebarData = toQuarterlySidebarData(articles)
@@ -53,17 +75,9 @@ function DesktopExperience({ articles = [], characters = [], contact }: DesktopE
   const quarterlyContentArticle = selectedArticle
     ? toQuarterlyContentArticle(selectedArticle, articles[selectedArticleIndex - 1], articles[selectedArticleIndex + 1])
     : undefined
-  const firstYear = quarterlySidebarData[0]
-  const firstQuarter = firstYear?.quarters[0]
-  const selectedCharacter = activeWindow?.type === 'chat'
-    ? characters.find((character) => character._id === activeWindow.characterId)
-    : undefined
-  const selectedDialogue = useMemo(
-    () => (selectedCharacter ? toCharacterDialogue(selectedCharacter) : undefined),
-    [selectedCharacter],
-  )
   const isDesktopVisible = experienceState === 'revealing' || experienceState === 'desktop'
   const transitionStage = experienceState === 'covering' || experienceState === 'revealing' ? experienceState : null
+  const isMobileViewport = viewportMode === 'mobile'
 
   const tryStartAudio = () => {
     audioRef.current?.play().catch(() => {})
@@ -79,6 +93,11 @@ function DesktopExperience({ articles = [], characters = [], contact }: DesktopE
     }
   }, [])
 
+  useEffect(() => {
+    if (viewportMode !== 'mobile') return
+    setOpenWindows((current) => (current.length > 1 ? [current.at(-1)!] : current))
+  }, [viewportMode])
+
   const startExperience = () => {
     if (isLoading) return
 
@@ -93,14 +112,35 @@ function DesktopExperience({ articles = [], characters = [], contact }: DesktopE
 
   const returnToEntry = () => {
     setExperienceState('entry')
-    setActiveWindow(null)
-    setIsContactOpen(false)
+    setOpenWindows([CONTACT_WINDOW])
   }
 
-  const openQuarterly = () => setActiveWindow({ type: 'quarterly' })
-  const openContact = () => setIsContactOpen(true)
+  const focusWindow = (windowId: string) => {
+    setOpenWindows((current) => {
+      const target = current.find((window) => window.id === windowId)
+      if (!target || current.at(-1)?.id === windowId) return current
+      return [...current.filter((window) => window.id !== windowId), target]
+    })
+  }
+
+  const openWindow = (window: DesktopWindow) => {
+    setOpenWindows((current) => {
+      const existing = current.find((item) => item.id === window.id)
+      const next = current.filter((item) => item.id !== window.id)
+      if (viewportMode === 'mobile') return [existing ?? window]
+      return [...next, existing ?? window]
+    })
+  }
+
+  const closeWindow = (windowId: string) => {
+    setOpenWindows((current) => current.filter((window) => window.id !== windowId))
+  }
+
+  const openQuarterly = () => openWindow({ id: 'quarterly', type: 'quarterly' })
+  const openContact = () => openWindow(CONTACT_WINDOW)
+  const openLegal = () => openWindow(LEGAL_WINDOW)
   const openCharacterChat = (character: SanityCharacter) => {
-    setActiveWindow({ type: 'chat', characterId: character._id })
+    openWindow({ id: `chat-${character._id}`, type: 'chat', characterId: character._id })
   }
 
   const backgroundAudio = (
@@ -154,11 +194,6 @@ function DesktopExperience({ articles = [], characters = [], contact }: DesktopE
         aria-hidden={!isDesktopVisible}
       >
         <div className="desktop-workspace">
-          <nav className="relative z-20 flex flex-wrap gap-space-sm" aria-label="動物公報桌面空間">
-            <Button label="季刊" size="large" textSize="body" className="shadow-window" onClick={openQuarterly} />
-            <Button label="聯絡" size="large" textSize="body" className="shadow-window" onClick={openContact} />
-          </nav>
-
           <div className="desktop-icon-layer" aria-label="動物公報桌面圖示">
             <div className="desktop-icon-group desktop-icon-group--leaf">
               {characters
@@ -198,81 +233,110 @@ function DesktopExperience({ articles = [], characters = [], contact }: DesktopE
           </div>
 
           <div className="desktop-window-stack">
-            {isContactOpen && (
-              <div className="desktop-window-shell desktop-window-shell--contact">
-                <Window mode="desktop" contact={contact ?? undefined} showClose={false} />
-              </div>
-            )}
+            {openWindows.map((window, index) => {
+              const windowStyle = { zIndex: 10 + index }
+              const focusProps = {
+                style: windowStyle,
+                onPointerDown: () => focusWindow(window.id),
+              }
 
-            {activeWindow?.type === 'quarterly' && (
-              <div className="desktop-window-shell desktop-window-shell--quarterly">
-                <Window
-                  title="季刊"
-                  mode="desktop"
-                  className="h-full max-h-full"
-                  showSidebar
-                  sidebarOpen={isSidebarOpen}
-                  onSidebarToggle={() => setIsSidebarOpen((open) => !open)}
-                  onClose={() => setActiveWindow(null)}
-                >
-                  <div className="flex min-h-0 min-w-0 flex-1">
-                    {isSidebarOpen && (
-                      <div className="min-h-0 w-sidebar shrink-0">
-                        <QuarterlySidebar
-                          data={quarterlySidebarData}
-                          initialOpenYearIds={firstYear ? [firstYear.id] : []}
-                          initialOpenQuarterIds={firstQuarter ? [firstQuarter.id] : []}
-                          initialSelectedArticleId={selectedArticleId ?? undefined}
-                          onArticleSelect={(article) => setSelectedArticleId(article.id)}
-                        />
-                      </div>
-                    )}
-
-                    {quarterlyContentArticle ? (
-                      <QuarterlyContent
-                        article={quarterlyContentArticle}
-                        className="min-h-0 min-w-0 flex-1"
-                        onPrevious={() => {
-                          if (selectedArticleIndex > 0) setSelectedArticleId(articles[selectedArticleIndex - 1]._id)
-                        }}
-                        onNext={() => {
-                          if (selectedArticleIndex >= 0 && selectedArticleIndex < articles.length - 1) {
-                            setSelectedArticleId(articles[selectedArticleIndex + 1]._id)
-                          }
-                        }}
-                      />
-                    ) : (
-                      <div className="flex min-h-0 min-w-0 flex-1 items-center justify-center p-space-lg font-body text-body text-ink-secondary">
-                        季刊目前沒有文章內容。
-                      </div>
-                    )}
+              if (window.type === 'contact') {
+                return (
+                  <div
+                    key={window.id}
+                    {...focusProps}
+                    className="desktop-window-shell desktop-window-shell--contact"
+                  >
+                    <Window
+                      mode={viewportMode}
+                      contact={contact ?? undefined}
+                      showClose
+                      onClose={() => closeWindow(window.id)}
+                    />
                   </div>
-                </Window>
-              </div>
-            )}
+                )
+              }
 
-            {activeWindow?.type === 'chat' && selectedCharacter && (
-              <div className="desktop-window-shell desktop-window-shell--chat">
-                <ChatWindows
-                  viewport="desktop"
-                  title={`Message from : ${selectedCharacter.name}`}
-                  profile={{
-                    imageSrc: selectedCharacter.imageUrl ?? '',
-                    imageAlt: selectedCharacter.imageAlt,
-                    name: selectedCharacter.name,
-                    role: selectedCharacter.role,
-                    species: selectedCharacter.species,
-                    imageScale: 'large',
-                  }}
-                  dialogue={selectedDialogue}
-                  onClose={() => setActiveWindow(null)}
-                />
-              </div>
-            )}
+              if (window.type === 'quarterly') {
+                return (
+                  <div
+                    key={window.id}
+                    {...focusProps}
+                    className="desktop-window-shell desktop-window-shell--quarterly"
+                  >
+                    <QuarterlyWindow
+                      title="季刊"
+                      data={quarterlySidebarData}
+                      article={quarterlyContentArticle}
+                      responsiveMode={viewportMode}
+                      initialSidebarOpen={!isMobileViewport}
+                      initialSelectedArticleId={selectedArticleId ?? undefined}
+                      onArticleSelect={(article) => setSelectedArticleId(article.id)}
+                      onPrevious={() => {
+                        if (selectedArticleIndex > 0) setSelectedArticleId(articles[selectedArticleIndex - 1]._id)
+                      }}
+                      onNext={() => {
+                        if (selectedArticleIndex >= 0 && selectedArticleIndex < articles.length - 1) {
+                          setSelectedArticleId(articles[selectedArticleIndex + 1]._id)
+                        }
+                      }}
+                      onClose={() => closeWindow(window.id)}
+                    />
+                  </div>
+                )
+              }
+
+              if (window.type === 'legal') {
+                return (
+                  <div
+                    key={window.id}
+                    {...focusProps}
+                    className="desktop-window-shell desktop-window-shell--legal"
+                  >
+                    <LegalWindow
+                      mode={viewportMode}
+                      onClose={() => closeWindow(window.id)}
+                    />
+                  </div>
+                )
+              }
+
+              const character = characters.find((item) => item._id === window.characterId)
+              if (!character) return null
+
+              return (
+                <div
+                  key={window.id}
+                  {...focusProps}
+                  className="desktop-window-shell desktop-window-shell--chat"
+                >
+                  <ChatWindows
+                    viewport={viewportMode}
+                    title={`Message from : ${character.name}`}
+                    profile={{
+                      imageSrc: character.imageUrl ?? '',
+                      imageAlt: character.imageAlt,
+                      name: character.name,
+                      role: character.role,
+                      species: character.species,
+                      imageScale: 'large',
+                    }}
+                    dialogue={toCharacterDialogue(character)}
+                    submit={{ placeholder: '寫點什麼吧', submitLabel: '送出' }}
+                    onClose={() => closeWindow(window.id)}
+                  />
+                </div>
+              )
+            })}
           </div>
         </div>
 
-        <Footer mode="responsive" onHome={returnToEntry} />
+        <Footer
+          mode={viewportMode === 'mobile' ? 'mobile' : viewportMode === 'tablet' ? 'tablet' : 'desktop'}
+          onHome={returnToEntry}
+          onLegal={openLegal}
+          onContact={openContact}
+        />
       </main>
 
       <PixelGridTransition

@@ -16,7 +16,7 @@ export type QuarterlyWindowProps = {
   title?: string
   data?: readonly QuarterlySidebarYear[]
   article?: QuarterlyContentArticle
-  responsiveMode?: 'auto' | 'desktop' | 'mobile'
+  responsiveMode?: 'auto' | 'desktop' | 'tablet' | 'mobile'
   initialSidebarOpen?: boolean
   initialSelectedArticleId?: string
   onClose?: ButtonProps['onClick']
@@ -79,6 +79,10 @@ function QuarterlyWindow({
   const [position, setPosition] = useState<Point>({ x: 0, y: 0 })
   const [dimensions, setDimensions] = useState<Point | null>(null)
   const [isDragging, setIsDragging] = useState(false)
+
+  useEffect(() => {
+    setSelectedArticleId(initialSelectedArticleId)
+  }, [initialSelectedArticleId])
 
   useEffect(() => {
     if (responsiveMode !== 'auto') {

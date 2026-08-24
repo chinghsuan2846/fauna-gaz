@@ -33,7 +33,7 @@
   }
 
   .experience-desktop {
-    @apply absolute inset-0 z-10 flex min-h-screen flex-col overflow-auto;
+    @apply absolute inset-0 z-10 flex h-screen min-h-0 flex-col overflow-auto;
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
@@ -90,8 +90,8 @@
   }
 
   .desktop-window-shell--contact {
-    top: theme('spacing.space-4xl');
-    left: theme('spacing.space-2xl');
+    top: theme('spacing.space-xl');
+    right: theme('spacing.space-2xl');
     z-index: 10;
     width: min(calc(100% - theme('spacing.space-2xl') - theme('spacing.space-2xl')), theme('maxWidth.viewport-mobile'));
     max-height: calc(100% - theme('spacing.space-4xl') - theme('spacing.space-lg'));
@@ -110,13 +110,28 @@
     top: theme('spacing.space-xl');
     right: theme('spacing.space-2xl');
     z-index: 30;
-    width: min(calc(100% - theme('spacing.space-2xl') - theme('spacing.space-2xl')), theme('maxWidth.viewport-tablet'));
+    width: min(calc(100% - theme('spacing.space-2xl') - theme('spacing.space-2xl')), theme('maxWidth.viewport-chat'));
     height: 70%;
   }
 
+  .desktop-window-shell--legal {
+    top: theme('spacing.space-xl');
+    left: theme('spacing.space-2xl');
+    z-index: 25;
+    width: min(calc(100% - theme('spacing.space-2xl') - theme('spacing.space-2xl')), theme('maxWidth.viewport-mobile'));
+    height: 60%;
+  }
+
   @media (max-width: 47.999rem) {
-    .desktop-workspace {
+    .experience-desktop {
+      height: 100svh;
       min-height: 100svh;
+      overflow: hidden;
+    }
+
+    .desktop-workspace {
+      min-height: 0;
+      overflow: hidden;
     }
 
     .desktop-icon-group--leaf {
@@ -131,7 +146,8 @@
 
     .desktop-window-shell--contact,
     .desktop-window-shell--quarterly,
-    .desktop-window-shell--chat {
+    .desktop-window-shell--chat,
+    .desktop-window-shell--legal {
       top: theme('spacing.space-sm');
       right: theme('spacing.space-sm');
       bottom: theme('spacing.space-sm');

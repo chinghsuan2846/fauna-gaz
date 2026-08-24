@@ -12,9 +12,10 @@ const viewportFrameClasses = {
 
 function FooterPreview(args: ComponentProps<typeof Footer>) {
   const frameClass = viewportFrameClasses[args.mode ?? 'responsive']
+  const stageClass = args.mode === 'mobile' ? 'min-h-viewport-mobile' : 'min-h-screen'
 
   return (
-    <div className="min-h-screen bg-ink-inverse p-space-md">
+    <div className={`${stageClass} bg-ink-inverse p-space-md`}>
       <div className={frameClass}>
         <Footer {...args} />
       </div>
@@ -39,6 +40,18 @@ const meta = {
     },
     currentDate: {
       control: 'text',
+    },
+    onLegal: {
+      action: 'open-legal-window',
+      table: {
+        disable: true,
+      },
+    },
+    onContact: {
+      action: 'open-contact-window',
+      table: {
+        disable: true,
+      },
     },
   },
 } satisfies Meta<typeof Footer>

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { PixelIcon } from './Button'
 
@@ -192,6 +192,10 @@ function QuarterlySidebar({
   const [openYearIds, setOpenYearIds] = useState(() => new Set(initialOpenYearIds))
   const [openQuarterIds, setOpenQuarterIds] = useState(() => new Set(initialOpenQuarterIds))
   const [selectedArticleId, setSelectedArticleId] = useState(initialSelectedArticleId)
+
+  useEffect(() => {
+    setSelectedArticleId(initialSelectedArticleId)
+  }, [initialSelectedArticleId])
 
   const toggleYear = (yearId: string) => {
     setOpenYearIds((current) => {

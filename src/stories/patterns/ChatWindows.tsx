@@ -4,8 +4,7 @@ import type { ComponentProps, ReactNode } from 'react'
 import CharacterProfile from '../component/CharacterProfile'
 import ChatBubble from '../component/ChatBubble'
 import ChatSubmit from '../component/ChatSubmit'
-import { Button } from '../component/Button'
-import type { PixelIconName } from '../component/Button'
+import { Button, type PixelIconName } from '../component/Button'
 import type { WindowMode, WindowProps } from '../component/Window'
 import Window from '../component/Window'
 
@@ -29,6 +28,11 @@ export type ChatWindowsDialogue = {
   nodes: readonly ChatWindowsDialogueNode[]
 }
 
+export type ChatWindowsQuickReply = {
+  label: string
+  onSelect?: () => void
+}
+
 export type ChatWindowsProps = {
   viewport?: WindowMode
   title?: string
@@ -36,6 +40,7 @@ export type ChatWindowsProps = {
   profile: ComponentProps<typeof CharacterProfile>
   messages?: readonly ChatWindowsMessage[]
   dialogue?: ChatWindowsDialogue
+  quickReplies?: readonly ChatWindowsQuickReply[]
   submit?: ComponentProps<typeof ChatSubmit>
   className?: string
   showClose?: boolean
@@ -67,9 +72,9 @@ const messageScrollClasses: Record<WindowMode, string> = {
 }
 
 const submitAreaClasses: Record<WindowMode, string> = {
-  desktop: 'window-footer shrink-0 p-space-md',
-  tablet: 'window-footer shrink-0 p-space-sm',
-  mobile: 'window-footer shrink-0 p-space-sm',
+  desktop: 'window-footer grid shrink-0 gap-space-sm p-space-md',
+  tablet: 'window-footer grid shrink-0 gap-space-sm p-space-sm',
+  mobile: 'window-footer grid shrink-0 gap-space-sm p-space-sm',
 }
 
 type ChatWindowsContentProps = {
@@ -77,6 +82,7 @@ type ChatWindowsContentProps = {
   profile: ComponentProps<typeof CharacterProfile>
   messages: readonly ChatWindowsMessage[]
   dialogue?: ChatWindowsDialogue
+  quickReplies?: readonly ChatWindowsQuickReply[]
   submit?: ComponentProps<typeof ChatSubmit>
 }
 
@@ -85,10 +91,12 @@ function ChatWindowsContent({
   profile,
   messages,
   dialogue,
+  quickReplies: providedQuickReplies,
   submit,
 }: ChatWindowsContentProps) {
   const isMobile = viewport === 'mobile'
   const [dialogueMessages, setDialogueMessages] = useState<ChatWindowsMessage[]>([])
+  const [submittedMessages, setSubmittedMessages] = useState<ChatWindowsMessage[]>([])
   const [activeNodeId, setActiveNodeId] = useState<string | null>(null)
   const dialogueNodeMap = useMemo(
     () => new Map((dialogue?.nodes ?? []).map((node) => [node.id, node])),
@@ -99,6 +107,7 @@ function ChatWindowsContent({
     if (!dialogue) {
       setDialogueMessages([])
       setActiveNodeId(null)
+      setSubmittedMessages([])
       return
     }
 
@@ -118,10 +127,11 @@ function ChatWindowsContent({
         speaker: 'character',
       },
     ])
+    setSubmittedMessages([])
     setActiveNodeId(startNode.id)
   }, [dialogue, dialogueNodeMap, profile.imageAlt, profile.imageSrc])
 
-  const visibleMessages = dialogue ? dialogueMessages : messages
+  const visibleMessages = dialogue ? dialogueMessages : [...messages, ...submittedMessages]
   const activeNode = activeNodeId ? dialogueNodeMap.get(activeNodeId) : undefined
 
   const chooseDialogueOption = (option: ChatWindowsDialogueOption) => {
@@ -147,6 +157,29 @@ function ChatWindowsContent({
     setActiveNodeId(nextNode?.id ?? null)
   }
 
+  const submitMessage = (message: string) => {
+    submit?.onSubmit?.(message)
+
+    const nextMessage: ChatWindowsMessage = {
+      id: `user-message-${visibleMessages.length}`,
+      message,
+      speaker: 'user',
+    }
+
+    if (dialogue) {
+      setDialogueMessages((current) => [...current, nextMessage])
+    } else {
+      setSubmittedMessages((current) => [...current, nextMessage])
+    }
+  }
+
+  const quickReplies = dialogue && activeNode
+    ? activeNode.options.map((option) => ({
+        label: option.label,
+        onSelect: () => chooseDialogueOption(option),
+      }))
+    : providedQuickReplies
+
   return (
     <div className="flex min-h-0 min-w-0 flex-1 flex-col">
       <div className={layoutClasses[viewport]}>
@@ -164,22 +197,24 @@ function ChatWindowsContent({
         </section>
       </div>
       <div className={submitAreaClasses[viewport]}>
-        {dialogue && activeNode ? (
-          <div className="flex flex-wrap gap-space-sm border-thin border-line-strong bg-window-surface p-space-sm">
-            {activeNode.options.map((option) => (
+        {quickReplies && quickReplies.length > 0 && (
+          <div className="flex flex-wrap justify-start gap-space-xs" aria-label="快速回覆">
+            {quickReplies.map((quickReply) => (
               <Button
-                key={option.label}
+                key={quickReply.label}
                 appearance="outline"
-                label={option.label}
+                label={quickReply.label}
                 size="small"
                 textSize={isMobile ? 'caption' : 'small'}
-                onClick={() => chooseDialogueOption(option)}
+                onClick={quickReply.onSelect}
               />
             ))}
           </div>
-        ) : (
-          <ChatSubmit {...submit} />
         )}
+        <ChatSubmit
+          {...submit}
+          onSubmit={submitMessage}
+        />
       </div>
     </div>
   )
@@ -192,6 +227,7 @@ export function ChatWindows({
   profile,
   messages = [],
   dialogue,
+  quickReplies,
   submit,
   className = '',
   showClose = true,
@@ -206,7 +242,14 @@ export function ChatWindows({
       onClose={onClose}
       className={`h-full min-h-0 ${className}`}
     >
-      <ChatWindowsContent viewport={viewport} profile={profile} messages={messages} dialogue={dialogue} submit={submit} />
+      <ChatWindowsContent
+        viewport={viewport}
+        profile={profile}
+        messages={messages}
+        dialogue={dialogue}
+        quickReplies={quickReplies}
+        submit={submit}
+      />
     </Window>
   )
 }

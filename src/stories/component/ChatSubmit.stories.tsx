@@ -23,7 +23,7 @@ const meta = {
     },
     submitLabel: {
       control: 'text',
-      description: '裝飾用的送出文字，不觸發對話。',
+      description: '送出按鈕文字。',
     },
     className: {
       table: {

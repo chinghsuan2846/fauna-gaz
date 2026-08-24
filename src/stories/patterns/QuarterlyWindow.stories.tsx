@@ -1,6 +1,12 @@
+import { useState } from 'react'
 import type { ComponentProps } from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
+import {
+  quarterlyContentFirstArticle,
+  quarterlyContentLastArticle,
+  quarterlyContentMockArticle,
+} from '../component/QuarterlyContent'
 import QuarterlyWindow from './QuarterlyWindow'
 
 type PreviewViewport = 'desktop' | 'tablet' | 'mobile'
@@ -9,6 +15,8 @@ type QuarterlyWindowPreviewProps = ComponentProps<typeof QuarterlyWindow> & {
 }
 
 function QuarterlyWindowPreview({ viewport, ...args }: QuarterlyWindowPreviewProps) {
+  const articles = [quarterlyContentFirstArticle, quarterlyContentMockArticle, quarterlyContentLastArticle]
+  const [articleIndex, setArticleIndex] = useState(1)
   const isMobile = viewport === 'mobile'
   const isTablet = viewport === 'tablet'
   const frameClassName = isMobile
@@ -20,7 +28,14 @@ function QuarterlyWindowPreview({ viewport, ...args }: QuarterlyWindowPreviewPro
   return (
     <div className={`flex min-h-screen justify-center overflow-visible bg-window-surface ${isMobile ? 'p-space-md' : 'p-space-xl'}`}>
       <div className={`mx-auto overflow-visible ${frameClassName}`}>
-        <QuarterlyWindow {...args} responsiveMode={isMobile ? 'mobile' : 'desktop'} />
+        <QuarterlyWindow
+          {...args}
+          article={articles[articleIndex]}
+          initialSelectedArticleId={articles[articleIndex].id}
+          onPrevious={() => setArticleIndex((current) => Math.max(0, current - 1))}
+          onNext={() => setArticleIndex((current) => Math.min(articles.length - 1, current + 1))}
+          responsiveMode={viewport}
+        />
       </div>
     </div>
   )

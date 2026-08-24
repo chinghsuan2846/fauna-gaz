@@ -45,7 +45,7 @@ export function ChatBubble({
         </div>
       ) : null}
       <p
-        className={`min-w-0 w-fit max-w-full break-words whitespace-pre-wrap border-thin font-body text-caption text-ink-primary ${paddingClasses[speaker]} ${borderClasses[speaker]} ${speaker === 'character' ? 'bg-scrollbar-track' : 'bg-window-surface'}`}
+        className={`min-w-0 w-fit max-w-full break-words whitespace-pre-wrap border-thin font-body text-small text-ink-primary ${paddingClasses[speaker]} ${borderClasses[speaker]} ${speaker === 'character' ? 'bg-scrollbar-track' : 'bg-window-surface'}`}
       >
         {message}
       </p>

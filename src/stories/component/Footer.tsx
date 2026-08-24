@@ -10,14 +10,14 @@ export type FooterProps = {
   currentTime?: string
   currentDate?: string
   onHome?: ButtonProps['onClick']
-  privacyHref?: string
-  termsHref?: string
+  onLegal?: ButtonProps['onClick']
+  onContact?: ButtonProps['onClick']
 }
 
 type FooterCopy = {
   brand: string
-  privacy: string
-  terms: string
+  legal: string
+  contact: string
   language: string
   musicOn: string
   musicOff: string
@@ -28,8 +28,8 @@ type FooterCopy = {
 const copy: Record<FooterLanguage, FooterCopy> = {
   zh: {
     brand: '動物公報',
-    privacy: '隱私權政策',
-    terms: '使用條款',
+    legal: '網站資訊',
+    contact: '聯絡我',
     language: '中文',
     musicOn: '音樂開啟',
     musicOff: '音樂關閉',
@@ -38,8 +38,8 @@ const copy: Record<FooterLanguage, FooterCopy> = {
   },
   en: {
     brand: 'Fauna Gaz',
-    privacy: 'Privacy Policy',
-    terms: 'Terms of Use',
+    legal: 'Info',
+    contact: 'Contact',
     language: 'English',
     musicOn: 'Music on',
     musicOff: 'Music off',
@@ -53,26 +53,26 @@ function Footer({
   currentTime = '22:53',
   currentDate = '2026/8/18',
   onHome,
-  privacyHref = '/privacy-policy',
-  termsHref = '/terms-of-use',
+  onLegal,
+  onContact,
 }: FooterProps) {
   const [language, setLanguage] = useState<FooterLanguage>('zh')
   const [musicEnabled, setMusicEnabled] = useState(true)
   const labels = copy[language]
   const isCompact = mode === 'mobile'
   const isTablet = mode === 'tablet'
-  const rootLayout = mode === 'desktop' || isTablet ? 'flex-nowrap' : 'flex-wrap sm:flex-nowrap'
-  const groupLayout = isTablet ? 'flex-nowrap' : 'flex-wrap'
-  const stackedGroup = isCompact ? 'w-full' : 'w-auto'
-  const footerTextSize = isCompact ? 'caption' : 'small'
-  const footerTextClass = isCompact ? 'text-caption' : 'text-small'
+  const rootLayout = mode === 'desktop' || isTablet || isCompact ? 'flex-nowrap' : 'flex-wrap sm:flex-nowrap'
+  const groupLayout = isTablet || isCompact ? 'flex-nowrap' : 'flex-wrap'
+  const stackedGroup = 'w-auto'
+  const footerTextSize = 'small'
+  const footerTextClass = 'text-small'
 
   const toggleLanguage = () => setLanguage((current) => (current === 'zh' ? 'en' : 'zh'))
   const toggleMusic = () => setMusicEnabled((enabled) => !enabled)
 
   return (
     <footer
-      className={`flex ${rootLayout} min-w-0 items-stretch border-t-thin border-ink-primary bg-window-surface font-ui text-ink-primary`}
+      className={`flex ${rootLayout} min-w-0 shrink-0 items-stretch border-t-thin border-ink-primary bg-window-surface font-ui text-ink-primary`}
     >
       <div className={`flex ${groupLayout} ${stackedGroup} min-w-0 items-stretch`}>
         <Button
@@ -80,31 +80,31 @@ function Footer({
           ariaLabel={labels.home}
           tone="brand"
           size="large"
-          padding="footer"
+          padding="footer-hug"
           textSize={footerTextSize}
           className="shrink-0"
           onClick={onHome}
         />
 
         <Button
-          label={labels.privacy}
+          label={labels.legal}
           appearance="text"
           size="large"
-          padding="footer"
+          padding="footer-hug"
           textSize={footerTextSize}
-          href={privacyHref}
-          className="whitespace-nowrap"
-          ariaLabel={labels.navigation}
-        />
-        <Button
-          label={labels.terms}
-          appearance="text"
-          size="large"
-          padding="footer"
-          textSize={footerTextSize}
-          href={termsHref}
           className="whitespace-nowrap border-r-thin border-ink-primary"
           ariaLabel={labels.navigation}
+          onClick={onLegal}
+        />
+        <Button
+          label={labels.contact}
+          appearance="text"
+          size="large"
+          padding="footer-hug"
+          textSize={footerTextSize}
+          className="whitespace-nowrap border-r-thin border-ink-primary"
+          ariaLabel={labels.navigation}
+          onClick={onContact}
         />
       </div>
 
@@ -131,7 +131,7 @@ function Footer({
           onClick={toggleMusic}
         />
         {!isCompact && <span className={`whitespace-nowrap px-space-xs py-space-xs ${footerTextClass}`}>{currentTime}</span>}
-        <span className={`whitespace-nowrap px-space-xs py-space-xs ${footerTextClass}`}>{currentDate}</span>
+        {!isCompact && <span className={`whitespace-nowrap px-space-xs py-space-xs ${footerTextClass}`}>{currentDate}</span>}
       </div>
     </footer>
   )

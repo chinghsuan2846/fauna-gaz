@@ -192,7 +192,7 @@ function Window({
             </div>
           </div>
 
-          <div className={`window-footer flex shrink-0 justify-end ${contentPaddingClass}`}>
+          <div className="window-footer flex min-h-[3rem] shrink-0 justify-end p-space-md">
             <Button
               appearance="outline"
               label={contact.supportLinkText}
@@ -200,8 +200,8 @@ function Window({
               icon="coffee"
               iconPosition="right"
               iconSize="small"
-              size={isMobile ? 'small' : 'large'}
-              textSize={isMobile ? 'caption' : 'body'}
+              size="small"
+              textSize={isMobile ? 'caption' : 'small'}
               ariaLabel={contact.supportLinkText}
               onClick={onSupport}
             />
