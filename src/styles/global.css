@@ -2,6 +2,24 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Ship the project's typefaces with the site so visitors do not need them
+   installed on their own devices. */
+@font-face {
+  font-family: "Cubic 11";
+  src: url("/fonts/Cubic-11.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Source Han Mono TC";
+  src: url("/fonts/Source-Han-Mono-TC-Regular.otf") format("opentype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
 @layer base {
   html {
     @apply scroll-smooth;
