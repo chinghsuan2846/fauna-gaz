@@ -12,6 +12,7 @@ export type FooterProps = {
   musicEnabled?: boolean
   onHome?: ButtonProps['onClick']
   onLegal?: ButtonProps['onClick']
+  onFaq?: ButtonProps['onClick']
   onContact?: ButtonProps['onClick']
   onMusicToggle?: () => void
 }
@@ -19,6 +20,7 @@ export type FooterProps = {
 type FooterCopy = {
   brand: string
   legal: string
+  faq: string
   contact: string
   language: string
   musicOn: string
@@ -31,6 +33,7 @@ const copy: Record<FooterLanguage, FooterCopy> = {
   zh: {
     brand: '動物公報',
     legal: '網站資訊',
+    faq: 'FAQ',
     contact: '聯絡我',
     language: '中文',
     musicOn: '音樂開啟',
@@ -41,6 +44,7 @@ const copy: Record<FooterLanguage, FooterCopy> = {
   en: {
     brand: 'Fauna Gaz',
     legal: 'Info',
+    faq: 'FAQ',
     contact: 'Contact',
     language: 'English',
     musicOn: 'Music on',
@@ -57,6 +61,7 @@ function Footer({
   musicEnabled,
   onHome,
   onLegal,
+  onFaq,
   onContact,
   onMusicToggle,
 }: FooterProps) {
@@ -95,7 +100,7 @@ function Footer({
           size="large"
           padding="footer-hug"
           textSize={footerTextSize}
-          className="shrink-0"
+          className="shrink-0 border-r-thin border-ink-primary"
           onClick={onHome}
         />
 
@@ -109,6 +114,18 @@ function Footer({
           ariaLabel={labels.navigation}
           onClick={onLegal}
         />
+        {!isCompact && (
+          <Button
+            label={labels.faq}
+            appearance="text"
+            size="large"
+            padding="footer-hug"
+            textSize={footerTextSize}
+            className="whitespace-nowrap border-r-thin border-ink-primary"
+            ariaLabel={labels.faq}
+            onClick={onFaq}
+          />
+        )}
         <Button
           label={labels.contact}
           appearance="text"

@@ -9,6 +9,7 @@ export type LegalDocument = 'privacy' | 'terms' | 'faq'
 export type LegalWindowProps = {
   mode?: WindowMode
   initialDocument?: LegalDocument
+  standalone?: boolean
   className?: string
   onClose?: WindowProps['onClose']
 }
@@ -34,6 +35,7 @@ const documentCopy: Record<LegalDocument, { label: string; title: string; body: 
 function LegalWindow({
   mode = 'desktop',
   initialDocument = 'privacy',
+  standalone = false,
   className = '',
   onClose,
 }: LegalWindowProps) {
@@ -44,32 +46,34 @@ function LegalWindow({
   return (
     <Window
       mode={mode}
-      title="網站資訊"
+      title={standalone ? 'FAQ' : '網站資訊'}
       className={`h-full min-h-0 ${className}`}
       onClose={onClose}
     >
       <div className="flex min-h-0 min-w-0 flex-1 flex-col text-ink-primary">
-        <nav
-          className="flex shrink-0 flex-wrap gap-space-xs border-b-thin border-line-strong bg-window-surface p-space-sm"
-          aria-label="法律文件"
-        >
-          {(Object.keys(documentCopy) as LegalDocument[]).map((documentId) => {
-            const document = documentCopy[documentId]
-            const isSelected = activeDocument === documentId
+        {!standalone && (
+          <nav
+            className="flex shrink-0 flex-wrap gap-space-xs border-b-thin border-line-strong bg-window-surface p-space-sm"
+            aria-label="法律文件"
+          >
+            {(Object.keys(documentCopy) as LegalDocument[]).map((documentId) => {
+              const document = documentCopy[documentId]
+              const isSelected = activeDocument === documentId
 
-            return (
-              <Button
-                key={documentId}
-                label={document.label}
-                appearance={isSelected ? 'outline' : 'text'}
-                size="small"
-                textSize="small"
-                ariaLabel={`查看${document.label}`}
-                onClick={() => setActiveDocument(documentId)}
-              />
-            )
-          })}
-        </nav>
+              return (
+                <Button
+                  key={documentId}
+                  label={document.label}
+                  appearance={isSelected ? 'outline' : 'text'}
+                  size="small"
+                  textSize="small"
+                  ariaLabel={`查看${document.label}`}
+                  onClick={() => setActiveDocument(documentId)}
+                />
+              )
+            })}
+          </nav>
+        )}
 
         <div className="retroScrollArea min-h-0 min-w-0 flex-1 overflow-y-auto p-space-md">
           <article className={`site-info-content grid gap-space-md font-body${isMobile ? ' text-small' : ''}`}>

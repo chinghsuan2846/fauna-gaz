@@ -27,12 +27,14 @@ type ExperienceState = 'entry' | 'covering' | 'revealing' | 'desktop'
 type DesktopWindow =
   | { id: 'contact'; type: 'contact' }
   | { id: 'legal'; type: 'legal' }
+  | { id: 'faq'; type: 'faq' }
   | { id: 'quarterly'; type: 'quarterly' }
   | { id: string; type: 'chat'; characterId: string }
 
 const LOADING_PREVIEW_DURATION = 120
 const CONTACT_WINDOW: DesktopWindow = { id: 'contact', type: 'contact' }
 const LEGAL_WINDOW: DesktopWindow = { id: 'legal', type: 'legal' }
+const FAQ_WINDOW: DesktopWindow = { id: 'faq', type: 'faq' }
 const GRASS_CHARACTER_ORDER: DesktopIconName[] = ['老莫', '一號', '二號']
 
 function resolveViewportMode(): WindowMode {
@@ -163,6 +165,7 @@ function DesktopExperience({ articles = [], characters = [], contact }: DesktopE
   const openQuarterly = () => openWindow({ id: 'quarterly', type: 'quarterly' })
   const openContact = () => openWindow(CONTACT_WINDOW)
   const openLegal = () => openWindow(LEGAL_WINDOW)
+  const openFaq = () => openWindow(FAQ_WINDOW)
   const openCharacterChat = (character: SanityCharacter) => {
     openWindow({ id: `chat-${character._id}`, type: 'chat', characterId: character._id })
   }
@@ -314,7 +317,9 @@ function DesktopExperience({ articles = [], characters = [], contact }: DesktopE
                 )
               }
 
-              if (window.type === 'legal') {
+              if (window.type === 'legal' || window.type === 'faq') {
+                const isFaqWindow = window.type === 'faq'
+
                 return (
                   <div
                     key={window.id}
@@ -323,6 +328,8 @@ function DesktopExperience({ articles = [], characters = [], contact }: DesktopE
                   >
                     <LegalWindow
                       mode={viewportMode}
+                      initialDocument={isFaqWindow ? 'faq' : undefined}
+                      standalone={isFaqWindow}
                       onClose={() => closeWindow(window.id)}
                     />
                   </div>
@@ -364,6 +371,7 @@ function DesktopExperience({ articles = [], characters = [], contact }: DesktopE
           musicEnabled={musicEnabled}
           onHome={returnToEntry}
           onLegal={openLegal}
+          onFaq={openFaq}
           onContact={openContact}
           onMusicToggle={toggleMusic}
         />
