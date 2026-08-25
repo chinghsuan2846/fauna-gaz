@@ -5,6 +5,7 @@ import CharacterProfile from '../component/CharacterProfile'
 import ChatBubble from '../component/ChatBubble'
 import ChatSubmit from '../component/ChatSubmit'
 import { Button, type PixelIconName } from '../component/Button'
+import { getBubbleImagePosition } from '../component/characterImagePosition'
 import type { WindowMode, WindowProps } from '../component/Window'
 import Window from '../component/Window'
 
@@ -190,7 +191,11 @@ function ChatWindowsContent({
           <div className={messageScrollClasses[viewport]}>
             <div className="grid min-h-full content-start gap-space-md">
               {visibleMessages.map(({ id, ...message }) => (
-                <ChatBubble key={id} {...message} />
+                <ChatBubble
+                  key={id}
+                  {...message}
+                  avatarPosition={message.avatarPosition ?? getBubbleImagePosition(profile.name)}
+                />
               ))}
             </div>
           </div>

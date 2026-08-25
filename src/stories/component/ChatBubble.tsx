@@ -1,3 +1,5 @@
+import { characterImagePositionClasses, type CharacterImagePosition } from './characterImagePosition'
+
 export type ChatBubbleSpeaker = 'character' | 'user'
 
 export type ChatBubbleProps = {
@@ -5,6 +7,7 @@ export type ChatBubbleProps = {
   avatarAlt?: string
   message: string
   speaker?: ChatBubbleSpeaker
+  avatarPosition?: CharacterImagePosition
   className?: string
 }
 
@@ -28,6 +31,7 @@ export function ChatBubble({
   avatarAlt = '',
   message,
   speaker = 'character',
+  avatarPosition = 'default',
   className = '',
 }: ChatBubbleProps) {
   return (
@@ -37,7 +41,7 @@ export function ChatBubble({
       {speaker === 'character' && avatarSrc ? (
         <div className="h-space-xl w-space-xl shrink-0 overflow-hidden rounded-full bg-scrollbar-track">
           <img
-            className="block h-full w-full scale-125 -translate-x-space-xs translate-y-space-xs object-cover object-top"
+            className={`block h-full w-full scale-125 translate-y-space-xs object-cover object-top ${characterImagePositionClasses[avatarPosition]}`}
             src={avatarSrc}
             alt={avatarAlt}
             draggable="false"

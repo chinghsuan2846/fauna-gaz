@@ -1,4 +1,11 @@
 import type { ReactNode } from 'react'
+import {
+  characterImageFitClasses,
+  characterImagePositionClasses,
+  characterImageScaleClasses,
+  getProfileImagePosition,
+  type CharacterImagePosition,
+} from './characterImagePosition'
 
 export type CharacterProfileVariant = 'full' | 'compact'
 export type CharacterProfileImageScale = 'default' | 'large'
@@ -11,6 +18,7 @@ export type CharacterProfileProps = {
   species: string
   variant?: CharacterProfileVariant
   imageScale?: CharacterProfileImageScale
+  imagePosition?: CharacterImagePosition
   className?: string
 }
 
@@ -26,12 +34,12 @@ const imageFrameClasses: Record<CharacterProfileVariant, string> = {
 
 const imageScaleClasses: Record<CharacterProfileVariant, Record<CharacterProfileImageScale, string>> = {
   full: {
-    default: 'scale-125 -translate-x-space-xs',
-    large: 'scale-125 origin-top -translate-x-space-xs translate-y-space-sm',
+    default: '',
+    large: 'origin-top translate-y-space-sm',
   },
   compact: {
-    default: 'scale-125 -translate-x-space-xs translate-y-space-xs',
-    large: 'scale-125 origin-top -translate-x-space-xs translate-y-space-xs',
+    default: 'translate-y-space-xs',
+    large: 'origin-top translate-y-space-xs',
   },
 }
 
@@ -40,11 +48,14 @@ function CharacterImage({
   imageAlt,
   variant,
   imageScale,
-}: Pick<CharacterProfileProps, 'imageSrc' | 'imageAlt' | 'imageScale'> & { variant: CharacterProfileVariant }) {
+  imagePosition,
+}: Pick<CharacterProfileProps, 'imageSrc' | 'imageAlt' | 'imageScale' | 'imagePosition'> & {
+  variant: CharacterProfileVariant
+}) {
   return (
     <div className={`${imageFrameClasses[variant]} overflow-hidden border-thin border-line-strong bg-scrollbar-track`}>
       <img
-        className={`block h-full w-full object-cover object-top ${imageScaleClasses[variant][imageScale ?? 'default']}`}
+        className={`block h-full w-full object-top ${characterImageFitClasses[imagePosition ?? 'default']} ${imageScaleClasses[variant][imageScale ?? 'default']} ${characterImageScaleClasses[imagePosition ?? 'default']} ${characterImagePositionClasses[imagePosition ?? 'default']}`}
         src={imageSrc}
         alt={imageAlt}
         draggable="false"
@@ -83,8 +94,10 @@ export function CharacterProfile({
   species,
   variant = 'full',
   imageScale = 'default',
+  imagePosition,
   className = '',
 }: CharacterProfileProps) {
+  const resolvedImagePosition = imagePosition ?? getProfileImagePosition(name)
   const content: ReactNode =
     variant === 'full' ? (
       <FullProfile role={role} name={name} species={species} />
@@ -98,6 +111,7 @@ export function CharacterProfile({
         imageSrc={imageSrc}
         imageAlt={imageAlt ?? `${name}角色插圖`}
         imageScale={imageScale}
+        imagePosition={resolvedImagePosition}
         variant={variant}
       />
       {content}

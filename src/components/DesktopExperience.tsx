@@ -72,6 +72,7 @@ function DesktopExperience({ articles = [], characters = [], contact }: DesktopE
   const [openWindows, setOpenWindows] = useState<DesktopWindow[]>([CONTACT_WINDOW])
   const [selectedArticleId, setSelectedArticleId] = useState<string | null>(articles[0]?._id ?? null)
   const [isLoading, setIsLoading] = useState(false)
+  const [musicEnabled, setMusicEnabled] = useState(true)
   const viewportMode = useViewportMode()
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const loadingTimerRef = useRef<number | null>(null)
@@ -87,7 +88,23 @@ function DesktopExperience({ articles = [], characters = [], contact }: DesktopE
   const backgroundFit = 'cover'
 
   const tryStartAudio = () => {
+    if (!musicEnabled) return
     audioRef.current?.play().catch(() => {})
+  }
+
+  const toggleMusic = () => {
+    const nextMusicEnabled = !musicEnabled
+    setMusicEnabled(nextMusicEnabled)
+
+    const audio = audioRef.current
+    if (!audio) return
+
+    audio.muted = !nextMusicEnabled
+    if (nextMusicEnabled) {
+      audio.play().catch(() => {})
+    } else {
+      audio.pause()
+    }
   }
 
   useEffect(() => {
@@ -102,7 +119,7 @@ function DesktopExperience({ articles = [], characters = [], contact }: DesktopE
 
   useEffect(() => {
     if (viewportMode !== 'mobile') return
-    setOpenWindows((current) => (current.length > 1 ? [current.at(-1)!] : current))
+    setOpenWindows((current) => current.filter((window) => window.id !== CONTACT_WINDOW.id))
   }, [viewportMode])
 
   const startExperience = () => {
@@ -119,7 +136,7 @@ function DesktopExperience({ articles = [], characters = [], contact }: DesktopE
 
   const returnToEntry = () => {
     setExperienceState('entry')
-    setOpenWindows([CONTACT_WINDOW])
+    setOpenWindows(viewportMode === 'mobile' ? [] : [CONTACT_WINDOW])
   }
 
   const focusWindow = (windowId: string) => {
@@ -344,9 +361,11 @@ function DesktopExperience({ articles = [], characters = [], contact }: DesktopE
 
         <Footer
           mode={viewportMode === 'mobile' ? 'mobile' : viewportMode === 'tablet' ? 'tablet' : 'desktop'}
+          musicEnabled={musicEnabled}
           onHome={returnToEntry}
           onLegal={openLegal}
           onContact={openContact}
+          onMusicToggle={toggleMusic}
         />
       </main>
 

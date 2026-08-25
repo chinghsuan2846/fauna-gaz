@@ -9,9 +9,11 @@ export type FooterProps = {
   mode?: FooterMode
   currentTime?: string
   currentDate?: string
+  musicEnabled?: boolean
   onHome?: ButtonProps['onClick']
   onLegal?: ButtonProps['onClick']
   onContact?: ButtonProps['onClick']
+  onMusicToggle?: () => void
 }
 
 type FooterCopy = {
@@ -52,12 +54,15 @@ function Footer({
   mode = 'responsive',
   currentTime = '22:53',
   currentDate = '2026/8/18',
+  musicEnabled,
   onHome,
   onLegal,
   onContact,
+  onMusicToggle,
 }: FooterProps) {
   const [language, setLanguage] = useState<FooterLanguage>('zh')
-  const [musicEnabled, setMusicEnabled] = useState(true)
+  const [internalMusicEnabled, setInternalMusicEnabled] = useState(true)
+  const isMusicEnabled = musicEnabled ?? internalMusicEnabled
   const labels = copy[language]
   const isCompact = mode === 'mobile'
   const isTablet = mode === 'tablet'
@@ -68,11 +73,18 @@ function Footer({
   const footerTextClass = 'text-small'
 
   const toggleLanguage = () => setLanguage((current) => (current === 'zh' ? 'en' : 'zh'))
-  const toggleMusic = () => setMusicEnabled((enabled) => !enabled)
+  const toggleMusic = () => {
+    if (onMusicToggle) {
+      onMusicToggle()
+      return
+    }
+
+    setInternalMusicEnabled((enabled) => !enabled)
+  }
 
   return (
     <footer
-      className={`flex ${rootLayout} min-w-0 shrink-0 items-stretch border-t-thin border-ink-primary bg-window-surface font-ui text-ink-primary`}
+      className={`flex ${rootLayout} min-h-[2.5rem] min-w-0 shrink-0 items-stretch border-t-thin border-ink-primary bg-window-surface font-ui text-ink-primary`}
     >
       <div className={`flex ${groupLayout} ${stackedGroup} min-w-0 items-stretch`}>
         <Button
@@ -121,13 +133,13 @@ function Footer({
           onClick={toggleLanguage}
         />
         <Button
-          icon={musicEnabled ? 'volume-on' : 'volume-off'}
+          icon={isMusicEnabled ? 'volume-on' : 'volume-off'}
           iconOnly
           iconSize="small"
           appearance="text"
           size="small"
           textSize={footerTextSize}
-          ariaLabel={musicEnabled ? labels.musicOn : labels.musicOff}
+          ariaLabel={isMusicEnabled ? labels.musicOn : labels.musicOff}
           onClick={toggleMusic}
         />
         {!isCompact && <span className={`whitespace-nowrap px-space-xs py-space-xs ${footerTextClass}`}>{currentTime}</span>}
