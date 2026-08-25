@@ -3,6 +3,7 @@ const {
   title = 'Fauna Gaz',
   description = 'Fauna Gaz — a quarterly journal for animal behaviour.',
   image,
+  bodyClass = '',
 } = Astro.props
 
 const canonicalUrl = new URL(Astro.url.pathname, Astro.site ?? Astro.url)
@@ -24,7 +25,7 @@ const socialImage = image ? new URL(image, canonicalUrl) : undefined
     <meta name="twitter:card" content={socialImage ? 'summary_large_image' : 'summary'} />
     <title>{title}</title>
   </head>
-  <body>
+  <body class={bodyClass}>
     <slot />
   </body>
 </html>

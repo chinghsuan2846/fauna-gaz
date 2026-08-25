@@ -71,6 +71,7 @@ function Footer({
   const stackedGroup = 'w-auto'
   const footerTextSize = 'small'
   const footerTextClass = 'text-small'
+  const mobileBottomBorder = isCompact ? ' border-b-thin' : ''
 
   const toggleLanguage = () => setLanguage((current) => (current === 'zh' ? 'en' : 'zh'))
   const toggleMusic = () => {
@@ -84,7 +85,7 @@ function Footer({
 
   return (
     <footer
-      className={`flex ${rootLayout} min-h-[2.5rem] min-w-0 shrink-0 items-stretch border-t-thin border-ink-primary bg-window-surface font-ui text-ink-primary`}
+      className={`flex ${rootLayout} min-h-[2.5rem] min-w-0 shrink-0 items-stretch border-t-thin${mobileBottomBorder} border-ink-primary bg-window-surface font-ui text-ink-primary`}
     >
       <div className={`flex ${groupLayout} ${stackedGroup} min-w-0 items-stretch`}>
         <Button
