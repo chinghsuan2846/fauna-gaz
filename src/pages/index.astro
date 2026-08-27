@@ -4,17 +4,18 @@ import DesktopExperience from '../components/DesktopExperience'
 import BaseLayout from '../layouts/BaseLayout.astro'
 import { toContactInfo } from '../lib/contentAdapter'
 import { demoArticles, demoCharacters, demoSiteSettings } from '../lib/demoContent'
-import { articleListQuery, characterListQuery, siteSettingsQuery } from '../lib/queries.js'
+import { articleListQuery, characterListQuery, quarterlyPdfListQuery, siteSettingsQuery } from '../lib/queries.js'
 import '../styles/global.css'
 
 const hasSanityConfig = Boolean(import.meta.env.PUBLIC_SANITY_PROJECT_ID)
-const [articles, siteSettings, characters] = hasSanityConfig
+const [articles, quarterlyPdfs, siteSettings, characters] = hasSanityConfig
   ? await Promise.all([
       sanityClient.fetch(articleListQuery),
+      sanityClient.fetch(quarterlyPdfListQuery),
       sanityClient.fetch(siteSettingsQuery),
       sanityClient.fetch(characterListQuery),
     ])
-  : [demoArticles, demoSiteSettings, demoCharacters]
+  : [demoArticles, [], demoSiteSettings, demoCharacters]
 const contact = toContactInfo(siteSettings)
 ---
 
@@ -23,5 +24,5 @@ const contact = toContactInfo(siteSettings)
   description="Fauna Gaz — a quarterly journal for animal behaviour."
   bodyClass="experience-page"
 >
-  <DesktopExperience client:load articles={articles} characters={characters} contact={contact} />
+  <DesktopExperience client:load articles={articles} quarterlyPdfs={quarterlyPdfs} characters={characters} contact={contact} />
 </BaseLayout>

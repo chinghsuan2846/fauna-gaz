@@ -2,10 +2,12 @@ import { useEffect, useRef, useState } from 'react'
 import {
   toCharacterDialogue,
   toQuarterlyContentArticle,
+  toQuarterlyPdfContentArticle,
   toQuarterlySidebarData,
   type ContactInfo,
   type SanityArticle,
   type SanityCharacter,
+  type SanityQuarterlyPdf,
 } from '../lib/contentAdapter'
 import ChatWindows from '../stories/patterns/ChatWindows'
 import QuarterlyWindow from '../stories/patterns/QuarterlyWindow'
@@ -19,6 +21,7 @@ import PixelGridTransition from './PixelGridTransition'
 
 type DesktopExperienceProps = {
   articles?: SanityArticle[]
+  quarterlyPdfs?: SanityQuarterlyPdf[]
   characters?: SanityCharacter[]
   contact?: ContactInfo | null
 }
@@ -69,7 +72,7 @@ function grassCharacterOrder(character: SanityCharacter) {
   return order === -1 ? GRASS_CHARACTER_ORDER.length : order
 }
 
-function DesktopExperience({ articles = [], characters = [], contact }: DesktopExperienceProps) {
+function DesktopExperience({ articles = [], quarterlyPdfs = [], characters = [], contact }: DesktopExperienceProps) {
   const [experienceState, setExperienceState] = useState<ExperienceState>('entry')
   const [openWindows, setOpenWindows] = useState<DesktopWindow[]>([CONTACT_WINDOW])
   const [selectedArticleId, setSelectedArticleId] = useState<string | null>(articles[0]?._id ?? null)
@@ -78,12 +81,15 @@ function DesktopExperience({ articles = [], characters = [], contact }: DesktopE
   const viewportMode = useViewportMode()
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const loadingTimerRef = useRef<number | null>(null)
-  const quarterlySidebarData = toQuarterlySidebarData(articles)
+  const quarterlySidebarData = toQuarterlySidebarData(articles, quarterlyPdfs)
   const selectedArticleIndex = articles.findIndex((article) => article._id === selectedArticleId)
   const selectedArticle = selectedArticleIndex >= 0 ? articles[selectedArticleIndex] : undefined
+  const selectedPdf = quarterlyPdfs.find((pdf) => pdf._id === selectedArticleId)
   const quarterlyContentArticle = selectedArticle
     ? toQuarterlyContentArticle(selectedArticle, articles[selectedArticleIndex - 1], articles[selectedArticleIndex + 1])
-    : undefined
+    : selectedPdf
+      ? toQuarterlyPdfContentArticle(selectedPdf, articles.at(-1))
+      : undefined
   const isDesktopVisible = experienceState === 'revealing' || experienceState === 'desktop'
   const transitionStage = experienceState === 'covering' || experienceState === 'revealing' ? experienceState : null
   const isMobileViewport = viewportMode === 'mobile'
@@ -304,7 +310,8 @@ function DesktopExperience({ articles = [], characters = [], contact }: DesktopE
                       initialSelectedArticleId={selectedArticleId ?? undefined}
                       onArticleSelect={(article) => setSelectedArticleId(article.id)}
                       onPrevious={() => {
-                        if (selectedArticleIndex > 0) setSelectedArticleId(articles[selectedArticleIndex - 1]._id)
+                        if (selectedPdf && articles.length > 0) setSelectedArticleId(articles.at(-1)?._id ?? null)
+                        else if (selectedArticleIndex > 0) setSelectedArticleId(articles[selectedArticleIndex - 1]._id)
                       }}
                       onNext={() => {
                         if (selectedArticleIndex >= 0 && selectedArticleIndex < articles.length - 1) {

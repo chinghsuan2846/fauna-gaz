@@ -51,6 +51,21 @@ export type SanityArticle = {
   }>
 }
 
+export type SanityQuarterlyPdf = {
+  _id: string
+  slug: string
+  title: string
+  pageCount?: number
+  fileUrl?: string
+  fileName?: string
+  issue?: {
+    title?: string
+    year?: string | number
+    quarter?: string
+    slug?: string
+  }
+}
+
 export type SanitySiteSettings = {
   title?: string
   contactCopy?: string
@@ -115,7 +130,10 @@ function categoryGroups(article: SanityArticle) {
     : [{ title: '未分類', slug: 'uncategorized' }]
 }
 
-export function toQuarterlySidebarData(articles: readonly SanityArticle[]): readonly QuarterlySidebarYear[] {
+export function toQuarterlySidebarData(
+  articles: readonly SanityArticle[],
+  quarterlyPdfs: readonly SanityQuarterlyPdf[] = [],
+): readonly QuarterlySidebarYear[] {
   const years = new Map<
     string,
     {
@@ -164,6 +182,26 @@ export function toQuarterlySidebarData(articles: readonly SanityArticle[]): read
     }
   }
 
+  for (const pdf of quarterlyPdfs) {
+    if (!pdf.fileUrl || !pdf.pageCount) continue
+
+    const year = String(pdf.issue?.year ?? '')
+    const quarterId = issueId({ issue: pdf.issue }, year)
+    const quarter = years.get(year)?.quarterMap.get(quarterId)
+    if (!quarter) continue
+
+    const lastGroup = quarter.groups.at(-1)
+    if (!lastGroup || lastGroup.articles.some((article) => article.id === pdf._id)) continue
+
+    lastGroup.articles.push({
+      id: pdf._id,
+      title: pdf.title,
+      kind: 'pdf',
+      pdfUrl: pdf.fileUrl,
+      pageCount: pdf.pageCount,
+    })
+  }
+
   return Array.from(years.values()).map(({ id, label, quarters }) => ({ id, label, quarters }))
 }
 
@@ -208,6 +246,28 @@ export function toQuarterlyContentArticle(
     paragraphs: toParagraphs(article),
     previous: previous ? { id: previous._id, title: previous.title } : null,
     next: next ? { id: next._id, title: next.title } : null,
+  }
+}
+
+export function toQuarterlyPdfContentArticle(
+  pdf: SanityQuarterlyPdf,
+  previous?: SanityArticle | null,
+): QuarterlyContentArticle {
+  const year = String(pdf.issue?.year ?? '')
+  const quarter = issueQuarterLabel({ issue: pdf.issue })
+
+  return {
+    id: pdf._id,
+    breadcrumb: [year, quarter, pdf.title].filter(Boolean),
+    title: pdf.title,
+    paragraphs: [],
+    pdf: {
+      url: pdf.fileUrl ?? '',
+      pageCount: pdf.pageCount ?? 1,
+      fileName: pdf.fileName,
+    },
+    previous: previous ? { id: previous._id, title: previous.title } : null,
+    next: null,
   }
 }
 

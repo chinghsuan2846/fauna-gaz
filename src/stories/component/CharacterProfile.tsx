@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import {
   characterImageFitClasses,
+  characterImageObjectPositionClasses,
   characterImagePositionClasses,
   characterImageScaleClasses,
   getProfileImagePosition,
@@ -43,6 +44,22 @@ const imageScaleClasses: Record<CharacterProfileVariant, Record<CharacterProfile
   },
 }
 
+const compactProfileImageOverrides: Partial<
+  Record<CharacterImagePosition, { fit: string; scale: string; position: string; objectPosition?: string }>
+> = {
+  'far-left': {
+    fit: 'object-cover',
+    scale: 'scale-125',
+    position: '-translate-x-space-xs sm:-translate-x-space-sm',
+    objectPosition: 'object-right-bottom',
+  },
+  'extra-left': {
+    fit: 'object-contain',
+    scale: 'scale-125 translate-y-space-xs',
+    position: '-translate-x-space-sm',
+  },
+}
+
 function CharacterImage({
   imageSrc,
   imageAlt,
@@ -52,10 +69,18 @@ function CharacterImage({
 }: Pick<CharacterProfileProps, 'imageSrc' | 'imageAlt' | 'imageScale' | 'imagePosition'> & {
   variant: CharacterProfileVariant
 }) {
+  const resolvedImagePosition = imagePosition ?? 'default'
+  const compactOverride = variant === 'compact' ? compactProfileImageOverrides[resolvedImagePosition] : undefined
+  const imageFit = compactOverride?.fit ?? characterImageFitClasses[resolvedImagePosition]
+  const imageScaleClass = compactOverride?.scale ?? imageScaleClasses[variant][imageScale ?? 'default']
+  const characterImageScale = compactOverride ? '' : characterImageScaleClasses[resolvedImagePosition]
+  const imagePositionClass = compactOverride?.position ?? characterImagePositionClasses[resolvedImagePosition]
+  const objectPositionClass = compactOverride?.objectPosition ?? characterImageObjectPositionClasses[resolvedImagePosition]
+
   return (
     <div className={`${imageFrameClasses[variant]} overflow-hidden border-thin border-line-strong bg-scrollbar-track`}>
       <img
-        className={`block h-full w-full object-top ${characterImageFitClasses[imagePosition ?? 'default']} ${imageScaleClasses[variant][imageScale ?? 'default']} ${characterImageScaleClasses[imagePosition ?? 'default']} ${characterImagePositionClasses[imagePosition ?? 'default']}`}
+        className={`block h-full w-full ${objectPositionClass} ${imageFit} ${imageScaleClass} ${characterImageScale} ${imagePositionClass}`}
         src={imageSrc}
         alt={imageAlt}
         draggable="false"

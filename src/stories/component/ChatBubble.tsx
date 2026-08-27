@@ -1,4 +1,8 @@
-import { characterImagePositionClasses, type CharacterImagePosition } from './characterImagePosition'
+import {
+  characterImageObjectPositionClasses,
+  characterImagePositionClasses,
+  type CharacterImagePosition,
+} from './characterImagePosition'
 
 export type ChatBubbleSpeaker = 'character' | 'user'
 
@@ -34,14 +38,18 @@ export function ChatBubble({
   avatarPosition = 'default',
   className = '',
 }: ChatBubbleProps) {
+  const mobileBubbleOffset = avatarPosition === 'slightly-left'
+    ? 'translate-x-space-xs translate-y-space-xs sm:translate-x-0 sm:translate-y-0'
+    : ''
+
   return (
     <article
-      className={`flex w-fit max-w-chat-bubble-mobile items-start gap-space-sm font-body sm:max-w-chat-bubble ${speakerClasses[speaker]} ${className}`}
+      className={`flex w-fit max-w-chat-bubble-mobile items-start gap-space-sm font-body sm:max-w-chat-bubble ${speakerClasses[speaker]} ${mobileBubbleOffset} ${className}`}
     >
       {speaker === 'character' && avatarSrc ? (
         <div className="h-space-xl w-space-xl shrink-0 overflow-hidden rounded-full bg-scrollbar-track">
           <img
-            className={`block h-full w-full scale-125 translate-y-space-xs object-cover object-top ${characterImagePositionClasses[avatarPosition]}`}
+            className={`block h-full w-full scale-125 translate-y-space-xs object-cover ${characterImageObjectPositionClasses[avatarPosition]} ${characterImagePositionClasses[avatarPosition]}`}
             src={avatarSrc}
             alt={avatarAlt}
             draggable="false"

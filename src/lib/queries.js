@@ -24,6 +24,23 @@ export const articleListQuery = `*[
   ${articleProjection}
 }`
 
+export const quarterlyPdfListQuery = `*[
+  _type == "quarterlyPdf" && defined(slug.current) && defined(file.asset)
+] | order(issue->year desc, issue->quarter asc, _createdAt asc){
+  _id,
+  title,
+  "slug": slug.current,
+  pageCount,
+  "fileUrl": file.asset->url,
+  "fileName": file.asset->originalFilename,
+  "issue": issue->{
+    title,
+    year,
+    quarter,
+    "slug": slug.current
+  }
+}`
+
 export const articleSlugsQuery = `*[
   _type == "article" && defined(slug.current)
 ]{

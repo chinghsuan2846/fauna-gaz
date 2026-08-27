@@ -5,6 +5,9 @@ import { PixelIcon } from './Button'
 export type QuarterlySidebarArticle = {
   id: string
   title: string
+  kind?: 'article' | 'pdf'
+  pdfUrl?: string
+  pageCount?: number
 }
 
 export type QuarterlySidebarGroup = {
