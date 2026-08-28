@@ -1,6 +1,5 @@
-import { useEffect, useState } from 'react'
-
-import { Button } from './Button'
+import { useEffect, useRef, useState } from 'react'
+import type { PDFDocumentProxy, RenderTask } from 'pdfjs-dist'
 
 export type QuarterlyPdfViewerProps = {
   url: string
@@ -9,77 +8,203 @@ export type QuarterlyPdfViewerProps = {
   mobile?: boolean
 }
 
-function QuarterlyPdfViewer({ url, pageCount, fileName, mobile = false }: QuarterlyPdfViewerProps) {
-  const [page, setPage] = useState(1)
+type PdfJsModule = typeof import('pdfjs-dist')
+type PdfLoadingTask = ReturnType<PdfJsModule['getDocument']>
+
+const pdfWorkerUrl = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).toString()
+
+function getPdfSource(url: string) {
+  if (!import.meta.env.DEV) return url
+
+  try {
+    const parsedUrl = new URL(url)
+    if (parsedUrl.hostname !== 'cdn.sanity.io') return url
+    return `/__sanity-pdf${parsedUrl.pathname}${parsedUrl.search}`
+  } catch {
+    return url
+  }
+}
+
+function QuarterlyPdfViewer({ url, pageCount, fileName }: QuarterlyPdfViewerProps) {
+  const [pdfDocument, setPdfDocument] = useState<PDFDocumentProxy | null>(null)
+  const [loadedPageCount, setLoadedPageCount] = useState<number | null>(null)
   const [isLoading, setIsLoading] = useState(true)
-  const safePageCount = Math.max(1, pageCount)
+  const [useNativeViewer, setUseNativeViewer] = useState(false)
+  const [containerWidth, setContainerWidth] = useState(0)
+  const viewerRef = useRef<HTMLDivElement>(null)
+  const canvasRefs = useRef(new Map<number, HTMLCanvasElement>())
+  const renderTasksRef = useRef(new Map<number, RenderTask>())
+  const renderGenerationRef = useRef(0)
+  const safePageCount = Math.max(1, loadedPageCount ?? pageCount)
+  const pdfSource = getPdfSource(url)
 
   useEffect(() => {
-    setPage(1)
+    let cancelled = false
+    let loadingTask: PdfLoadingTask | undefined
+    let loadedDocument: PDFDocumentProxy | undefined
+
+    setPdfDocument(null)
+    setLoadedPageCount(null)
     setIsLoading(true)
-  }, [url])
+    setUseNativeViewer(false)
 
-  useEffect(() => {
-    setIsLoading(true)
-  }, [page])
+    const loadDocument = async () => {
+      try {
+        const pdfjs = await import('pdfjs-dist')
+        if (cancelled) return
 
-  useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'ArrowLeft') setPage((current) => Math.max(1, current - 1))
-      if (event.key === 'ArrowRight') setPage((current) => Math.min(safePageCount, current + 1))
+        pdfjs.GlobalWorkerOptions.workerSrc = pdfWorkerUrl
+        loadingTask = pdfjs.getDocument({ url: pdfSource })
+        loadedDocument = await loadingTask.promise
+
+        if (cancelled) return
+
+        setPdfDocument(loadedDocument)
+        setLoadedPageCount(loadedDocument.numPages)
+      } catch {
+        if (cancelled) return
+        setIsLoading(false)
+        setUseNativeViewer(true)
+      }
     }
 
-    window.addEventListener('keydown', onKeyDown)
-    return () => window.removeEventListener('keydown', onKeyDown)
-  }, [safePageCount])
+    void loadDocument()
 
-  const pdfSrc = `${url}#page=${page}&view=FitH&toolbar=0&navpanes=0&scrollbar=0`
-  const buttonSize: 'small' | 'large' = mobile ? 'small' : 'large'
-  const buttonPadding: 'close' | 'close-mobile' = mobile ? 'close-mobile' : 'close'
+    return () => {
+      cancelled = true
+      void loadingTask?.destroy()
+      loadedDocument?.cleanup()
+    }
+  }, [pdfSource])
+
+  useEffect(() => {
+    const element = viewerRef.current
+    if (!element) return
+
+    const updateSize = () => {
+      const styles = window.getComputedStyle(element)
+      const horizontalPadding = Number.parseFloat(styles.paddingLeft) + Number.parseFloat(styles.paddingRight)
+
+      setContainerWidth(Math.max(0, element.clientWidth - horizontalPadding))
+    }
+
+    updateSize()
+    const observer = new ResizeObserver(updateSize)
+    observer.observe(element)
+    return () => observer.disconnect()
+  }, [])
+
+  useEffect(() => {
+    if (useNativeViewer || !pdfDocument || containerWidth <= 0) return
+
+    let cancelled = false
+    const generation = renderGenerationRef.current + 1
+    renderGenerationRef.current = generation
+    renderTasksRef.current.forEach((task) => task.cancel())
+    renderTasksRef.current.clear()
+
+    const renderPages = async () => {
+      setIsLoading(true)
+
+      try {
+        for (let pageNumber = 1; pageNumber <= pdfDocument.numPages; pageNumber += 1) {
+          if (cancelled || renderGenerationRef.current !== generation) return
+
+          const canvas = canvasRefs.current.get(pageNumber)
+          if (!canvas) continue
+
+          const pdfPage = await pdfDocument.getPage(pageNumber)
+          if (cancelled || renderGenerationRef.current !== generation) {
+            pdfPage.cleanup()
+            return
+          }
+
+          const baseViewport = pdfPage.getViewport({ scale: 1 })
+          const scale = containerWidth / baseViewport.width
+          const outputScale = Math.min(window.devicePixelRatio || 1, 2)
+          const viewport = pdfPage.getViewport({ scale })
+          const renderViewport = pdfPage.getViewport({ scale: scale * outputScale })
+          const context = canvas.getContext('2d')
+
+          if (!context) {
+            pdfPage.cleanup()
+            throw new Error('Canvas is unavailable')
+          }
+
+          canvas.width = Math.floor(renderViewport.width)
+          canvas.height = Math.floor(renderViewport.height)
+          canvas.style.width = `${viewport.width}px`
+          canvas.style.height = `${viewport.height}px`
+          context.clearRect(0, 0, canvas.width, canvas.height)
+
+          const renderTask = pdfPage.render({ canvasContext: context, canvas, viewport: renderViewport })
+          renderTasksRef.current.set(pageNumber, renderTask)
+
+          try {
+            await renderTask.promise
+          } finally {
+            if (renderTasksRef.current.get(pageNumber) === renderTask) {
+              renderTasksRef.current.delete(pageNumber)
+            }
+            pdfPage.cleanup()
+          }
+        }
+
+        if (!cancelled && renderGenerationRef.current === generation) setIsLoading(false)
+      } catch (renderError) {
+        if (cancelled || renderGenerationRef.current !== generation || (renderError as { name?: string }).name === 'RenderingCancelledException') return
+        setIsLoading(false)
+        setUseNativeViewer(true)
+      }
+    }
+
+    void renderPages()
+
+    return () => {
+      cancelled = true
+      renderTasksRef.current.forEach((task) => task.cancel())
+      renderTasksRef.current.clear()
+    }
+  }, [containerWidth, loadedPageCount, pdfDocument, useNativeViewer])
+
+  const pdfSrc = `${url}#toolbar=0&navpanes=0&scrollbar=1`
 
   return (
     <div className="flex min-h-0 flex-1 flex-col bg-ink-primary">
-      <div className="relative min-h-0 flex-1 overflow-hidden">
-        <iframe
-          key={pdfSrc}
-          title={fileName ? `PDF：${fileName}` : '季刊 PDF'}
-          src={pdfSrc}
-          className="h-full w-full border-0 bg-window-surface"
-          onLoad={() => setIsLoading(false)}
-        />
-
-        {isLoading && (
-          <div className="pointer-events-none absolute inset-0 grid place-items-center bg-ink-primary px-space-xl text-center font-ui text-small text-ink-inverse">
-            <span role="status">PDF 載入中…</span>
+      <div ref={viewerRef} className="retroScrollArea relative flex min-h-0 flex-1 flex-col items-center overflow-x-hidden overflow-y-auto bg-ink-primary p-space-sm">
+        {useNativeViewer ? (
+          <iframe
+            key={pdfSrc}
+            title={fileName ? `PDF：${fileName}` : '季刊 PDF'}
+            src={pdfSrc}
+            className="h-full w-full border-0 bg-window-surface"
+            onLoad={() => setIsLoading(false)}
+          />
+        ) : (
+          <div className="flex w-full flex-col items-center gap-space-sm">
+            {Array.from({ length: safePageCount }, (_, index) => index + 1).map((pageNumber) => (
+              <canvas
+                key={pageNumber}
+                ref={(canvas) => {
+                  if (canvas) canvasRefs.current.set(pageNumber, canvas)
+                  else canvasRefs.current.delete(pageNumber)
+                }}
+                aria-label={fileName ? `PDF：${fileName}，第 ${pageNumber} 頁` : `季刊 PDF，第 ${pageNumber} 頁`}
+                className="block max-w-full bg-window-surface shadow-window"
+              />
+            ))}
           </div>
         )}
 
-        <Button
-          icon="chevron-left"
-          iconOnly
-          iconSize={buttonSize}
-          size="small"
-          padding={buttonPadding}
-          ariaLabel="PDF 上一頁"
-          state={page > 1 ? 'default' : 'disabled'}
-          className="absolute left-space-sm top-1/2 z-10 -translate-y-1/2 shadow-window"
-          onClick={() => setPage((current) => Math.max(1, current - 1))}
-        />
-        <Button
-          icon="chevron-right"
-          iconOnly
-          iconSize={buttonSize}
-          size="small"
-          padding={buttonPadding}
-          ariaLabel="PDF 下一頁"
-          state={page < safePageCount ? 'default' : 'disabled'}
-          className="absolute right-space-sm top-1/2 z-10 -translate-y-1/2 shadow-window"
-          onClick={() => setPage((current) => Math.min(safePageCount, current + 1))}
-        />
+        {isLoading && (
+          <div className="pointer-events-none absolute inset-0 grid place-items-center bg-ink-primary/80 px-space-xl text-center font-ui text-small text-ink-inverse">
+            <span role="status">PDF 載入中…</span>
+          </div>
+        )}
       </div>
 
       <div className="flex shrink-0 items-center justify-center gap-space-sm border-t-thin border-line-strong bg-window-surface px-space-sm py-space-xs font-ui text-caption text-ink-primary">
-        <span aria-live="polite">第 {page} / {safePageCount} 頁</span>
+        <span aria-live="polite">共 {safePageCount} 頁</span>
         <a
           href={url}
           target="_blank"

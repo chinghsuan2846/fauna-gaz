@@ -151,7 +151,9 @@ function QuarterlyContent({
         borderless ? '' : ' border-thin border-line-strong'
       } ${className}`}
     >
-      <div className="retroScrollArea flex min-h-0 min-w-0 flex-1 flex-col overflow-x-hidden overflow-y-auto">
+      <div
+        className="retroScrollArea flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden"
+      >
         {article.pdf ? (
           <div className="flex min-h-0 flex-1 flex-col">
             <header className={`shrink-0 ${articleSpacingClass}`}>
@@ -163,7 +165,6 @@ function QuarterlyContent({
                   </span>
                 ))}
               </nav>
-              <h1 className={`${titleMarginClass} break-words text-title font-regular text-ink-primary`}>{article.title}</h1>
             </header>
             <QuarterlyPdfViewer
               url={article.pdf.url}

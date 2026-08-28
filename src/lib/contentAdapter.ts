@@ -112,6 +112,13 @@ function textValue(value: unknown) {
   return typeof value === 'string' ? value.trim() : ''
 }
 
+const QUARTERLY_PDF_DISPLAY_TITLE = '本期季刊 PDF'
+
+function quarterlyPdfDisplayTitle(pdf: Pick<SanityQuarterlyPdf, 'title'>) {
+  const title = textValue(pdf.title)
+  return title.replace(/\s+/g, '').toLowerCase() === '完整pdf' ? QUARTERLY_PDF_DISPLAY_TITLE : title
+}
+
 function issueQuarterLabel(article: Pick<SanityArticle, 'issue'>) {
   const year = String(article.issue?.year ?? '')
   const title = textValue(article.issue?.title)
@@ -195,7 +202,7 @@ export function toQuarterlySidebarData(
 
     lastGroup.articles.push({
       id: pdf._id,
-      title: pdf.title,
+      title: quarterlyPdfDisplayTitle(pdf),
       kind: 'pdf',
       pdfUrl: pdf.fileUrl,
       pageCount: pdf.pageCount,
@@ -255,11 +262,12 @@ export function toQuarterlyPdfContentArticle(
 ): QuarterlyContentArticle {
   const year = String(pdf.issue?.year ?? '')
   const quarter = issueQuarterLabel({ issue: pdf.issue })
+  const title = quarterlyPdfDisplayTitle(pdf)
 
   return {
     id: pdf._id,
-    breadcrumb: [year, quarter, pdf.title].filter(Boolean),
-    title: pdf.title,
+    breadcrumb: [year, quarter, title].filter(Boolean),
+    title,
     paragraphs: [],
     pdf: {
       url: pdf.fileUrl ?? '',

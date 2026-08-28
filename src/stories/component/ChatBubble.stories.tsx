@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import ChatBubble from './ChatBubble'
 import { desktopIconSources } from './DesktopIcon'
 
-const mortimerMessage = 'Hi，我是老莫。我最喜歡的東西大概是身上的這件背心吧，這是我媽媽過世當舖給我的。'
+const mortimerMessage = '大家好，我是老莫。我最喜歡的東西大概是身上的這件背心吧，這是我媽媽過世前織給我的。'
 
 const stageClasses = 'min-h-screen w-full bg-window-surface p-space-md sm:p-space-xl'
 

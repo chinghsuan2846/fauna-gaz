@@ -1,6 +1,6 @@
 import type { MouseEventHandler } from 'react'
 
-export const desktopIconNames = ['R先生', '二號', '老莫', '阿雀', '季刊', '一號'] as const
+export const desktopIconNames = ['R先生', '一五', '老莫', '阿雀', '季刊', '四月'] as const
 
 export type DesktopIconName = (typeof desktopIconNames)[number]
 export type DesktopIconSize = 'small' | 'medium' | 'large'
@@ -17,11 +17,11 @@ export type DesktopIconProps = {
 
 export const desktopIconSources: Record<DesktopIconName, string> = {
   R先生: '/assets/editor-icons/R先生.png',
-  二號: '/assets/editor-icons/二號.png',
+  一五: '/assets/editor-icons/二號.png',
   老莫: '/assets/editor-icons/老莫.png',
   阿雀: '/assets/editor-icons/阿雀.png',
   季刊: '/assets/editor-icons/季刊.png',
-  一號: '/assets/editor-icons/一號.png',
+  四月: '/assets/editor-icons/一號.png',
 }
 
 const iconSizeClasses: Record<DesktopIconSize, string> = {
@@ -32,11 +32,11 @@ const iconSizeClasses: Record<DesktopIconSize, string> = {
 
 const iconImageScaleClasses: Record<DesktopIconName, string> = {
   R先生: '',
-  二號: '',
+  一五: 'scale-75',
   老莫: '',
   阿雀: 'scale-125',
   季刊: 'scale-110 translate-y-space-xs',
-  一號: 'scale-125',
+  四月: 'scale-125',
 }
 
 export function DesktopIcon({

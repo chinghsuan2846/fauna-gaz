@@ -21,7 +21,7 @@ const chatMessages: ChatWindowsStoryArgs['messages'] = [
     id: 'mortimer-intro',
     avatarSrc: desktopIconSources['老莫'],
     avatarAlt: '老莫的像素風角色插圖',
-    message: 'Hi，我是老莫。我最喜歡的東西大概是身上的這件背心吧，這是我媽媽過世當舖給我的。',
+    message: '大家好，我是老莫。我最喜歡的東西大概是身上的這件背心吧，這是我媽媽過世前織給我的。',
     speaker: 'character',
   },
   {
@@ -45,7 +45,7 @@ const chatMessages: ChatWindowsStoryArgs['messages'] = [
     id: 'mortimer-story',
     avatarSrc: desktopIconSources['老莫'],
     avatarAlt: '老莫的像素風角色插圖',
-    message: '什麼？我不應該用「鼠」這個詞？妳說話可得大聲點，親愛的！真可惜，是沒辦法吃上什麼嗎？',
+    message: '什麼？我不應該用什麼這個詞？妳說話可得大聲點親愛的，真可憐，是沒能吃上什麼飯嗎？',
     speaker: 'character',
   },
   {

@@ -9,6 +9,17 @@ const dataset = env.PUBLIC_SANITY_DATASET || 'production'
 
 export default defineConfig({
   output: 'static',
+  vite: {
+    server: {
+      proxy: {
+        '/__sanity-pdf': {
+          target: 'https://cdn.sanity.io',
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/__sanity-pdf/, ''),
+        },
+      },
+    },
+  },
   integrations: [
     react(),
     sanity({

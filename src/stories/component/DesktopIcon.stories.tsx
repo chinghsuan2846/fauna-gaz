@@ -47,7 +47,7 @@ const meta = {
     name: {
       control: 'select',
       options: desktopIconNames,
-      description: '角色圖示名稱，與 PNG 檔名一致。',
+      description: '角色圖示名稱。',
     },
     label: {
       control: 'text',

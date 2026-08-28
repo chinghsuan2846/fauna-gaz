@@ -17,7 +17,14 @@ const client = createClient({ projectId, dataset, apiVersion: '2025-01-01', toke
 const root = fileURLToPath(new URL('..', import.meta.url))
 const assetsRoot = join(root, 'public', 'assets', 'editor-icons')
 
-const dialogue = (opening, firstOption, secondOption) => [
+const dialogue = (
+  opening,
+  firstOption,
+  secondOption,
+  firstResponse = '我會把觀察記錄整理成一篇清楚的報導，讓每個細節都能被看見。',
+  secondResponse = '每天都有新的事情發生，慢慢觀察就會發現很多有趣的線索。',
+  closingResponse = '下次見，別忘了留意身邊那些細小的動物朋友。',
+) => [
   {
     _key: 'intro',
     id: 'intro',
@@ -30,19 +37,19 @@ const dialogue = (opening, firstOption, secondOption) => [
   {
     _key: 'field-notes',
     id: 'field-notes',
-    text: '我會把觀察記錄整理成一篇清楚的報導，讓每個細節都能被看見。',
+    text: firstResponse,
     options: [{ _key: 'thanks', label: '謝謝你的分享', nextNode: 'closing' }],
   },
   {
     _key: 'daily-life',
     id: 'daily-life',
-    text: '每天都有新的事情發生，慢慢觀察就會發現很多有趣的線索。',
+    text: secondResponse,
     options: [{ _key: 'again', label: '我會再來找你', nextNode: 'closing' }],
   },
   {
     _key: 'closing',
     id: 'closing',
-    text: '下次見，別忘了留意身邊那些細小的動物朋友。',
+    text: closingResponse,
     options: [],
   },
 ]
@@ -59,7 +66,44 @@ const characters = [
     assetFile: '老莫.png',
     imageAlt: '像素風老莫角色插圖',
     dialogueStart: 'intro',
-    dialogue: dialogue('嗨，我是老莫。我最近在記錄高山草叢裡那些不容易被發現的聲音。', '聊聊田野觀察', '你平常都在做什麼？'),
+    dialogue: [
+      {
+        _key: 'intro',
+        id: 'intro',
+        text: '大家好，我是老莫。我最喜歡的東西大概是身上的這件背心吧，這是我媽媽過世前織給我的。',
+        options: [{ _key: 'dislike', label: '那你最討厭什麼？', nextNode: 'dislike' }],
+      },
+      {
+        _key: 'dislike',
+        id: 'dislike',
+        text: '最討厭的東西？黃鼠狼！一群奸詐的鼠輩！',
+        options: [{ _key: 'word-choice', label: '你不該這樣稱呼牠們嗎？', nextNode: 'word-choice' }],
+      },
+      {
+        _key: 'word-choice',
+        id: 'word-choice',
+        text: '什麼？我不應該用什麼這個詞？妳說話可得大聲點親愛的，真可憐，是沒能吃上什麼飯嗎？',
+        options: [{ _key: 'peanut', label: '那你背上的花生是怎麼回事？', nextNode: 'peanut' }],
+      },
+      {
+        _key: 'peanut',
+        id: 'peanut',
+        text: '喔？妳問我背上這顆花生？是的！這是來自一位我西方好友的贈禮，去年可是我的兩歲大壽呢！',
+        options: [{ _key: 'peanut-memory', label: '你真的不會吃掉它嗎？', nextNode: 'peanut-memory' }],
+      },
+      {
+        _key: 'peanut-memory',
+        id: 'peanut-memory',
+        text: '這真是好東西，可不是嗎？我在家裡可從沒見過的好東西！什麼？吃它？喔，不不不，我想我不會吃它的。',
+        options: [{ _key: 'closing', label: '為什麼不吃？', nextNode: 'closing' }],
+      },
+      {
+        _key: 'closing',
+        id: 'closing',
+        text: '這可是珍貴的回憶啊！',
+        options: [],
+      },
+    ],
   },
   {
     _id: 'mock-character-r',
@@ -72,7 +116,7 @@ const characters = [
     assetFile: 'R先生.png',
     imageAlt: '像素風 R 先生角色插圖',
     dialogueStart: 'intro',
-    dialogue: dialogue('我是 R 先生。我對聲音、記憶，以及誰先發現食物這些事很有興趣。', '渡鴉真的很聰明嗎？', '最近有什麼新發現？'),
+    dialogue: dialogue('我沒有什麼好說的。', '你確定嗎？', '那我先不打擾了。', '……嗯。', '再見。', '就這樣。'),
   },
   {
     _id: 'mock-character-que',
@@ -85,33 +129,70 @@ const characters = [
     assetFile: '阿雀.png',
     imageAlt: '像素風阿雀角色插圖',
     dialogueStart: 'intro',
-    dialogue: dialogue('你好，我是阿雀，負責把城市裡每天發生的小故事寫成專欄。', '聊聊城市觀察', '你今天看到什麼？'),
+    dialogue: [
+      {
+        _key: 'intro',
+        id: 'intro',
+        text: '真希望我是一隻公鳥，這樣我的羽毛就會更漂亮了！',
+        options: [{ _key: 'feathers', label: '為什麼想要公鳥的羽毛？', nextNode: 'feathers' }],
+      },
+      {
+        _key: 'feathers',
+        id: 'feathers',
+        text: '哦，不知道在食譜中加入一點點公鳥的羽毛會不會讓我更漂亮呢？',
+        options: [{ _key: 'recipe', label: '你會把整隻公鳥加進去嗎？', nextNode: 'recipe' }],
+      },
+      {
+        _key: 'recipe',
+        id: 'recipe',
+        text: '不，我當然不會整隻加進去！當然，除非那是能讓我更漂亮的配方。不過那應該不可能，對吧？',
+        options: [{ _key: 'crown', label: '那你的花冠呢？', nextNode: 'crown' }],
+      },
+      {
+        _key: 'crown',
+        id: 'crown',
+        text: '我的花冠是我根據四季變換的，很好看吧！我可真是一隻漂亮的小麻雀！',
+        options: [{ _key: 'whole-bird', label: '加入公鳥會讓你長出他的羽毛嗎？', nextNode: 'whole-bird' }],
+      },
+      {
+        _key: 'whole-bird',
+        id: 'whole-bird',
+        text: '話說，妳覺得在食譜加入一整隻公鳥會讓我長出他的羽毛嗎？',
+        options: [{ _key: 'closing', label: '你說完了嗎？', nextNode: 'closing' }],
+      },
+      {
+        _key: 'closing',
+        id: 'closing',
+        text: '嗯？為什麼不說話了？難道不會嗎？',
+        options: [],
+      },
+    ],
   },
   {
     _id: 'mock-character-one',
     _type: 'character',
-    name: '一號',
-    slug: { _type: 'slug', current: 'one' },
+    name: '四月',
+    slug: { _type: 'slug', current: 'april' },
     species: '家貓',
-    role: '貓',
+    role: '貓咪',
     characterType: 'cat',
     assetFile: '一號.png',
-    imageAlt: '像素風一號角色插圖',
+    imageAlt: '像素風四月角色插圖',
     dialogueStart: 'intro',
-    dialogue: dialogue('我是一號。我的研究方法很簡單：先找一個舒服的位置，再觀察所有經過的人。', '貓咪如何觀察？', '你想知道什麼？'),
+    dialogue: dialogue('我是四月。我的研究方法很簡單：先找一個舒服的位置，再觀察所有經過的人。', '貓咪如何觀察？', '你想知道什麼？'),
   },
   {
     _id: 'mock-character-two',
     _type: 'character',
-    name: '二號',
-    slug: { _type: 'slug', current: 'two' },
+    name: '一五',
+    slug: { _type: 'slug', current: 'fifteen' },
     species: '家貓',
-    role: '貓',
+    role: '貓咪',
     characterType: 'cat',
     assetFile: '二號.png',
-    imageAlt: '像素風二號角色插圖',
+    imageAlt: '像素風一五角色插圖',
     dialogueStart: 'intro',
-    dialogue: dialogue('我是二號，專門研究門打開之後，究竟要不要立刻走出去。', '研究有結果嗎？', '你喜歡哪裡？'),
+    dialogue: dialogue('我是一五，專門研究門打開之後，究竟要不要立刻走出去。', '研究有結果嗎？', '你喜歡哪裡？'),
   },
 ]
 

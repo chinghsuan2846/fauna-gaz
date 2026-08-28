@@ -194,7 +194,7 @@ function ChatWindowsContent({
                 <ChatBubble
                   key={id}
                   {...message}
-                  avatarPosition={message.avatarPosition ?? getBubbleImagePosition(profile.name)}
+                  avatarPosition={message.avatarPosition ?? getBubbleImagePosition(profile.name, viewport)}
                 />
               ))}
             </div>

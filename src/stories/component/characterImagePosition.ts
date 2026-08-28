@@ -10,15 +10,19 @@ export type CharacterImagePosition =
 const profileImagePositionOverrides: Record<string, CharacterImagePosition> = {
   R先生: 'extra-left',
   阿雀: 'right',
-  一號: 'far-left',
-  二號: 'right',
+  四月: 'far-left',
+  一五: 'right',
 }
 
 const bubbleImagePositionOverrides: Record<string, CharacterImagePosition> = {
   R先生: 'slightly-left',
   阿雀: 'right',
-  一號: 'slightly-left-bottom',
-  二號: 'right',
+  四月: 'slightly-left-bottom',
+  一五: 'right',
+}
+
+const desktopBubbleImagePositionOverrides: Record<string, CharacterImagePosition> = {
+  四月: 'right',
 }
 
 export const characterImagePositionClasses: Record<CharacterImagePosition, string> = {
@@ -65,6 +69,13 @@ export function getProfileImagePosition(name?: string): CharacterImagePosition {
   return profileImagePositionOverrides[name ?? ''] ?? 'default'
 }
 
-export function getBubbleImagePosition(name?: string): CharacterImagePosition {
+export function getBubbleImagePosition(
+  name?: string,
+  viewport: 'desktop' | 'tablet' | 'mobile' = 'desktop',
+): CharacterImagePosition {
+  if (viewport === 'desktop') {
+    return desktopBubbleImagePositionOverrides[name ?? ''] ?? bubbleImagePositionOverrides[name ?? ''] ?? 'default'
+  }
+
   return bubbleImagePositionOverrides[name ?? ''] ?? 'default'
 }

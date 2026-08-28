@@ -11,7 +11,8 @@
     "studio:build": "npm --prefix studio run build",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "sanity:seed": "node scripts/seed-sanity.mjs"
+    "sanity:seed": "node scripts/seed-sanity.mjs",
+    "sanity:update-characters": "node scripts/update-character-content.mjs"
   },
   "dependencies": {
     "@portabletext/to-html": "^6.0.0",
@@ -19,6 +20,7 @@
     "@sanity/client": "^8.2.0",
     "@sanity/image-url": "^2.1.1",
     "astro": "^7.2.4",
+    "pdfjs-dist": "^6.2.108",
     "react": "^19.1.1",
     "react-dom": "^19.1.1"
   },

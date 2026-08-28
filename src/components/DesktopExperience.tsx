@@ -38,7 +38,7 @@ const LOADING_PREVIEW_DURATION = 120
 const CONTACT_WINDOW: DesktopWindow = { id: 'contact', type: 'contact' }
 const LEGAL_WINDOW: DesktopWindow = { id: 'legal', type: 'legal' }
 const FAQ_WINDOW: DesktopWindow = { id: 'faq', type: 'faq' }
-const GRASS_CHARACTER_ORDER: DesktopIconName[] = ['老莫', '一號', '二號']
+const GRASS_CHARACTER_ORDER: DesktopIconName[] = ['老莫', '四月', '一五']
 
 function resolveViewportMode(): WindowMode {
   if (typeof window === 'undefined') return 'desktop'
@@ -63,7 +63,7 @@ function useViewportMode() {
 function iconNameForCharacter(character: SanityCharacter): DesktopIconName {
   if (desktopIconNames.includes(character.name as DesktopIconName)) return character.name as DesktopIconName
   if (character.characterType === 'bird') return '阿雀'
-  if (character.characterType === 'cat') return '一號'
+  if (character.characterType === 'cat') return '四月'
   return '老莫'
 }
 
