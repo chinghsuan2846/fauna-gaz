@@ -4,6 +4,7 @@ const {
   description = 'Fauna Gaz — a quarterly journal for animal behaviour.',
   image,
   bodyClass = '',
+  preloadForest = false,
 } = Astro.props
 
 const canonicalUrl = new URL(Astro.url.pathname, Astro.site ?? Astro.url)
@@ -23,6 +24,7 @@ const socialImage = image ? new URL(image, canonicalUrl) : undefined
     <meta property="og:url" content={canonicalUrl} />
     {socialImage && <meta property="og:image" content={socialImage} />}
     <meta name="twitter:card" content={socialImage ? 'summary_large_image' : 'summary'} />
+    {preloadForest && <link rel="preload" href="/assets/forest_pixel.svg" as="fetch" crossorigin="anonymous" />}
     <title>{title}</title>
   </head>
   <body class={bodyClass}>

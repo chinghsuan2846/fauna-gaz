@@ -2,7 +2,7 @@
 import { sanityClient } from 'sanity:client'
 import DesktopExperience from '../components/DesktopExperience'
 import BaseLayout from '../layouts/BaseLayout.astro'
-import { toContactInfo } from '../lib/contentAdapter'
+import { isQuarterlyArticleHidden, toContactInfo } from '../lib/contentAdapter'
 import { demoArticles, demoCharacters, demoSiteSettings } from '../lib/demoContent'
 import { articleListQuery, characterListQuery, quarterlyPdfListQuery, siteSettingsQuery } from '../lib/queries.js'
 import '../styles/global.css'
@@ -16,6 +16,7 @@ const [articles, quarterlyPdfs, siteSettings, characters] = hasSanityConfig
       sanityClient.fetch(characterListQuery),
     ])
   : [demoArticles, [], demoSiteSettings, demoCharacters]
+const visibleArticles = articles.filter((article) => !isQuarterlyArticleHidden(article))
 const contact = toContactInfo(siteSettings)
 ---
 
@@ -23,6 +24,7 @@ const contact = toContactInfo(siteSettings)
   title="Fauna Gaz"
   description="Fauna Gaz — a quarterly journal for animal behaviour."
   bodyClass="experience-page"
+  preloadForest
 >
-  <DesktopExperience client:load articles={articles} quarterlyPdfs={quarterlyPdfs} characters={characters} contact={contact} />
+  <DesktopExperience client:load articles={visibleArticles} quarterlyPdfs={quarterlyPdfs} characters={characters} contact={contact} />
 </BaseLayout>

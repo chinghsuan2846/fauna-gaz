@@ -15,7 +15,7 @@ const meta = {
     },
     initialDocument: {
       control: 'inline-radio',
-      options: ['privacy', 'terms', 'faq'],
+      options: ['privacy', 'terms'],
     },
     className: {
       table: {
@@ -85,6 +85,7 @@ export const FAQ = {
   args: {
     mode: 'desktop',
     initialDocument: 'faq',
+    standalone: true,
   },
   render: (args) => (
     <div className={frameClasses.desktop}>

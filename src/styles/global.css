@@ -196,6 +196,85 @@
     line-height: 1.35;
   }
 
+  .legal-document {
+    font-family: theme('fontFamily.body');
+    line-height: 1.75;
+  }
+
+  .legal-document-header {
+    display: grid;
+    gap: theme('spacing.space-sm');
+  }
+
+  .legal-document-header h1,
+  .legal-document-header h3 {
+    margin: 0;
+    font-family: theme('fontFamily.body');
+    font-weight: 500;
+    line-height: 1.35;
+  }
+
+  .legal-document-header h1 {
+    font-size: theme('fontSize.title.0');
+  }
+
+  .legal-document-header h3 {
+    font-size: clamp(1rem, 2vw, 1.25rem);
+  }
+
+  .legal-document-updated {
+    margin: 0;
+    color: theme('colors.ink.secondary');
+    font-size: theme('fontSize.small.0');
+  }
+
+  .legal-document-intro {
+    margin: 0;
+  }
+
+  .legal-document-sections {
+    display: grid;
+    gap: theme('spacing.space-lg');
+  }
+
+  .legal-document-section {
+    display: grid;
+    gap: theme('spacing.space-sm');
+  }
+
+  .legal-document-section h2,
+  .legal-document-section h4 {
+    margin: 0;
+    font-family: theme('fontFamily.body');
+    font-weight: 500;
+    line-height: 1.4;
+  }
+
+  .legal-document-section h2 {
+    font-size: theme('fontSize.lead.0');
+  }
+
+  .legal-document-section h4 {
+    font-size: theme('fontSize.body.0');
+  }
+
+  .legal-document-blocks {
+    display: grid;
+    gap: theme('spacing.space-sm');
+  }
+
+  .legal-document-blocks p,
+  .legal-document-list {
+    margin: 0;
+  }
+
+  .legal-document-list {
+    display: grid;
+    gap: theme('spacing.space-xs');
+    list-style-type: disc;
+    padding-left: theme('spacing.space-lg');
+  }
+
   @media (max-width: 37.499rem) {
     html.experience-page {
       height: 100%;

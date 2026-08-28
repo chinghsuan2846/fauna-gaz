@@ -1,7 +1,7 @@
 ---
 import { sanityClient } from 'sanity:client'
 import BaseLayout from '../../layouts/BaseLayout.astro'
-import { toQuarterlyContentArticle } from '../../lib/contentAdapter'
+import { isQuarterlyArticleHidden, toQuarterlyContentArticle } from '../../lib/contentAdapter'
 import { articleListQuery, articleSlugsQuery } from '../../lib/queries.js'
 import { sanityImageUrl } from '../../lib/sanityImage.js'
 import QuarterlyContent from '../../stories/component/QuarterlyContent'
@@ -12,7 +12,7 @@ export async function getStaticPaths() {
 
   const articles = await sanityClient.fetch(articleSlugsQuery)
 
-  return articles.map(({ slug }) => ({
+  return articles.filter((article) => !isQuarterlyArticleHidden(article)).map(({ slug }) => ({
     params: { slug },
     props: { slug },
   }))
@@ -20,7 +20,8 @@ export async function getStaticPaths() {
 
 const { slug } = Astro.props
 const allArticles = await sanityClient.fetch(articleListQuery)
-const article = allArticles.find((candidate) => candidate.slug === slug)
+const visibleArticles = allArticles.filter((candidate) => !isQuarterlyArticleHidden(candidate))
+const article = visibleArticles.find((candidate) => candidate.slug === slug)
 
 if (!article) {
   throw new Error(`Article not found for slug: ${slug}`)
@@ -28,8 +29,8 @@ if (!article) {
 
 const description = article.excerpt || 'Fauna Gaz quarterly journal article.'
 const coverImageUrl = sanityImageUrl(article.coverImage, { width: 1600 })
-const articleIndex = allArticles.findIndex((candidate) => candidate._id === article._id)
-const contentArticle = toQuarterlyContentArticle(article, allArticles[articleIndex - 1], allArticles[articleIndex + 1])
+const articleIndex = visibleArticles.findIndex((candidate) => candidate._id === article._id)
+const contentArticle = toQuarterlyContentArticle(article, visibleArticles[articleIndex - 1], visibleArticles[articleIndex + 1])
 ---
 
 <BaseLayout

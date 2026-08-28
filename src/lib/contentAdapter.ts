@@ -113,10 +113,45 @@ function textValue(value: unknown) {
 }
 
 const QUARTERLY_PDF_DISPLAY_TITLE = '本期季刊 PDF'
+const EXTENDED_CONTENT_CATEGORY = { title: '延伸內容', slug: 'extended-content' } as const
+const HIDDEN_QUARTERLY_ARTICLE_SLUGS = new Set(['isbn', 'chelseas-diet'])
+const EXTENDED_CONTENT_ARTICLE_SLUGS = new Set(['reader-mail', 'references-and-notes'])
+const REFERENCE_ARTICLE_SLUGS = new Set(['references-and-notes'])
+const REFERENCE_TEXT = [
+  '[1] Mildener A, Buchman D, Ragir S, Reiss D (2026) Evidence for mirror self-recognition in beluga whales (Delphinapterus leucas). PLoS One 21(5): e0348287. https://doi.org/10.1371/journal.pone.0348287',
+  '[2] D. Reiss, & L. Marino, Mirror self-recognition in the bottlenose dolphin: A case of cognitive convergence, Proc. Natl. Acad. Sci. U.S.A. 98 (10) 5937-5942, https://doi.org/10.1073/pnas.101086398 (2001).',
+  '[3] J.M. Plotnik, F.B.M. de Waal, & D. Reiss, Self-recognition in an Asian elephant, Proc. Natl. Acad. Sci. U.S.A. 103 (45) 17053-17057, https://doi.org/10.1073/pnas.0608062103 (2006).',
+  '[4] Tricot, M., & Cammaerts, R. (2015). Are ants (Hymenoptera, Formicidae) capable of self recognition ? Journal of science, 5, 521-532.',
+  '[5] Prior H, Schwarz A, Güntürkün O (2008) Mirror-Induced Behavior in the Magpie (Pica pica): Evidence of Self-Recognition . PLoS Biol 6(8): e202. https://doi.org/10.1371/journal.pbio.0060202',
+  '[6] Soler, M., Colmenero, J. M., Pérez-Contreras, T., & Peralta-Sánchez, J. M. (2020). Replication of the mirror mark test experiment in the magpie (Pica pica) does not provide evidence of self-recognition. Journal of comparative psychology (Washington, D.C. : 1983), 134(4), 363–371. https://doi.org/10.1037/com0000223',
+  '[7] Horowitz A. (2017). Smelling themselves: Dogs investigate their own odours longer when modified in an "olfactory mirror" test. Behavioural processes, 143, 17–24. https://doi.org/10.1016/j.beproc.2017.08.001',
+  '[8] Gallup, G. G., Jr., & Anderson, J. R. (2020). Self-recognition in animals: Where do we stand 50 years later? Lessons from cleaner wrasse and other species. Psychology of Consciousness: Theory, Research, and Practice, 7(1), 46–58. https://doi.org/10.1037/cns0000206',
+] as const
 
 function quarterlyPdfDisplayTitle(pdf: Pick<SanityQuarterlyPdf, 'title'>) {
   const title = textValue(pdf.title)
   return title.replace(/\s+/g, '').toLowerCase() === '完整pdf' ? QUARTERLY_PDF_DISPLAY_TITLE : title
+}
+
+function normalizedArticleTitle(title: string) {
+  return title.replace(/[’‘]/g, "'").replace(/\s+/g, '').toLowerCase()
+}
+
+export function isQuarterlyArticleHidden(article: Pick<SanityArticle, 'slug'> & Partial<Pick<SanityArticle, 'title'>>) {
+  const slug = textValue(article.slug).toLowerCase()
+  const title = normalizedArticleTitle(textValue(article.title))
+  return HIDDEN_QUARTERLY_ARTICLE_SLUGS.has(slug) || title === 'isbn' || title === "chelsea'sdiet"
+}
+
+function isExtendedContentArticle(article: Pick<SanityArticle, 'slug' | 'title'>) {
+  const slug = textValue(article.slug).toLowerCase()
+  const title = normalizedArticleTitle(textValue(article.title))
+  return EXTENDED_CONTENT_ARTICLE_SLUGS.has(slug) || title === '讀者回函' || title.includes('引用')
+}
+
+function isReferenceArticle(article: Pick<SanityArticle, 'slug' | 'title'>) {
+  const slug = textValue(article.slug).toLowerCase()
+  return REFERENCE_ARTICLE_SLUGS.has(slug) || normalizedArticleTitle(textValue(article.title)).includes('引用')
 }
 
 function issueQuarterLabel(article: Pick<SanityArticle, 'issue'>) {
@@ -132,6 +167,8 @@ function issueId(article: Pick<SanityArticle, 'issue'>, year: string) {
 }
 
 function categoryGroups(article: SanityArticle) {
+  if (isExtendedContentArticle(article)) return [EXTENDED_CONTENT_CATEGORY]
+
   return article.categories?.length
     ? article.categories
     : [{ title: '未分類', slug: 'uncategorized' }]
@@ -152,6 +189,8 @@ export function toQuarterlySidebarData(
   >()
 
   for (const article of articles) {
+    if (isQuarterlyArticleHidden(article)) continue
+
     const year = String(article.issue?.year ?? '未分類年份')
     const yearEntry = years.get(year) ?? {
       id: year,
@@ -197,10 +236,15 @@ export function toQuarterlySidebarData(
     const quarter = years.get(year)?.quarterMap.get(quarterId)
     if (!quarter) continue
 
-    const lastGroup = quarter.groups.at(-1)
-    if (!lastGroup || lastGroup.articles.some((article) => article.id === pdf._id)) continue
+    const extendedContentGroup = quarter.groups.find((group) => group.id === EXTENDED_CONTENT_CATEGORY.slug) ?? {
+      id: EXTENDED_CONTENT_CATEGORY.slug,
+      label: EXTENDED_CONTENT_CATEGORY.title,
+      articles: [],
+    }
+    if (!quarter.groups.includes(extendedContentGroup)) quarter.groups.push(extendedContentGroup)
+    if (extendedContentGroup.articles.some((article) => article.id === pdf._id)) continue
 
-    lastGroup.articles.push({
+    extendedContentGroup.articles.push({
       id: pdf._id,
       title: quarterlyPdfDisplayTitle(pdf),
       kind: 'pdf',
@@ -213,6 +257,13 @@ export function toQuarterlySidebarData(
 }
 
 function toParagraphs(article: SanityArticle): readonly QuarterlyContentParagraph[] {
+  if (isReferenceArticle(article)) {
+    return REFERENCE_TEXT.map((text, index) => ({
+      id: `${article._id}-reference-${index}`,
+      segments: [{ kind: 'text', text }],
+    }))
+  }
+
   return (article.body ?? [])
     .filter((block) => block._type === 'block')
     .map((block, index) => {

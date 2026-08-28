@@ -27,7 +27,7 @@ const borderClasses: Record<ChatBubbleSpeaker, string> = {
 
 const paddingClasses: Record<ChatBubbleSpeaker, string> = {
   character: 'p-space-sm',
-  user: 'py-space-sm pl-space-sm pr-space-xs',
+  user: 'p-space-sm',
 }
 
 export function ChatBubble({

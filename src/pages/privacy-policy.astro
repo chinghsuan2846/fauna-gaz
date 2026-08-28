@@ -1,13 +1,37 @@
 ---
+import { privacyPolicy } from '../lib/legalContent'
 import BaseLayout from '../layouts/BaseLayout.astro'
 import '../styles/global.css'
 ---
 
 <BaseLayout title="隱私權政策｜動物公報">
-  <main class="min-h-screen bg-window-surface p-space-lg font-body text-body text-ink-primary">
-    <article class="mx-auto grid max-w-viewport-tablet gap-space-lg">
-      <h1 class="font-ui text-title">隱私權政策</h1>
-      <p>這是動物公報預留的隱私權政策頁面。正式上線前，請由內容管理者補上完整政策內容。</p>
+  <main class="min-h-screen bg-window-surface p-space-lg text-ink-primary">
+    <article class="legal-document mx-auto grid max-w-viewport-tablet gap-space-lg">
+      <header class="legal-document-header">
+        <h1 class="font-body text-title font-medium">{privacyPolicy.title}</h1>
+        {privacyPolicy.updatedAt && <p class="legal-document-updated">{privacyPolicy.updatedAt}</p>}
+        {privacyPolicy.intro && <p class="legal-document-intro">{privacyPolicy.intro}</p>}
+      </header>
+
+      <div class="legal-document-sections">
+        {privacyPolicy.sections.map((section) => (
+          <section class="legal-document-section">
+            {section.heading && <h2>{section.heading}</h2>}
+            <div class="legal-document-blocks">
+              {section.blocks.map((block) =>
+                block.type === 'list' ? (
+                  <ul class="legal-document-list">
+                    {block.items.map((item) => <li>{item}</li>)}
+                  </ul>
+                ) : (
+                  <p>{block.text}</p>
+                ),
+              )}
+            </div>
+          </section>
+        ))}
+      </div>
+
       <a class="w-fit font-ui text-action-link underline" href="/">回到動物公報</a>
     </article>
   </main>

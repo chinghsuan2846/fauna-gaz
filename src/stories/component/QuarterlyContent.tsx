@@ -142,7 +142,8 @@ function QuarterlyContent({
   const articleSpacingClass = mobile ? 'p-space-md' : 'p-space-lg'
   const titleMarginClass = mobile ? 'mt-space-md' : 'mt-space-lg'
   const paragraphSpacingClass = mobile ? 'mt-space-md gap-space-md' : 'mt-space-lg gap-space-lg'
-  const articleTextClass = mobile ? 'text-small' : 'text-body'
+  const isReferenceArticle = article.title === '引用來源與備註'
+  const articleTextClass = mobile || isReferenceArticle ? 'text-small' : 'text-body'
 
   return (
     <section
@@ -152,7 +153,7 @@ function QuarterlyContent({
       } ${className}`}
     >
       <div
-        className="retroScrollArea flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden"
+        className="retroScrollArea flex min-h-0 min-w-0 flex-1 flex-col overflow-x-hidden overflow-y-auto"
       >
         {article.pdf ? (
           <div className="flex min-h-0 flex-1 flex-col">

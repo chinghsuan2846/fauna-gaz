@@ -220,6 +220,13 @@ const category = {
   slug: { _type: 'slug', current: 'self-awareness' },
 }
 
+const extendedContentCategory = {
+  _id: 'mock-category-extended-content',
+  _type: 'category',
+  title: '延伸內容',
+  slug: { _type: 'slug', current: 'extended-content' },
+}
+
 const articleDrafts = [
   ['self-awareness', '自我意識', '從一個問題開始：動物如何知道自己是自己？', '我們常常把自我意識想成一面鏡子，但真正重要的也許不是看見自己的外表，而是能不能在不同的時間裡，感覺到自己仍然是同一個存在。', '這一期，我們從鏡像測試、記憶、遊戲與社會互動出發，慢慢靠近「自我」這個既熟悉又難以說清楚的詞。'],
   ['white-whale', '白鯨', '海面之下，白鯨用聲音記住彼此，也記住回家的路。', '白鯨生活在遼闊而明亮的海域。對牠們來說，聲音不是背景，而是一張能夠在水中展開的地圖。', '研究者觀察到，白鯨會用不同的叫聲維持群體聯繫。當一隻白鯨離開視線，聲音就成了牠與同伴之間的細線。'],
@@ -231,11 +238,24 @@ const articleDrafts = [
   ['conclusion', '總結', '自我不是一道答案，而是一連串持續發生的關係。', '我們很難用單一測驗證明另一個物種是否擁有自我意識。每個物種都有自己的身體、感官與生活歷史。', '也許更好的問題不是「牠們像不像人」，而是「牠們如何成為牠們自己」。'],
   ['recipe', '食譜', '一份給觀察者的簡單食譜：耐心、距離，以及一點好奇心。', '第一步，找一個不打擾動物的位置。第二步，把時間放慢，讓原本不明顯的聲音與動作逐漸浮現。', '最後，記下你看到的事，也記下你沒有看到的事。好的觀察，總會為下一次提問留下空間。'],
   ['reader-mail', '讀者回函', '讀者分享一段在陽台上遇見麻雀的午後。', '「我原本以為麻雀只是來找食物，後來發現牠每天都會停在同一條曬衣桿上，像是在確認這個地方還在。」', '謝謝讀者提醒我們，觀察不一定要發生在遙遠的森林。家門口也有一整座值得慢慢閱讀的世界。'],
-  ['references-and-notes', '引用來源與備註', '本期文章的閱讀線索與編輯備註。', '本期內容以動物行為學、認知科學與田野觀察的入門資料為起點，並將複雜研究轉寫成容易閱讀的短文。', '文中的例子是編輯部為了示範版面而整理的暫時內容，正式刊載前仍需要補上完整引用與核對。'],
-  ['isbn', 'ISBN', '創刊號的出版資訊與編輯備忘。', '本期目前是 Fauna Gaz 的內容原型，ISBN 欄位暫以版面測試為主，正式出版資訊將於定稿後更新。', '我們希望每一期都能保留一點修改的空間，讓內容在被閱讀之前，先經過一次仔細的照顧。'],
-  ['chelseas-diet', 'Chelsea’s diet', '一份從餐桌旁開始的飲食觀察筆記。', 'Chelsea 的飲食紀錄看起來像是一張簡單的清單，但真正有趣的是牠如何選擇、等待，以及在不同情境下改變順序。', '飲食不只是攝取能量，也包含記憶、環境與熟悉的日常。把這些線索放在一起，才能看見行為背後的故事。'],
+  [
+    'references-and-notes',
+    '引用來源與備註',
+    '本期文章所引用的研究資料如下。',
+    [
+      '[1] Mildener A, Buchman D, Ragir S, Reiss D (2026) Evidence for mirror self-recognition in beluga whales (Delphinapterus leucas). PLoS One 21(5): e0348287. https://doi.org/10.1371/journal.pone.0348287',
+      '[2] D. Reiss, & L. Marino, Mirror self-recognition in the bottlenose dolphin: A case of cognitive convergence, Proc. Natl. Acad. Sci. U.S.A. 98 (10) 5937-5942, https://doi.org/10.1073/pnas.101086398 (2001).',
+      '[3] J.M. Plotnik, F.B.M. de Waal, & D. Reiss, Self-recognition in an Asian elephant, Proc. Natl. Acad. Sci. U.S.A. 103 (45) 17053-17057, https://doi.org/10.1073/pnas.0608062103 (2006).',
+      '[4] Tricot, M., & Cammaerts, R. (2015). Are ants (Hymenoptera, Formicidae) capable of self recognition ? Journal of science, 5, 521-532.',
+      '[5] Prior H, Schwarz A, Güntürkün O (2008) Mirror-Induced Behavior in the Magpie (Pica pica): Evidence of Self-Recognition . PLoS Biol 6(8): e202. https://doi.org/10.1371/journal.pbio.0060202',
+      '[6] Soler, M., Colmenero, J. M., Pérez-Contreras, T., & Peralta-Sánchez, J. M. (2020). Replication of the mirror mark test experiment in the magpie (Pica pica) does not provide evidence of self-recognition. Journal of comparative psychology (Washington, D.C. : 1983), 134(4), 363–371. https://doi.org/10.1037/com0000223',
+      '[7] Horowitz A. (2017). Smelling themselves: Dogs investigate their own odours longer when modified in an "olfactory mirror" test. Behavioural processes, 143, 17–24. https://doi.org/10.1016/j.beproc.2017.08.001',
+      '[8] Gallup, G. G., Jr., & Anderson, J. R. (2020). Self-recognition in animals: Where do we stand 50 years later? Lessons from cleaner wrasse and other species. Psychology of Consciousness: Theory, Research, and Practice, 7(1), 46–58. https://doi.org/10.1037/cns0000206',
+    ],
+  ],
 ]
 
+const extendedContentSlugs = new Set(['reader-mail', 'references-and-notes'])
 const articles = articleDrafts.map(([slug, title, excerpt, firstParagraph, secondParagraph], index) => ({
   _id: `mock-article-${slug}`,
   _type: 'article',
@@ -244,8 +264,8 @@ const articles = articleDrafts.map(([slug, title, excerpt, firstParagraph, secon
   excerpt,
   publishedAt: `2026-08-${String(30 - Math.min(index, 12)).padStart(2, '0')}T00:00:00.000Z`,
   issue: { _type: 'reference', _ref: issue._id },
-  categories: [{ _type: 'reference', _ref: category._id }],
-  body: body([firstParagraph, secondParagraph]),
+  categories: [{ _type: 'reference', _ref: extendedContentSlugs.has(slug) ? extendedContentCategory._id : category._id }],
+  body: body([firstParagraph, ...(Array.isArray(secondParagraph) ? secondParagraph : [secondParagraph])]),
 }))
 
 const siteSettings = {
@@ -290,12 +310,12 @@ const characterDocuments = characters.map(({ assetFile, imageAlt, ...character }
 }))
 
 const existingSiteSettings = await client.getDocument('siteSettings')
-const documents = [issue, category, ...characterDocuments, ...articles]
+const documents = [issue, category, extendedContentCategory, ...characterDocuments, ...articles]
 if (!existingSiteSettings) documents.push(siteSettings)
 
 const transaction = client.transaction()
 for (const document of documents) transaction.createOrReplace(document)
 
 await transaction.commit()
-console.log(`Seeded ${characterDocuments.length} characters, ${articles.length} articles, one issue, one category${existingSiteSettings ? '' : ', and site settings'}.`)
+console.log(`Seeded ${characterDocuments.length} characters, ${articles.length} articles, one issue, two categories${existingSiteSettings ? '' : ', and site settings'}.`)
 console.log(`Sanity Studio: https://www.sanity.io/manage/project/${projectId}/dataset/${dataset}`)

@@ -11,6 +11,26 @@ type PixelForestProps = {
   fit?: 'cover' | 'fill'
 }
 
+const sourceCache = new Map<string, Promise<string>>()
+
+function loadForestSource(src: string) {
+  const cachedSource = sourceCache.get(src)
+  if (cachedSource) return cachedSource
+
+  const source = fetch(src)
+    .then((response) => {
+      if (!response.ok) throw new Error(`Unable to load ${src}`)
+      return response.text()
+    })
+    .catch((error) => {
+      sourceCache.delete(src)
+      throw error
+    })
+
+  sourceCache.set(src, source)
+  return source
+}
+
 const leafClasses = new Set([
   'cls-1',
   'cls-2',
@@ -176,11 +196,7 @@ function PixelForest({ src, fit = 'cover' }: PixelForestProps) {
   useEffect(() => {
     let active = true
 
-    fetch(src)
-      .then((response) => {
-        if (!response.ok) throw new Error(`Unable to load ${src}`)
-        return response.text()
-      })
+    loadForestSource(src)
       .then((source) => {
         if (active) setMarkup(preparePixelForest(source, fit))
       })
