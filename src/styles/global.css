@@ -445,6 +445,18 @@
     will-change: filter;
   }
 
+  /* WebKit can keep SVG filter animations running without repainting the
+     filtered rect. Use a direct white-pixel opacity pulse on small screens so
+     the leaf light remains visible in iPhone Safari. */
+  @media (max-width: 37.499rem) {
+    .entry-forest-pixels .forest-flicker {
+      fill: #fff;
+      animation: pixel-flicker-mobile var(--pixel-duration) steps(1, end) infinite;
+      animation-delay: var(--pixel-delay);
+      will-change: opacity;
+    }
+  }
+
   .entry-enter-button {
     @apply relative;
   }
@@ -614,6 +626,20 @@
   72% {
     filter: brightness(1);
     opacity: 1;
+  }
+}
+
+@keyframes pixel-flicker-mobile {
+  0%,
+  46%,
+  72%,
+  100% {
+    opacity: 0;
+  }
+
+  54%,
+  64% {
+    opacity: 0.28;
   }
 }
 
