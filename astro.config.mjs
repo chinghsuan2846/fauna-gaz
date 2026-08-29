@@ -6,8 +6,19 @@ import { loadEnv } from 'vite'
 const env = loadEnv(process.env.NODE_ENV || 'development', process.cwd(), '')
 const projectId = env.PUBLIC_SANITY_PROJECT_ID || 'replace-me'
 const dataset = env.PUBLIC_SANITY_DATASET || 'production'
+const rawSiteUrl =
+  env.PUBLIC_SITE_URL ||
+  process.env.PUBLIC_SITE_URL ||
+  process.env.VERCEL_PROJECT_PRODUCTION_URL ||
+  process.env.VERCEL_URL
+const site = rawSiteUrl
+  ? /^https?:\/\//.test(rawSiteUrl)
+    ? rawSiteUrl
+    : `https://${rawSiteUrl}`
+  : undefined
 
 export default defineConfig({
+  site,
   output: 'static',
   vite: {
     server: {
