@@ -179,14 +179,15 @@ function DesktopExperience({ articles = [], quarterlyPdfs = [], characters = [],
   const backgroundAudio = (
     <audio
       ref={audioRef}
-      src="/assets/naturally.mp3"
       autoPlay
       loop
       playsInline
       preload="auto"
       onCanPlay={tryStartAudio}
       aria-hidden="true"
-    />
+    >
+      <source src="/assets/alex-morgan-autumn-leaves-falling-517092.mp3" type="audio/mpeg" />
+    </audio>
   )
 
   return (

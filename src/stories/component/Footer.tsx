@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { ButtonProps } from './Button'
 import { Button } from './Button'
 
@@ -29,6 +29,14 @@ type FooterCopy = {
   navigation: string
 }
 
+function formatLocalTime(date: Date) {
+  return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`
+}
+
+function formatLocalDate(date: Date) {
+  return `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`
+}
+
 const copy: Record<FooterLanguage, FooterCopy> = {
   zh: {
     brand: '動物公報',
@@ -56,8 +64,8 @@ const copy: Record<FooterLanguage, FooterCopy> = {
 
 function Footer({
   mode = 'responsive',
-  currentTime = '22:53',
-  currentDate = '2026/8/18',
+  currentTime,
+  currentDate,
   musicEnabled,
   onHome,
   onLegal,
@@ -67,6 +75,8 @@ function Footer({
 }: FooterProps) {
   const [language, setLanguage] = useState<FooterLanguage>('zh')
   const [internalMusicEnabled, setInternalMusicEnabled] = useState(true)
+  const [localTime, setLocalTime] = useState(currentTime ?? '')
+  const [localDate, setLocalDate] = useState(currentDate ?? '')
   const isMusicEnabled = musicEnabled ?? internalMusicEnabled
   const labels = copy[language]
   const isCompact = mode === 'mobile'
@@ -77,6 +87,20 @@ function Footer({
   const footerTextSize = 'small'
   const footerTextClass = 'text-small'
   const mobileBottomBorder = isCompact ? ' border-b-thin' : ''
+
+  useEffect(() => {
+    if (currentTime !== undefined && currentDate !== undefined) return
+
+    const updateClock = () => {
+      const now = new Date()
+      if (currentTime === undefined) setLocalTime(formatLocalTime(now))
+      if (currentDate === undefined) setLocalDate(formatLocalDate(now))
+    }
+
+    updateClock()
+    const clockTimer = window.setInterval(updateClock, 1000)
+    return () => window.clearInterval(clockTimer)
+  }, [currentDate, currentTime])
 
   const toggleLanguage = () => setLanguage((current) => (current === 'zh' ? 'en' : 'zh'))
   const toggleMusic = () => {
@@ -160,8 +184,8 @@ function Footer({
           ariaLabel={isMusicEnabled ? labels.musicOn : labels.musicOff}
           onClick={toggleMusic}
         />
-        {!isCompact && <span className={`whitespace-nowrap px-space-xs py-space-xs ${footerTextClass}`}>{currentTime}</span>}
-        {!isCompact && <span className={`whitespace-nowrap px-space-xs py-space-xs ${footerTextClass}`}>{currentDate}</span>}
+        {!isCompact && <span className={`whitespace-nowrap px-space-xs py-space-xs ${footerTextClass}`}>{localTime}</span>}
+        {!isCompact && <span className={`whitespace-nowrap px-space-xs py-space-xs ${footerTextClass}`}>{localDate}</span>}
       </div>
     </footer>
   )
