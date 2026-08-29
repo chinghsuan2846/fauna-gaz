@@ -29,7 +29,7 @@ function QuarterlyPdfViewer({ url, pageCount, fileName, mobile = false }: Quarte
   const [pdfDocument, setPdfDocument] = useState<PDFDocumentProxy | null>(null)
   const [loadedPageCount, setLoadedPageCount] = useState<number | null>(null)
   const [isLoading, setIsLoading] = useState(true)
-  const [useNativeViewer, setUseNativeViewer] = useState(false)
+  const [loadError, setLoadError] = useState(false)
   const [containerWidth, setContainerWidth] = useState(0)
   const viewerRef = useRef<HTMLDivElement>(null)
   const canvasRefs = useRef(new Map<number, HTMLCanvasElement>())
@@ -46,7 +46,7 @@ function QuarterlyPdfViewer({ url, pageCount, fileName, mobile = false }: Quarte
     setPdfDocument(null)
     setLoadedPageCount(null)
     setIsLoading(true)
-    setUseNativeViewer(false)
+    setLoadError(false)
 
     const loadDocument = async () => {
       try {
@@ -64,7 +64,7 @@ function QuarterlyPdfViewer({ url, pageCount, fileName, mobile = false }: Quarte
       } catch {
         if (cancelled) return
         setIsLoading(false)
-        setUseNativeViewer(true)
+        setLoadError(true)
       }
     }
 
@@ -95,7 +95,7 @@ function QuarterlyPdfViewer({ url, pageCount, fileName, mobile = false }: Quarte
   }, [])
 
   useEffect(() => {
-    if (useNativeViewer || !pdfDocument || containerWidth <= 0) return
+    if (!pdfDocument || containerWidth <= 0) return
 
     let cancelled = false
     const generation = renderGenerationRef.current + 1
@@ -153,7 +153,7 @@ function QuarterlyPdfViewer({ url, pageCount, fileName, mobile = false }: Quarte
       } catch (renderError) {
         if (cancelled || renderGenerationRef.current !== generation || (renderError as { name?: string }).name === 'RenderingCancelledException') return
         setIsLoading(false)
-        setUseNativeViewer(true)
+        setLoadError(true)
       }
     }
 
@@ -164,36 +164,29 @@ function QuarterlyPdfViewer({ url, pageCount, fileName, mobile = false }: Quarte
       renderTasksRef.current.forEach((task) => task.cancel())
       renderTasksRef.current.clear()
     }
-  }, [containerWidth, loadedPageCount, mobile, pdfDocument, useNativeViewer])
-
-  const pdfSrc = `${url}#toolbar=0&navpanes=0&scrollbar=1`
+  }, [containerWidth, loadedPageCount, mobile, pdfDocument])
 
   return (
     <div className="flex min-h-0 flex-1 flex-col bg-ink-primary">
       <div ref={viewerRef} className="retroScrollArea relative flex min-h-0 min-w-0 flex-1 flex-col items-center overflow-x-hidden overflow-y-auto bg-ink-primary p-space-sm">
-        {useNativeViewer ? (
-          <iframe
-            key={pdfSrc}
-            title={fileName ? `PDF：${fileName}` : '季刊 PDF'}
-            src={pdfSrc}
-            className="h-full w-full border-0 bg-window-surface"
-            onLoad={() => setIsLoading(false)}
-          />
-        ) : (
-          <div className="flex min-w-0 w-full flex-col items-center gap-space-sm">
-            {Array.from({ length: safePageCount }, (_, index) => index + 1).map((pageNumber) => (
-              <canvas
-                key={pageNumber}
-                ref={(canvas) => {
-                  if (canvas) canvasRefs.current.set(pageNumber, canvas)
-                  else canvasRefs.current.delete(pageNumber)
-                }}
-                aria-label={fileName ? `PDF：${fileName}，第 ${pageNumber} 頁` : `季刊 PDF，第 ${pageNumber} 頁`}
-                className="block h-auto w-full max-w-full bg-window-surface shadow-window"
-              />
-            ))}
-          </div>
-        )}
+        <div className="flex min-w-0 w-full flex-col items-center gap-space-sm">
+          {Array.from({ length: safePageCount }, (_, index) => index + 1).map((pageNumber) => (
+            <canvas
+              key={pageNumber}
+              ref={(canvas) => {
+                if (canvas) canvasRefs.current.set(pageNumber, canvas)
+                else canvasRefs.current.delete(pageNumber)
+              }}
+              aria-label={fileName ? `PDF：${fileName}，第 ${pageNumber} 頁` : `季刊 PDF，第 ${pageNumber} 頁`}
+              className="block h-auto w-full max-w-full bg-window-surface shadow-window"
+            />
+          ))}
+          {loadError && (
+            <div className="grid min-h-space-4xl w-full place-items-center bg-window-surface p-space-lg text-center font-ui text-small text-ink-primary">
+              <p>PDF 載入失敗，請改用下方連結開啟原始檔案。</p>
+            </div>
+          )}
+        </div>
 
         {isLoading && (
           <div className="pointer-events-none absolute inset-0 grid place-items-center bg-ink-primary/80 px-space-xl text-center font-ui text-small text-ink-inverse">
