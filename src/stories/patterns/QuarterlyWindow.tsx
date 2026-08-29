@@ -1,21 +1,20 @@
 import { useEffect, useRef, useState } from 'react'
 import type { PointerEvent as ReactPointerEvent } from 'react'
 import type { ButtonProps } from '../component/Button'
-import QuarterlyContent, {
-  quarterlyContentMockArticle,
-  type QuarterlyContentArticle,
-} from '../component/QuarterlyContent'
+import QuarterlyContent, { type QuarterlyContentArticle } from '../component/QuarterlyContent'
 import QuarterlySidebar, {
   quarterlySidebarMockData,
   type QuarterlySidebarArticle,
   type QuarterlySidebarYear,
 } from '../component/QuarterlySidebar'
 import WindowHeader from '../component/WindowHeader'
+import WindowState, { type WindowStateKind } from '../component/WindowState'
 
 export type QuarterlyWindowProps = {
   title?: string
   data?: readonly QuarterlySidebarYear[]
   article?: QuarterlyContentArticle
+  state?: WindowStateKind
   responsiveMode?: 'auto' | 'desktop' | 'tablet' | 'mobile'
   initialSidebarOpen?: boolean
   initialSelectedArticleId?: string
@@ -59,10 +58,11 @@ function getIsMobileViewport() {
 function QuarterlyWindow({
   title = 'Quarterly',
   data = quarterlySidebarMockData,
-  article = quarterlyContentMockArticle,
+  article,
+  state,
   responsiveMode = 'auto',
   initialSidebarOpen = true,
-  initialSelectedArticleId = article.id,
+  initialSelectedArticleId = article?.id,
   onClose,
   onArticleSelect,
   onPrevious,
@@ -73,6 +73,7 @@ function QuarterlyWindow({
   const dragRef = useRef<DragState | null>(null)
   const resizeRef = useRef<ResizeState | null>(null)
   const getResolvedMobileViewport = () => responsiveMode === 'mobile' || (responsiveMode === 'auto' && getIsMobileViewport())
+  const resolvedState = state ?? (!article || (!article.pdf && article.paragraphs.length === 0) ? 'empty' : undefined)
   const [isMobileViewport, setIsMobileViewport] = useState(getResolvedMobileViewport)
   const [isSidebarOpen, setIsSidebarOpen] = useState(() => !getResolvedMobileViewport() && initialSidebarOpen)
   const [selectedArticleId, setSelectedArticleId] = useState(initialSelectedArticleId)
@@ -211,9 +212,17 @@ function QuarterlyWindow({
       onArticleSelect={selectArticle}
     />
   )
-  const content = (
+  const content = resolvedState ? (
+    <WindowState
+      kind={resolvedState}
+      actionLabel={resolvedState === 'error' ? '重新載入' : undefined}
+      onAction={resolvedState === 'error' ? () => window.location.reload() : undefined}
+      detail={resolvedState === 'error' ? 'ERROR: CONTENT_UNAVAILABLE' : undefined}
+      className="min-h-0 min-w-0 flex-1"
+    />
+  ) : (
     <QuarterlyContent
-      article={article}
+      article={article!}
       borderless
       mobile={isMobileViewport}
       className="min-h-0 min-w-0 flex-1"
@@ -243,7 +252,9 @@ function QuarterlyWindow({
       />
 
       <div className="relative flex min-h-0 min-w-0 flex-1 overflow-hidden">
-        {isMobileViewport ? (
+        {resolvedState ? (
+          content
+        ) : isMobileViewport ? (
           <>
             {content}
 

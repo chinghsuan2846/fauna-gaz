@@ -2,20 +2,38 @@
 import { sanityClient } from 'sanity:client'
 import DesktopExperience from '../components/DesktopExperience'
 import BaseLayout from '../layouts/BaseLayout.astro'
+import type { SanityArticle, SanityCharacter, SanityQuarterlyPdf, SanitySiteSettings } from '../lib/contentAdapter'
 import { isQuarterlyArticleHidden, toContactInfo } from '../lib/contentAdapter'
 import { demoArticles, demoCharacters, demoSiteSettings } from '../lib/demoContent'
 import { articleListQuery, characterListQuery, quarterlyPdfListQuery, siteSettingsQuery } from '../lib/queries.js'
 import '../styles/global.css'
 
 const hasSanityConfig = Boolean(import.meta.env.PUBLIC_SANITY_PROJECT_ID)
-const [articles, quarterlyPdfs, siteSettings, characters] = hasSanityConfig
-  ? await Promise.all([
+let articles: SanityArticle[] = demoArticles
+let quarterlyPdfs: SanityQuarterlyPdf[] = []
+let siteSettings: SanitySiteSettings | null = demoSiteSettings
+let characters: SanityCharacter[] = demoCharacters
+let contentState: 'empty' | 'error' | undefined
+
+if (hasSanityConfig) {
+  try {
+    ;[articles, quarterlyPdfs, siteSettings, characters] = await Promise.all([
       sanityClient.fetch(articleListQuery),
       sanityClient.fetch(quarterlyPdfListQuery),
       sanityClient.fetch(siteSettingsQuery),
       sanityClient.fetch(characterListQuery),
     ])
-  : [demoArticles, [], demoSiteSettings, demoCharacters]
+  } catch {
+    articles = []
+    quarterlyPdfs = []
+    siteSettings = null
+    characters = []
+    contentState = 'error'
+  }
+
+  if (!contentState && articles.length === 0 && quarterlyPdfs.length === 0) contentState = 'empty'
+}
+
 const visibleArticles = articles.filter((article) => !isQuarterlyArticleHidden(article))
 const contact = toContactInfo(siteSettings)
 ---
@@ -27,5 +45,12 @@ const contact = toContactInfo(siteSettings)
   bodyClass="experience-page"
   preloadForest
 >
-  <DesktopExperience client:load articles={visibleArticles} quarterlyPdfs={quarterlyPdfs} characters={characters} contact={contact} />
+  <DesktopExperience
+    client:load
+    articles={visibleArticles}
+    quarterlyPdfs={quarterlyPdfs}
+    characters={characters}
+    contact={contact}
+    contentState={contentState}
+  />
 </BaseLayout>

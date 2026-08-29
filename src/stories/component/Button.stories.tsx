@@ -191,6 +191,8 @@ const meta = {
         'volume-on',
         'volume-off',
         'close',
+        'box-empty',
+        'alert-triangle',
         'loading',
       ],
     },

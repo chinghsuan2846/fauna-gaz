@@ -16,6 +16,7 @@ import DesktopIcon, { desktopIconNames, type DesktopIconName } from '../stories/
 import LegalWindow from '../stories/component/LegalWindow'
 import { PixelIcon } from '../stories/component/Button'
 import Window, { type WindowMode } from '../stories/component/Window'
+import type { WindowStateKind } from '../stories/component/WindowState'
 import PixelForest from './PixelForest'
 import PixelGridTransition from './PixelGridTransition'
 
@@ -24,6 +25,7 @@ type DesktopExperienceProps = {
   quarterlyPdfs?: SanityQuarterlyPdf[]
   characters?: SanityCharacter[]
   contact?: ContactInfo | null
+  contentState?: WindowStateKind
 }
 
 type ExperienceState = 'entry' | 'covering' | 'revealing' | 'desktop'
@@ -38,6 +40,7 @@ const LOADING_PREVIEW_DURATION = 120
 const CONTACT_WINDOW: DesktopWindow = { id: 'contact', type: 'contact' }
 const LEGAL_WINDOW: DesktopWindow = { id: 'legal', type: 'legal' }
 const FAQ_WINDOW: DesktopWindow = { id: 'faq', type: 'faq' }
+const QUARTERLY_WINDOW: DesktopWindow = { id: 'quarterly', type: 'quarterly' }
 const GRASS_CHARACTER_ORDER: DesktopIconName[] = ['老莫', '四月', '一五']
 
 function resolveViewportMode(): WindowMode {
@@ -72,9 +75,10 @@ function grassCharacterOrder(character: SanityCharacter) {
   return order === -1 ? GRASS_CHARACTER_ORDER.length : order
 }
 
-function DesktopExperience({ articles = [], quarterlyPdfs = [], characters = [], contact }: DesktopExperienceProps) {
+function DesktopExperience({ articles = [], quarterlyPdfs = [], characters = [], contact, contentState }: DesktopExperienceProps) {
   const [experienceState, setExperienceState] = useState<ExperienceState>('entry')
-  const [openWindows, setOpenWindows] = useState<DesktopWindow[]>([CONTACT_WINDOW])
+  const defaultOpenWindows = contentState ? [QUARTERLY_WINDOW] : [CONTACT_WINDOW]
+  const [openWindows, setOpenWindows] = useState<DesktopWindow[]>(defaultOpenWindows)
   const [selectedArticleId, setSelectedArticleId] = useState<string | null>(articles[0]?._id ?? null)
   const [isLoading, setIsLoading] = useState(false)
   const [musicEnabled, setMusicEnabled] = useState(true)
@@ -144,7 +148,7 @@ function DesktopExperience({ articles = [], quarterlyPdfs = [], characters = [],
 
   const returnToEntry = () => {
     setExperienceState('entry')
-    setOpenWindows(viewportMode === 'mobile' ? [] : [CONTACT_WINDOW])
+    setOpenWindows(viewportMode === 'mobile' ? [] : defaultOpenWindows)
   }
 
   const focusWindow = (windowId: string) => {
@@ -168,7 +172,7 @@ function DesktopExperience({ articles = [], quarterlyPdfs = [], characters = [],
     setOpenWindows((current) => current.filter((window) => window.id !== windowId))
   }
 
-  const openQuarterly = () => openWindow({ id: 'quarterly', type: 'quarterly' })
+  const openQuarterly = () => openWindow(QUARTERLY_WINDOW)
   const openContact = () => openWindow(CONTACT_WINDOW)
   const openLegal = () => openWindow(LEGAL_WINDOW)
   const openFaq = () => openWindow(FAQ_WINDOW)
@@ -304,6 +308,7 @@ function DesktopExperience({ articles = [], quarterlyPdfs = [], characters = [],
                   >
                     <QuarterlyWindow
                       title="季刊"
+                      state={contentState}
                       data={quarterlySidebarData}
                       article={quarterlyContentArticle}
                       responsiveMode={viewportMode}

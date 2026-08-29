@@ -10,7 +10,12 @@ import '../../styles/global.css'
 export async function getStaticPaths() {
   if (!import.meta.env.PUBLIC_SANITY_PROJECT_ID) return []
 
-  const articles = await sanityClient.fetch(articleSlugsQuery)
+  let articles
+  try {
+    articles = await sanityClient.fetch(articleSlugsQuery)
+  } catch {
+    return []
+  }
 
   return articles.filter((article) => !isQuarterlyArticleHidden(article)).map(({ slug }) => ({
     params: { slug },

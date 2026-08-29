@@ -17,6 +17,8 @@ export type PixelIconName =
   | 'volume-on'
   | 'volume-off'
   | 'close'
+  | 'box-empty'
+  | 'alert-triangle'
   | 'loading'
 export type ButtonIconPosition = 'left' | 'right'
 
@@ -165,6 +167,41 @@ const iconShapes: Record<PixelIconName, ReactNode> = {
       <rect x="4" y="9" width="2" height="2" />
       <rect x="10" y="9" width="2" height="2" />
       <rect x="12" y="11" width="2" height="2" />
+    </>
+  ),
+  'box-empty': (
+    <>
+      <rect x="5" y="2" width="6" height="1" />
+      <rect x="4" y="3" width="8" height="1" />
+      <rect x="3" y="4" width="10" height="1" />
+      <rect x="2" y="5" width="12" height="1" />
+      <rect x="2" y="6" width="1" height="7" />
+      <rect x="13" y="6" width="1" height="7" />
+      <rect x="3" y="13" width="10" height="1" />
+      <rect x="4" y="6" width="8" height="1" />
+      <rect x="4" y="7" width="1" height="5" />
+      <rect x="11" y="7" width="1" height="5" />
+      <rect x="5" y="11" width="6" height="1" />
+    </>
+  ),
+  'alert-triangle': (
+    <>
+      <rect x="7" width="2" height="1" />
+      <rect x="6" y="1" width="1" height="2" />
+      <rect x="9" y="1" width="1" height="2" />
+      <rect x="5" y="3" width="1" height="2" />
+      <rect x="10" y="3" width="1" height="2" />
+      <rect x="4" y="5" width="1" height="2" />
+      <rect x="11" y="5" width="1" height="2" />
+      <rect x="3" y="7" width="1" height="2" />
+      <rect x="12" y="7" width="1" height="2" />
+      <rect x="2" y="9" width="1" height="2" />
+      <rect x="13" y="9" width="1" height="2" />
+      <rect x="1" y="11" width="1" height="2" />
+      <rect x="14" y="11" width="1" height="2" />
+      <rect y="13" width="16" height="1" />
+      <rect x="7" y="4" width="2" height="5" />
+      <rect x="7" y="10" width="2" height="2" />
     </>
   ),
 }

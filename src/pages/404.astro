@@ -1,0 +1,12 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro'
+import NotFoundPage from '../stories/patterns/NotFoundPage'
+import '../styles/global.css'
+---
+
+<BaseLayout
+  title="404 — 動物公報"
+  description="找不到你要尋找的動物公報頁面。"
+>
+  <NotFoundPage client:load />
+</BaseLayout>
