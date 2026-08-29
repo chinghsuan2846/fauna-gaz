@@ -9,7 +9,7 @@
   src: url("/fonts/Cubic-11.ttf") format("truetype");
   font-style: normal;
   font-weight: 400;
-  font-display: swap;
+  font-display: block;
 }
 
 @font-face {

@@ -25,7 +25,7 @@ function getPdfSource(url: string) {
   }
 }
 
-function QuarterlyPdfViewer({ url, pageCount, fileName }: QuarterlyPdfViewerProps) {
+function QuarterlyPdfViewer({ url, pageCount, fileName, mobile = false }: QuarterlyPdfViewerProps) {
   const [pdfDocument, setPdfDocument] = useState<PDFDocumentProxy | null>(null)
   const [loadedPageCount, setLoadedPageCount] = useState<number | null>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -121,8 +121,7 @@ function QuarterlyPdfViewer({ url, pageCount, fileName }: QuarterlyPdfViewerProp
 
           const baseViewport = pdfPage.getViewport({ scale: 1 })
           const scale = containerWidth / baseViewport.width
-          const outputScale = Math.min(window.devicePixelRatio || 1, 2)
-          const viewport = pdfPage.getViewport({ scale })
+          const outputScale = Math.min(window.devicePixelRatio || 1, mobile ? 1.25 : 2)
           const renderViewport = pdfPage.getViewport({ scale: scale * outputScale })
           const context = canvas.getContext('2d')
 
@@ -133,8 +132,8 @@ function QuarterlyPdfViewer({ url, pageCount, fileName }: QuarterlyPdfViewerProp
 
           canvas.width = Math.floor(renderViewport.width)
           canvas.height = Math.floor(renderViewport.height)
-          canvas.style.width = `${viewport.width}px`
-          canvas.style.height = `${viewport.height}px`
+          canvas.style.width = '100%'
+          canvas.style.height = 'auto'
           context.clearRect(0, 0, canvas.width, canvas.height)
 
           const renderTask = pdfPage.render({ canvasContext: context, canvas, viewport: renderViewport })
@@ -165,13 +164,13 @@ function QuarterlyPdfViewer({ url, pageCount, fileName }: QuarterlyPdfViewerProp
       renderTasksRef.current.forEach((task) => task.cancel())
       renderTasksRef.current.clear()
     }
-  }, [containerWidth, loadedPageCount, pdfDocument, useNativeViewer])
+  }, [containerWidth, loadedPageCount, mobile, pdfDocument, useNativeViewer])
 
   const pdfSrc = `${url}#toolbar=0&navpanes=0&scrollbar=1`
 
   return (
     <div className="flex min-h-0 flex-1 flex-col bg-ink-primary">
-      <div ref={viewerRef} className="retroScrollArea relative flex min-h-0 flex-1 flex-col items-center overflow-x-hidden overflow-y-auto bg-ink-primary p-space-sm">
+      <div ref={viewerRef} className="retroScrollArea relative flex min-h-0 min-w-0 flex-1 flex-col items-center overflow-x-hidden overflow-y-auto bg-ink-primary p-space-sm">
         {useNativeViewer ? (
           <iframe
             key={pdfSrc}
@@ -181,7 +180,7 @@ function QuarterlyPdfViewer({ url, pageCount, fileName }: QuarterlyPdfViewerProp
             onLoad={() => setIsLoading(false)}
           />
         ) : (
-          <div className="flex w-full flex-col items-center gap-space-sm">
+          <div className="flex min-w-0 w-full flex-col items-center gap-space-sm">
             {Array.from({ length: safePageCount }, (_, index) => index + 1).map((pageNumber) => (
               <canvas
                 key={pageNumber}
@@ -190,7 +189,7 @@ function QuarterlyPdfViewer({ url, pageCount, fileName }: QuarterlyPdfViewerProp
                   else canvasRefs.current.delete(pageNumber)
                 }}
                 aria-label={fileName ? `PDF：${fileName}，第 ${pageNumber} 頁` : `季刊 PDF，第 ${pageNumber} 頁`}
-                className="block max-w-full bg-window-surface shadow-window"
+                className="block h-auto w-full max-w-full bg-window-surface shadow-window"
               />
             ))}
           </div>

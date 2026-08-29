@@ -24,6 +24,7 @@ const socialImage = image ? new URL(image, canonicalUrl) : undefined
     <meta property="og:url" content={canonicalUrl} />
     {socialImage && <meta property="og:image" content={socialImage} />}
     <meta name="twitter:card" content={socialImage ? 'summary_large_image' : 'summary'} />
+    <link rel="preload" href="/fonts/Cubic-11.ttf" as="font" type="font/ttf" crossorigin="anonymous" />
     {preloadForest && <link rel="preload" href="/assets/forest_pixel.svg" as="fetch" crossorigin="anonymous" />}
     <title>{title}</title>
   </head>
