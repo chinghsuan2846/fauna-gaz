@@ -1,7 +1,7 @@
 ---
 import { sanityClient } from 'sanity:client'
 import BaseLayout from '../../layouts/BaseLayout.astro'
-import { isQuarterlyArticleHidden, toQuarterlyContentArticle } from '../../lib/contentAdapter'
+import { displayArticleTitle, findReferenceArticle, isQuarterlyArticleHidden, toQuarterlyContentArticle } from '../../lib/contentAdapter'
 import { articleListQuery, articleSlugsQuery } from '../../lib/queries.js'
 import { sanityImageUrl } from '../../lib/sanityImage.js'
 import QuarterlyContent from '../../stories/component/QuarterlyContent'
@@ -35,11 +35,16 @@ if (!article) {
 const description = article.excerpt || 'Fauna Gaz quarterly journal article.'
 const coverImageUrl = sanityImageUrl(article.coverImage, { width: 1600 })
 const articleIndex = visibleArticles.findIndex((candidate) => candidate._id === article._id)
-const contentArticle = toQuarterlyContentArticle(article, visibleArticles[articleIndex - 1], visibleArticles[articleIndex + 1])
+const contentArticle = toQuarterlyContentArticle(
+  article,
+  visibleArticles[articleIndex - 1],
+  visibleArticles[articleIndex + 1],
+  findReferenceArticle(visibleArticles, article),
+)
 ---
 
 <BaseLayout
-  title={`${article.title} — Fauna Gaz`}
+  title={`${displayArticleTitle(article.title)} — Fauna Gaz`}
   description={description}
   image={coverImageUrl}
 >

@@ -31,6 +31,7 @@ export type PixelIconProps = {
 export type ButtonProps = {
   appearance?: ButtonAppearance
   label?: string
+  subLabel?: string
   icon?: PixelIconName
   iconPosition?: ButtonIconPosition
   iconSize?: ButtonSize
@@ -43,6 +44,7 @@ export type ButtonProps = {
   ariaLabel?: string
   href?: string
   className?: string
+  tabIndex?: number
   onClick?: MouseEventHandler<HTMLButtonElement>
 }
 
@@ -276,6 +278,7 @@ const textSizeClasses: Record<ButtonTextSize, string> = {
 export function Button({
   appearance = 'outline',
   label = '',
+  subLabel,
   icon,
   iconPosition = 'left',
   iconSize,
@@ -288,6 +291,7 @@ export function Button({
   ariaLabel,
   href,
   className = '',
+  tabIndex,
   onClick,
 }: ButtonProps) {
   const isLoading = state === 'loading'
@@ -314,7 +318,14 @@ export function Button({
       {showIcon && resolvedIconPosition === 'left' && (
         <PixelIcon name={resolvedIcon} size={resolvedIconSize} className={isLoading ? 'animate-pulse' : ''} />
       )}
-      {!iconOnly && label}
+      {!iconOnly && (
+        subLabel ? (
+          <span className="grid min-w-0 justify-items-center gap-space-xs text-center leading-compact">
+            <span className="whitespace-nowrap">{label}</span>
+            <span className="whitespace-normal text-micro font-regular text-ink-secondary">{subLabel}</span>
+          </span>
+        ) : label
+      )}
       {showIcon && resolvedIconPosition === 'right' && (
         <PixelIcon name={resolvedIcon} size={resolvedIconSize} className={isLoading ? 'animate-pulse' : ''} />
       )}
@@ -328,6 +339,7 @@ export function Button({
         className={classes}
         aria-disabled={isUnavailable || undefined}
         aria-label={iconOnly ? ariaLabel || label : undefined}
+        tabIndex={tabIndex}
       >
         {content}
       </a>
@@ -341,6 +353,7 @@ export function Button({
       disabled={isUnavailable}
       aria-busy={isLoading}
       aria-label={iconOnly ? ariaLabel || label : undefined}
+      tabIndex={tabIndex}
       onClick={onClick}
     >
       {content}

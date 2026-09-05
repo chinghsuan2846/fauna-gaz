@@ -53,6 +53,12 @@ const meta = {
         disable: true,
       },
     },
+    onTour: {
+      action: 'open-system-tour',
+      table: {
+        disable: true,
+      },
+    },
   },
 } satisfies Meta<typeof Footer>
 

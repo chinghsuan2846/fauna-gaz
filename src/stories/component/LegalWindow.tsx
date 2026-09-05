@@ -2,7 +2,7 @@ import { useState } from 'react'
 
 import { faqContent, privacyPolicy, termsOfUse, type LegalBlock, type LegalDocumentContent } from '../../lib/legalContent'
 import { Button } from './Button'
-import type { WindowMode, WindowProps } from './Window'
+import type { WindowMode, WindowPosition, WindowProps } from './Window'
 import Window from './Window'
 
 export type LegalDocument = 'privacy' | 'terms' | 'faq'
@@ -14,6 +14,7 @@ export type LegalWindowProps = {
   initialDocument?: LegalDocument
   standalone?: boolean
   className?: string
+  initialPosition?: WindowPosition
   onClose?: WindowProps['onClose']
 }
 
@@ -40,6 +41,7 @@ function LegalWindow({
   initialDocument = 'privacy',
   standalone = false,
   className = '',
+  initialPosition,
   onClose,
 }: LegalWindowProps) {
   const [activeDocument, setActiveDocument] = useState<LegalDocument>(initialDocument)
@@ -50,6 +52,7 @@ function LegalWindow({
     <Window
       mode={mode}
       title={standalone ? 'FAQ' : '網站資訊'}
+      initialPosition={initialPosition}
       className={`h-full min-h-0 ${className}`}
       onClose={onClose}
     >
@@ -81,7 +84,7 @@ function LegalWindow({
         <div className="retroScrollArea min-h-0 min-w-0 flex-1 overflow-y-auto p-space-md">
           <article className={`site-info-content legal-document font-body${isMobile ? ' text-small' : ''}`}>
             <header className="legal-document-header">
-              <h3>{selectedDocument.title}</h3>
+              <h3 className="font-medium">{selectedDocument.title}</h3>
               {selectedDocument.updatedAt && <p className="legal-document-updated">{selectedDocument.updatedAt}</p>}
               {selectedDocument.intro && <p className="legal-document-intro">{selectedDocument.intro}</p>}
             </header>

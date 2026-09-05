@@ -6,7 +6,7 @@ import ChatBubble from '../component/ChatBubble'
 import ChatSubmit from '../component/ChatSubmit'
 import { Button, type PixelIconName } from '../component/Button'
 import { getBubbleImagePosition } from '../component/characterImagePosition'
-import type { WindowMode, WindowProps } from '../component/Window'
+import type { WindowMode, WindowPosition, WindowProps } from '../component/Window'
 import Window from '../component/Window'
 
 export type ChatWindowsMessage = ComponentProps<typeof ChatBubble> & {
@@ -45,6 +45,7 @@ export type ChatWindowsProps = {
   submit?: ComponentProps<typeof ChatSubmit>
   className?: string
   showClose?: boolean
+  initialPosition?: WindowPosition
   onClose?: WindowProps['onClose']
 }
 
@@ -236,6 +237,7 @@ export function ChatWindows({
   submit,
   className = '',
   showClose = true,
+  initialPosition,
   onClose,
 }: ChatWindowsProps) {
   return (
@@ -244,6 +246,7 @@ export function ChatWindows({
       title={title}
       headerIcon={headerIcon}
       showClose={showClose}
+      initialPosition={initialPosition}
       onClose={onClose}
       className={`h-full min-h-0 ${className}`}
     >

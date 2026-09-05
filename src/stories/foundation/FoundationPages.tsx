@@ -30,6 +30,7 @@ const colorTokens: readonly ColorToken[] = [
   { label: 'line-subtle', value: '#A49D93', className: 'bg-line-subtle' },
   { label: 'overlay-scrim', value: 'rgb(0 0 0 / 25%)', className: 'bg-overlay-scrim' },
   { label: 'overlay-label', value: 'rgb(0 0 0 / 30%)', className: 'bg-overlay-label' },
+  { label: 'overlay-label-strong', value: 'rgb(0 0 0 / 60%)', className: 'bg-overlay-label-strong' },
   { label: 'scrollbar-track', value: '#F3ECE1', className: 'bg-scrollbar-track' },
   { label: 'scrollbar-highlight', value: '#FFFFFF', className: 'bg-scrollbar-highlight' },
   { label: 'scrollbar-shadow', value: '#D8CDBA', className: 'bg-scrollbar-shadow' },
@@ -40,6 +41,8 @@ const colorTokens: readonly ColorToken[] = [
 ]
 
 const fontSizes: readonly FontSizeToken[] = [
+  ['nano', 'text-nano', '0.5rem / 0.75rem'],
+  ['micro', 'text-micro', '0.625rem / 0.875rem'],
   ['caption', 'text-caption', '0.75rem / 1rem'],
   ['small', 'text-small', '0.875rem / 1.25rem'],
   ['body', 'text-body', '1rem / 1.75rem'],
@@ -163,6 +166,7 @@ export function FontFoundation() {
           <div className="grid gap-space-sm border-thin border-line bg-window-surface p-space-md">
             <p className="font-ui text-title font-regular">regular / 400</p>
             <p className="font-ui text-title font-medium">medium / 500</p>
+            <p className="font-ui text-title font-semibold">semibold / 600</p>
           </div>
         </section>
       </div>

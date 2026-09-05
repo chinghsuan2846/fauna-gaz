@@ -170,21 +170,29 @@ function QuarterlyPdfViewer({ url, pageCount, fileName, mobile = false }: Quarte
     <div className="flex min-h-0 flex-1 flex-col bg-ink-primary">
       <div ref={viewerRef} className="retroScrollArea relative flex min-h-0 min-w-0 flex-1 flex-col items-center overflow-x-hidden overflow-y-auto bg-ink-primary p-space-sm">
         <div className="flex min-w-0 w-full flex-col items-center gap-space-sm">
-          {Array.from({ length: safePageCount }, (_, index) => index + 1).map((pageNumber) => (
-            <canvas
-              key={pageNumber}
-              ref={(canvas) => {
-                if (canvas) canvasRefs.current.set(pageNumber, canvas)
-                else canvasRefs.current.delete(pageNumber)
-              }}
-              aria-label={fileName ? `PDF：${fileName}，第 ${pageNumber} 頁` : `季刊 PDF，第 ${pageNumber} 頁`}
-              className="block h-auto w-full max-w-full bg-window-surface shadow-window"
-            />
-          ))}
-          {loadError && (
-            <div className="grid min-h-space-4xl w-full place-items-center bg-window-surface p-space-lg text-center font-ui text-small text-ink-primary">
-              <p>PDF 載入失敗，請改用下方連結開啟原始檔案。</p>
+          {loadError ? (
+            <div className="flex min-h-full w-full flex-col bg-window-surface">
+              <iframe
+                src={url}
+                title={fileName ? `PDF：${fileName}` : '季刊 PDF'}
+                className="min-h-[32rem] w-full flex-1 border-0 bg-window-surface"
+              />
+              <p className="shrink-0 p-space-md text-center font-ui text-small text-ink-primary">
+                若 PDF 沒有自動顯示，請使用下方連結開啟原始檔案。
+              </p>
             </div>
+          ) : (
+            Array.from({ length: safePageCount }, (_, index) => index + 1).map((pageNumber) => (
+              <canvas
+                key={pageNumber}
+                ref={(canvas) => {
+                  if (canvas) canvasRefs.current.set(pageNumber, canvas)
+                  else canvasRefs.current.delete(pageNumber)
+                }}
+                aria-label={fileName ? `PDF：${fileName}，第 ${pageNumber} 頁` : `季刊 PDF，第 ${pageNumber} 頁`}
+                className="block h-auto w-full max-w-full bg-window-surface shadow-window"
+              />
+            ))
           )}
         </div>
 
@@ -197,13 +205,14 @@ function QuarterlyPdfViewer({ url, pageCount, fileName, mobile = false }: Quarte
 
       <div className="flex shrink-0 items-center justify-center gap-space-sm border-t-thin border-line-strong bg-window-surface px-space-sm py-space-xs font-ui text-caption text-ink-primary">
         <span aria-live="polite">共 {safePageCount} 頁</span>
+        {fileName && <span className="min-w-0 max-w-[45%] truncate" title={fileName}>{fileName}</span>}
         <a
           href={url}
           target="_blank"
           rel="noreferrer"
           className="text-action-link underline decoration-action-link underline-offset-2"
         >
-          開啟原始 PDF
+          開啟 PDF
         </a>
       </div>
     </div>

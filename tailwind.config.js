@@ -36,6 +36,7 @@ export default {
         overlay: {
           scrim: 'rgb(0 0 0 / 25%)',
           label: 'rgb(0 0 0 / 30%)',
+          'label-strong': 'rgb(0 0 0 / 60%)',
         },
       },
       fontFamily: {
@@ -43,6 +44,8 @@ export default {
         body: ['"Source Han Mono TC"', 'ui-monospace', 'monospace'],
       },
       fontSize: {
+        nano: ['0.5rem', { lineHeight: '0.75rem' }],
+        micro: ['0.625rem', { lineHeight: '0.875rem' }],
         caption: ['0.75rem', { lineHeight: '1rem' }],
         small: ['0.875rem', { lineHeight: '1.25rem' }],
         body: ['1rem', { lineHeight: '1.75rem' }],
@@ -73,6 +76,7 @@ export default {
       fontWeight: {
         regular: '400',
         medium: '500',
+        semibold: '600',
       },
       letterSpacing: {
         display: '0.12em',

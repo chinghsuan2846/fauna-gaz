@@ -1,0 +1,27 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro'
+import '../styles/global.css'
+---
+
+<BaseLayout
+  title="donate — 動物公報"
+  description="支持動物公報的出版計畫。"
+>
+  <main class="donate-page font-ui text-ink-primary">
+    <div class="donate-page__forest" aria-hidden="true">
+      <img src="/assets/forest_pixel.svg" alt="" />
+    </div>
+
+    <section class="donate-page__window" aria-labelledby="donate-title">
+      <header class="donate-page__header">
+        <h1 id="donate-title">donate</h1>
+        <a class="donate-page__close" href="/" aria-label="回到動物公報桌面">×</a>
+      </header>
+      <div class="donate-page__content">
+        <p>謝謝你願意支持動物公報。</p>
+        <p>捐助入口即將開放，敬請期待。</p>
+        <a class="donate-page__back" href="/">回到桌面</a>
+      </div>
+    </section>
+  </main>
+</BaseLayout>

@@ -3,7 +3,6 @@ import type { ButtonProps } from './Button'
 import { Button } from './Button'
 
 export type FooterMode = 'responsive' | 'desktop' | 'tablet' | 'mobile'
-type FooterLanguage = 'zh' | 'en'
 
 export type FooterProps = {
   mode?: FooterMode
@@ -15,6 +14,7 @@ export type FooterProps = {
   onFaq?: ButtonProps['onClick']
   onContact?: ButtonProps['onClick']
   onMusicToggle?: () => void
+  onTour?: ButtonProps['onClick']
 }
 
 type FooterCopy = {
@@ -22,7 +22,7 @@ type FooterCopy = {
   legal: string
   faq: string
   contact: string
-  language: string
+  tour: string
   musicOn: string
   musicOff: string
   home: string
@@ -37,29 +37,16 @@ function formatLocalDate(date: Date) {
   return `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`
 }
 
-const copy: Record<FooterLanguage, FooterCopy> = {
-  zh: {
-    brand: '動物公報',
-    legal: '網站資訊',
-    faq: 'FAQ',
-    contact: '聯絡我',
-    language: '中文',
-    musicOn: '音樂開啟',
-    musicOff: '音樂關閉',
-    home: '回到動物公報首頁',
-    navigation: '頁尾導覽',
-  },
-  en: {
-    brand: 'Fauna Gaz',
-    legal: 'Info',
-    faq: 'FAQ',
-    contact: 'Contact',
-    language: 'English',
-    musicOn: 'Music on',
-    musicOff: 'Music off',
-    home: 'Back to Fauna Gaz home',
-    navigation: 'Footer navigation',
-  },
+const labels: FooterCopy = {
+  brand: '動物公報',
+  legal: '網站資訊',
+  faq: 'FAQ',
+  contact: '聯絡我',
+  tour: '系統導覽',
+  musicOn: '音樂開啟',
+  musicOff: '音樂關閉',
+  home: '回到動物公報首頁',
+  navigation: '頁尾導覽',
 }
 
 function Footer({
@@ -72,13 +59,12 @@ function Footer({
   onFaq,
   onContact,
   onMusicToggle,
+  onTour,
 }: FooterProps) {
-  const [language, setLanguage] = useState<FooterLanguage>('zh')
   const [internalMusicEnabled, setInternalMusicEnabled] = useState(true)
   const [localTime, setLocalTime] = useState(currentTime ?? '')
   const [localDate, setLocalDate] = useState(currentDate ?? '')
   const isMusicEnabled = musicEnabled ?? internalMusicEnabled
-  const labels = copy[language]
   const isCompact = mode === 'mobile'
   const isTablet = mode === 'tablet'
   const rootLayout = mode === 'desktop' || isTablet || isCompact ? 'flex-nowrap' : 'flex-wrap sm:flex-nowrap'
@@ -102,7 +88,6 @@ function Footer({
     return () => window.clearInterval(clockTimer)
   }, [currentDate, currentTime])
 
-  const toggleLanguage = () => setLanguage((current) => (current === 'zh' ? 'en' : 'zh'))
   const toggleMusic = () => {
     if (onMusicToggle) {
       onMusicToggle()
@@ -166,13 +151,13 @@ function Footer({
         className={`ml-auto flex ${groupLayout} ${stackedGroup} min-w-0 items-center justify-end p-space-xs`}
       >
         <Button
-          label={labels.language}
+          label={isCompact ? '導覽' : labels.tour}
           appearance="text"
           size="small"
           textSize={footerTextSize}
-          className="whitespace-nowrap"
-          ariaLabel={language === 'zh' ? '切換成 English' : '切換成中文'}
-          onClick={toggleLanguage}
+          className="footer-tour-button whitespace-nowrap"
+          ariaLabel={isCompact ? '開啟導覽' : '開啟系統導覽'}
+          onClick={onTour}
         />
         <Button
           icon={isMusicEnabled ? 'volume-on' : 'volume-off'}

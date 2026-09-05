@@ -22,7 +22,7 @@ const bubbleImagePositionOverrides: Record<string, CharacterImagePosition> = {
 }
 
 const desktopBubbleImagePositionOverrides: Record<string, CharacterImagePosition> = {
-  四月: 'right',
+  四月: 'left',
 }
 
 export const characterImagePositionClasses: Record<CharacterImagePosition, string> = {

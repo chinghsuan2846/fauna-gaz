@@ -9,6 +9,7 @@ import QuarterlySidebar, {
 } from '../component/QuarterlySidebar'
 import WindowHeader from '../component/WindowHeader'
 import WindowState, { type WindowStateKind } from '../component/WindowState'
+import type { WindowPosition } from '../component/Window'
 
 export type QuarterlyWindowProps = {
   title?: string
@@ -22,6 +23,7 @@ export type QuarterlyWindowProps = {
   onArticleSelect?: (article: QuarterlySidebarArticle) => void
   onPrevious?: ButtonProps['onClick']
   onNext?: ButtonProps['onClick']
+  initialPosition?: WindowPosition
   className?: string
 }
 
@@ -67,6 +69,7 @@ function QuarterlyWindow({
   onArticleSelect,
   onPrevious,
   onNext,
+  initialPosition,
   className = '',
 }: QuarterlyWindowProps) {
   const windowRef = useRef<HTMLElement>(null)
@@ -77,9 +80,14 @@ function QuarterlyWindow({
   const [isMobileViewport, setIsMobileViewport] = useState(getResolvedMobileViewport)
   const [isSidebarOpen, setIsSidebarOpen] = useState(() => !getResolvedMobileViewport() && initialSidebarOpen)
   const [selectedArticleId, setSelectedArticleId] = useState(initialSelectedArticleId)
-  const [position, setPosition] = useState<Point>({ x: 0, y: 0 })
+  const [position, setPosition] = useState<Point>(() => initialPosition ?? { x: 0, y: 0 })
   const [dimensions, setDimensions] = useState<Point | null>(null)
   const [isDragging, setIsDragging] = useState(false)
+
+  useEffect(() => {
+    if (!initialPosition) return
+    setPosition(initialPosition)
+  }, [initialPosition?.x, initialPosition?.y])
 
   useEffect(() => {
     setSelectedArticleId(initialSelectedArticleId)
@@ -193,10 +201,12 @@ function QuarterlyWindow({
     resizeRef.current = null
   }
 
-  const windowStyle = {
-    transform: `translate(${position.x}px, ${position.y}px)`,
-    ...(dimensions ? { width: dimensions.x, height: dimensions.y } : {}),
-  }
+  const windowStyle = isMobileViewport
+    ? {}
+    : {
+        transform: `translate(${position.x}px, ${position.y}px)`,
+        ...(dimensions ? { width: dimensions.x, height: dimensions.y } : {}),
+      }
   const interactionCursor = isMobileViewport ? '' : isDragging ? 'cursor-grabbing' : 'cursor-grab'
   const windowClassName = isMobileViewport
     ? `relative flex h-full min-h-0 min-w-0 flex-col overflow-hidden border-thin border-ink-primary bg-window-surface shadow-window ${className}`

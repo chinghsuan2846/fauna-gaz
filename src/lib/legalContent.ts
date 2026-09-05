@@ -15,10 +15,14 @@ export type LegalDocumentContent = {
   readonly sections: readonly LegalSection[]
 }
 
+function formatUpdatedAt(date: Date) {
+  return `最後更新於：${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`
+}
+
 export const privacyPolicy: LegalDocumentContent = {
   label: '隱私權政策',
   title: '隱私權政策',
-  updatedAt: '最後更新於：（日期）',
+  updatedAt: formatUpdatedAt(new Date()),
   intro:
     '非常歡迎您光臨動物公報 Fauna Gaz（以下簡稱本網站），為了讓您能夠安心的使用本網站的各項服務與資訊，特此向您說明本網站的隱私權保護政策，以保障您的權益，請您詳閱下列內容：',
   sections: [

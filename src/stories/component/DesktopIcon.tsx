@@ -1,6 +1,6 @@
 import type { MouseEventHandler } from 'react'
 
-export const desktopIconNames = ['R先生', '一五', '老莫', '阿雀', '季刊', '四月'] as const
+export const desktopIconNames = ['R先生', '一五', '老莫', '阿雀', '季刊', '四月', '老鼠洞'] as const
 
 export type DesktopIconName = (typeof desktopIconNames)[number]
 export type DesktopIconSize = 'small' | 'medium' | 'large'
@@ -11,6 +11,7 @@ export type DesktopIconProps = {
   imageSrc?: string
   imageAlt?: string
   size?: DesktopIconSize
+  labelGap?: 'default' | 'tight'
   onActivate?: MouseEventHandler<HTMLButtonElement>
   className?: string
 }
@@ -22,6 +23,7 @@ export const desktopIconSources: Record<DesktopIconName, string> = {
   阿雀: '/assets/editor-icons/阿雀.png',
   季刊: '/assets/editor-icons/季刊.png',
   四月: '/assets/editor-icons/一號.png',
+  老鼠洞: '/assets/editor-icons/老鼠洞.png',
 }
 
 const iconSizeClasses: Record<DesktopIconSize, string> = {
@@ -37,6 +39,7 @@ const iconImageScaleClasses: Record<DesktopIconName, string> = {
   阿雀: 'scale-125',
   季刊: 'scale-110 translate-y-space-xs',
   四月: 'scale-125',
+  老鼠洞: 'scale-125 translate-y-space-sm',
 }
 
 export function DesktopIcon({
@@ -45,13 +48,16 @@ export function DesktopIcon({
   imageSrc,
   imageAlt = '',
   size = 'medium',
+  labelGap = 'default',
   onActivate,
   className = '',
 }: DesktopIconProps) {
+  const labelGapClass = labelGap === 'tight' ? 'gap-0' : 'gap-space-xs'
+
   return (
     <button
       type="button"
-      className={`group inline-grid justify-items-center gap-space-xs bg-transparent px-space-sm py-space-xs font-ui text-caption text-ink-inverse transition-transform hover:scale-95 focus-visible:outline-2 focus-visible:outline-ink-primary ${className}`}
+      className={`group inline-grid justify-items-center ${labelGapClass} bg-transparent px-space-sm py-space-xs font-ui text-caption text-ink-inverse transition-transform hover:scale-95 focus-visible:outline-2 focus-visible:outline-ink-primary ${className}`}
       aria-label={label}
       title={label}
       onClick={onActivate}

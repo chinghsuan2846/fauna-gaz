@@ -1,5 +1,6 @@
 import type {
   QuarterlyContentArticle,
+  QuarterlyContentCitation,
   QuarterlyContentParagraph,
   QuarterlyContentSegment,
 } from '../stories/component/QuarterlyContent'
@@ -117,7 +118,12 @@ const EXTENDED_CONTENT_CATEGORY = { title: '延伸內容', slug: 'extended-conte
 const HIDDEN_QUARTERLY_ARTICLE_SLUGS = new Set(['isbn', 'chelseas-diet'])
 const EXTENDED_CONTENT_ARTICLE_SLUGS = new Set(['reader-mail', 'references-and-notes'])
 const REFERENCE_ARTICLE_SLUGS = new Set(['references-and-notes'])
-const REFERENCE_TEXT = [
+const CITATION_MARKER_PATTERN = /(?:\[(\d+)\]|［(\d+)］)/
+const REFERENCE_INTRO_TEXTS = [
+  '本期內容以動物行為學、認知科學與田野觀察的入門資料為起點，並將複雜研究轉寫成容易閱讀的短文。',
+  '文中的例子是編輯部為了示範版面而整理的暫時內容，正式刊載前仍需要補上完整引用與核對。',
+] as const
+const DEFAULT_REFERENCE_TEXTS = [
   '[1] Mildener A, Buchman D, Ragir S, Reiss D (2026) Evidence for mirror self-recognition in beluga whales (Delphinapterus leucas). PLoS One 21(5): e0348287. https://doi.org/10.1371/journal.pone.0348287',
   '[2] D. Reiss, & L. Marino, Mirror self-recognition in the bottlenose dolphin: A case of cognitive convergence, Proc. Natl. Acad. Sci. U.S.A. 98 (10) 5937-5942, https://doi.org/10.1073/pnas.101086398 (2001).',
   '[3] J.M. Plotnik, F.B.M. de Waal, & D. Reiss, Self-recognition in an Asian elephant, Proc. Natl. Acad. Sci. U.S.A. 103 (45) 17053-17057, https://doi.org/10.1073/pnas.0608062103 (2006).',
@@ -143,6 +149,11 @@ export function isQuarterlyArticleHidden(article: Pick<SanityArticle, 'slug'> & 
   return HIDDEN_QUARTERLY_ARTICLE_SLUGS.has(slug) || title === 'isbn' || title === "chelsea'sdiet"
 }
 
+export function displayArticleTitle(title: string) {
+  const value = textValue(title)
+  return value.replace(/\s*(?:（[^（）]*）|\([^()]*\))\s*$/, '').trim() || value
+}
+
 function isExtendedContentArticle(article: Pick<SanityArticle, 'slug' | 'title'>) {
   const slug = textValue(article.slug).toLowerCase()
   const title = normalizedArticleTitle(textValue(article.title))
@@ -152,6 +163,19 @@ function isExtendedContentArticle(article: Pick<SanityArticle, 'slug' | 'title'>
 function isReferenceArticle(article: Pick<SanityArticle, 'slug' | 'title'>) {
   const slug = textValue(article.slug).toLowerCase()
   return REFERENCE_ARTICLE_SLUGS.has(slug) || normalizedArticleTitle(textValue(article.title)).includes('引用')
+}
+
+function sameIssue(left: Pick<SanityArticle, 'issue'>, right: Pick<SanityArticle, 'issue'>) {
+  if (left.issue?.slug && right.issue?.slug) return left.issue.slug === right.issue.slug
+  return String(left.issue?.year ?? '') === String(right.issue?.year ?? '') && left.issue?.quarter === right.issue?.quarter
+}
+
+export function findReferenceArticle(
+  articles: readonly SanityArticle[],
+  article: Pick<SanityArticle, 'issue'>,
+) {
+  const references = articles.filter((candidate) => isReferenceArticle(candidate))
+  return references.find((candidate) => sameIssue(candidate, article)) ?? (references.length === 1 ? references[0] : undefined)
 }
 
 function issueQuarterLabel(article: Pick<SanityArticle, 'issue'>) {
@@ -172,6 +196,61 @@ function categoryGroups(article: SanityArticle) {
   return article.categories?.length
     ? article.categories
     : [{ title: '未分類', slug: 'uncategorized' }]
+}
+
+function bodyParagraphTexts(article: SanityArticle) {
+  return (article.body ?? [])
+    .filter((block) => block._type === 'block')
+    .map((block) => (block.children ?? []).map((span) => span.text ?? '').join('').trim())
+    .filter(Boolean)
+}
+
+function splitReferenceTexts(texts: readonly string[]) {
+  return texts.flatMap((text) => text.split(/(?=(?:\[\d+\]|［\d+］))/g).map((part) => part.trim()).filter(Boolean))
+}
+
+function referencePageTexts(article: SanityArticle) {
+  return referenceTexts(article).filter((text) => !CITATION_MARKER_PATTERN.test(text))
+}
+
+function ensureReferenceIntro(texts: readonly string[]) {
+  const missingIntro = REFERENCE_INTRO_TEXTS.filter((intro) => !texts.includes(intro))
+  return [...missingIntro, ...texts]
+}
+
+function isDefaultReferenceIssue(article: SanityArticle) {
+  const issueSlug = textValue(article.issue?.slug).toLowerCase()
+  const issueTitle = normalizedArticleTitle(textValue(article.issue?.title))
+  return issueSlug === '2026-autumn' || (issueTitle.includes('2026') && issueTitle.includes('秋季'))
+}
+
+function referenceTexts(article?: SanityArticle | null) {
+  if (!article) return []
+
+  const articleTexts = bodyParagraphTexts(article)
+  if (articleTexts.length === 0) return []
+
+  const parsedTexts = splitReferenceTexts(articleTexts)
+  const hasCompleteDefaultReferences = DEFAULT_REFERENCE_TEXTS.every((reference) => {
+    const marker = reference.match(CITATION_MARKER_PATTERN)?.[0]
+    return marker ? parsedTexts.some((text) => text.startsWith(marker)) : false
+  })
+
+  if (isReferenceArticle(article) && isDefaultReferenceIssue(article) && !hasCompleteDefaultReferences) {
+    return [...REFERENCE_INTRO_TEXTS, ...DEFAULT_REFERENCE_TEXTS]
+  }
+
+  return isReferenceArticle(article) && isDefaultReferenceIssue(article)
+    ? ensureReferenceIntro(parsedTexts)
+    : parsedTexts
+}
+
+function citationEntries(article?: SanityArticle | null): readonly QuarterlyContentCitation[] {
+  return referenceTexts(article).flatMap((text) => {
+    const markerMatch = text.match(CITATION_MARKER_PATTERN)
+    const number = markerMatch?.[1] ?? markerMatch?.[2]
+    return number ? [{ marker: `[${number}]`, text }] : []
+  })
 }
 
 export function toQuarterlySidebarData(
@@ -222,7 +301,7 @@ export function toQuarterlySidebarData(
 
       const sidebarArticle: QuarterlySidebarArticle = {
         id: article._id,
-        title: article.title,
+        title: displayArticleTitle(article.title),
       }
       if (!group.articles.some((entry) => entry.id === sidebarArticle.id)) group.articles.push(sidebarArticle)
     }
@@ -258,7 +337,7 @@ export function toQuarterlySidebarData(
 
 function toParagraphs(article: SanityArticle): readonly QuarterlyContentParagraph[] {
   if (isReferenceArticle(article)) {
-    return REFERENCE_TEXT.map((text, index) => ({
+    return referencePageTexts(article).map((text, index) => ({
       id: `${article._id}-reference-${index}`,
       segments: [{ kind: 'text', text }],
     }))
@@ -283,6 +362,7 @@ function toParagraphs(article: SanityArticle): readonly QuarterlyContentParagrap
 
       return {
         id: `${article._id}-paragraph-${index}`,
+        style: (block.style === 'h1' || block.style === 'h2' || block.style === 'h3' ? block.style : 'normal') as QuarterlyContentParagraph['style'],
         segments,
       }
     })
@@ -293,18 +373,29 @@ export function toQuarterlyContentArticle(
   article: SanityArticle,
   previous?: SanityArticle | null,
   next?: SanityArticle | null,
+  referenceArticle?: SanityArticle | null,
 ): QuarterlyContentArticle {
   const year = String(article.issue?.year ?? '')
   const quarter = issueQuarterLabel(article)
+  const citationSource = referenceArticle ?? (isReferenceArticle(article) ? article : undefined)
 
   return {
     id: article._id,
-    breadcrumb: [year, quarter, article.title].filter(Boolean),
-    title: article.title,
+    breadcrumb: [year, quarter, displayArticleTitle(article.title)].filter(Boolean),
+    title: displayArticleTitle(article.title),
     paragraphs: toParagraphs(article),
-    previous: previous ? { id: previous._id, title: previous.title } : null,
-    next: next ? { id: next._id, title: next.title } : null,
+    citations: citationEntries(citationSource),
+    previous: previous ? { id: previous._id, title: displayArticleTitle(previous.title) } : null,
+    next: next ? { id: next._id, title: displayArticleTitle(next.title) } : null,
   }
+}
+
+function quarterlyPdfFileName(pdf: SanityQuarterlyPdf) {
+  const issueTitle = textValue(pdf.issue?.title) || [pdf.issue?.year, issueQuarterLabel({ issue: pdf.issue })].filter(Boolean).join('')
+  const title = quarterlyPdfDisplayTitle(pdf).replace(/\.pdf$/i, '')
+  const safePart = (value: string) => value.replace(/\s+/g, '').replace(/[\\/:*?"<>|]+/g, '-')
+  const parts = [safePart(issueTitle), safePart(title)].filter(Boolean)
+  return parts.length > 0 ? `${parts.join('-')}.pdf` : pdf.fileName
 }
 
 export function toQuarterlyPdfContentArticle(
@@ -323,9 +414,9 @@ export function toQuarterlyPdfContentArticle(
     pdf: {
       url: pdf.fileUrl ?? '',
       pageCount: pdf.pageCount ?? 1,
-      fileName: pdf.fileName,
+      fileName: quarterlyPdfFileName(pdf) || pdf.fileName,
     },
-    previous: previous ? { id: previous._id, title: previous.title } : null,
+    previous: previous ? { id: previous._id, title: displayArticleTitle(previous.title) } : null,
     next: null,
   }
 }

@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { PointerEvent as ReactPointerEvent, ReactNode } from 'react'
 
 import type { ContactInfo } from '../../lib/contentAdapter'
@@ -7,6 +7,11 @@ import { Button } from './Button'
 import WindowHeader from './WindowHeader'
 
 export type WindowMode = 'desktop' | 'tablet' | 'mobile'
+
+export type WindowPosition = {
+  x: number
+  y: number
+}
 
 export type WindowProps = {
   mode?: WindowMode
@@ -22,6 +27,7 @@ export type WindowProps = {
   onSidebarToggle?: ButtonProps['onClick']
   onClose?: ButtonProps['onClick']
   onSupport?: ButtonProps['onClick']
+  initialPosition?: WindowPosition
 }
 
 type Point = {
@@ -32,6 +38,12 @@ type Point = {
 type DragState = Point & {
   pointerId: number
   origin: Point
+  bounds: {
+    left: number
+    top: number
+    width: number
+    height: number
+  }
 }
 
 type ResizeState = {
@@ -56,16 +68,22 @@ function Window({
   sidebarPreviewState = 'none',
   showClose = true,
   onSidebarToggle,
+  initialPosition,
 }: WindowProps) {
   const isMobile = mode === 'mobile'
   const hasCustomContent = children !== undefined
   const windowRef = useRef<HTMLElement>(null)
   const dragRef = useRef<DragState | null>(null)
   const resizeRef = useRef<ResizeState | null>(null)
-  const [position, setPosition] = useState<Point>({ x: 0, y: 0 })
+  const [position, setPosition] = useState<Point>(() => initialPosition ?? { x: 0, y: 0 })
   const [dimensions, setDimensions] = useState<Point | null>(null)
   const [isDragging, setIsDragging] = useState(false)
   const [isResizing, setIsResizing] = useState(false)
+
+  useEffect(() => {
+    if (!initialPosition) return
+    setPosition(initialPosition)
+  }, [initialPosition?.x, initialPosition?.y])
 
   const startDrag = (event: ReactPointerEvent<HTMLElement>) => {
     if (isMobile || event.button !== 0) return
@@ -73,11 +91,15 @@ function Window({
 
     event.preventDefault()
     event.currentTarget.setPointerCapture(event.pointerId)
+    const bounds = windowRef.current?.getBoundingClientRect()
+    if (!bounds) return
+
     dragRef.current = {
       pointerId: event.pointerId,
       x: event.clientX,
       y: event.clientY,
       origin: position,
+      bounds,
     }
     setIsDragging(true)
   }
@@ -86,9 +108,20 @@ function Window({
     const drag = dragRef.current
     if (!drag || drag.pointerId !== event.pointerId) return
 
+    const viewportWidth = document.documentElement.clientWidth || window.innerWidth
+    const viewportHeight = document.documentElement.clientHeight || window.innerHeight
+    const nextLeft = Math.min(
+      Math.max(drag.bounds.left + event.clientX - drag.x, 0),
+      Math.max(0, viewportWidth - drag.bounds.width),
+    )
+    const nextTop = Math.min(
+      Math.max(drag.bounds.top + event.clientY - drag.y, 0),
+      Math.max(0, viewportHeight - drag.bounds.height),
+    )
+
     setPosition({
-      x: drag.origin.x + event.clientX - drag.x,
-      y: drag.origin.y + event.clientY - drag.y,
+      x: drag.origin.x + nextLeft - drag.bounds.left,
+      y: drag.origin.y + nextTop - drag.bounds.top,
     })
   }
 
@@ -192,17 +225,29 @@ function Window({
             </div>
           </div>
 
-          <div className="window-footer flex min-h-[3rem] shrink-0 justify-end p-space-md">
+          <div className="window-footer grid min-h-[3rem] shrink-0 grid-cols-2 gap-space-md p-space-md">
             <Button
               appearance="outline"
-              label={contact.supportLinkText}
+              label="Support Us"
+              subLabel="International Readers"
               href={contact.supportLinkUrl}
-              icon="coffee"
-              iconPosition="right"
-              iconSize="small"
               size="small"
               textSize="small"
-              ariaLabel={contact.supportLinkText}
+              padding="footer-hug"
+              className="window-footer-action w-full min-w-0 whitespace-normal"
+              ariaLabel="Support Us, International Readers"
+              onClick={onSupport}
+            />
+            <Button
+              appearance="outline"
+              label="支持我們"
+              subLabel="台灣讀者"
+              href={contact.supportLinkUrl}
+              size="small"
+              textSize="small"
+              padding="footer-hug"
+              className="window-footer-action w-full min-w-0 whitespace-normal"
+              ariaLabel="支持我們，台灣讀者"
               onClick={onSupport}
             />
           </div>
