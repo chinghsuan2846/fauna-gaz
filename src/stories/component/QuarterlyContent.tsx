@@ -360,12 +360,12 @@ function QuarterlyContent({
     >
       <div
         className={article.pdf
-          ? 'flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden'
+          ? 'retroScrollArea min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto'
           : 'retroScrollArea flex min-h-0 min-w-0 flex-1 flex-col overflow-x-hidden overflow-y-auto'}
       >
         {article.pdf ? (
-          <div className="flex min-h-0 flex-1 flex-col">
-            <header className={`shrink-0 ${articleSpacingClass}`}>
+          <>
+            <header className={articleSpacingClass}>
               <nav aria-label="文章位置" className="flex min-w-0 flex-wrap items-center gap-space-xs text-caption text-ink-muted">
                 {article.breadcrumb.map((item, index) => (
                   <span key={`${item}-${index}`} className="inline-flex min-w-0 max-w-full items-center gap-space-xs break-words">
@@ -381,7 +381,7 @@ function QuarterlyContent({
               fileName={article.pdf.fileName}
               mobile={mobile}
             />
-          </div>
+          </>
         ) : (
           <article className={`min-w-0 break-words font-body ${articleTextClass} ${articleSpacingClass}`}>
             <nav aria-label="文章位置" className="flex min-w-0 flex-wrap items-center gap-space-xs text-caption text-ink-muted">

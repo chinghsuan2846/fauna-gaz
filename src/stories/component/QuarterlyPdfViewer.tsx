@@ -167,8 +167,8 @@ function QuarterlyPdfViewer({ url, pageCount, fileName, mobile = false }: Quarte
   }, [containerWidth, loadedPageCount, mobile, pdfDocument])
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col bg-ink-primary">
-      <div ref={viewerRef} className="retroScrollArea relative flex min-h-0 min-w-0 flex-1 flex-col items-center overflow-x-hidden overflow-y-auto bg-ink-primary p-space-sm">
+    <div className="flex w-full min-w-0 flex-col bg-ink-primary">
+      <div ref={viewerRef} className="relative flex min-w-0 flex-col items-center bg-ink-primary p-space-sm">
         <div className="flex min-w-0 w-full flex-col items-center gap-space-sm">
           {loadError ? (
             <div className="flex min-h-full w-full flex-col bg-window-surface">
