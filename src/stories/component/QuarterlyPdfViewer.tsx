@@ -14,8 +14,6 @@ type PdfLoadingTask = ReturnType<PdfJsModule['getDocument']>
 const pdfWorkerUrl = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).toString()
 
 function getPdfSource(url: string) {
-  if (!import.meta.env.DEV) return url
-
   try {
     const parsedUrl = new URL(url)
     if (parsedUrl.hostname !== 'cdn.sanity.io') return url
@@ -173,7 +171,7 @@ function QuarterlyPdfViewer({ url, pageCount, fileName, mobile = false }: Quarte
           {loadError ? (
             <div className="flex min-h-full w-full flex-col bg-window-surface">
               <iframe
-                src={url}
+                src={pdfSource}
                 title={fileName ? `PDF：${fileName}` : '季刊 PDF'}
                 className="min-h-[32rem] w-full flex-1 border-0 bg-window-surface"
               />

@@ -1,0 +1,9 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "rewrites": [
+    {
+      "source": "/__sanity-pdf/:path*",
+      "destination": "https://cdn.sanity.io/:path*"
+    }
+  ]
+}
