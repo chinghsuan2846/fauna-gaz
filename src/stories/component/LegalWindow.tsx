@@ -47,6 +47,7 @@ function LegalWindow({
   const [activeDocument, setActiveDocument] = useState<LegalDocument>(initialDocument)
   const selectedDocument = documentCopy[activeDocument]
   const isMobile = mode === 'mobile'
+  const availableDocumentIds: LegalDocument[] = isMobile ? [...legalDocumentIds, 'faq'] : legalDocumentIds
 
   return (
     <Window
@@ -62,7 +63,7 @@ function LegalWindow({
             className="flex shrink-0 flex-wrap gap-space-xs border-b-thin border-line-strong bg-window-surface p-space-sm"
             aria-label="法律文件"
           >
-            {legalDocumentIds.map((documentId) => {
+            {availableDocumentIds.map((documentId) => {
               const document = documentCopy[documentId]
               const isSelected = activeDocument === documentId
 

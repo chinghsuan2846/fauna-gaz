@@ -15,7 +15,7 @@ const meta = {
     },
     initialDocument: {
       control: 'inline-radio',
-      options: ['privacy', 'terms'],
+      options: ['privacy', 'terms', 'faq'],
     },
     className: {
       table: {
