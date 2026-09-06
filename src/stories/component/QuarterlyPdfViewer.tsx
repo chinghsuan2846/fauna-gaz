@@ -169,15 +169,22 @@ function QuarterlyPdfViewer({ url, pageCount, fileName, mobile = false }: Quarte
       <div ref={viewerRef} className="relative flex min-w-0 flex-col items-center bg-ink-primary p-space-sm">
         <div className="flex min-w-0 w-full flex-col items-center gap-space-sm">
           {loadError ? (
-            <div className="flex min-h-full w-full flex-col bg-window-surface">
-              <iframe
-                src={pdfSource}
-                title={fileName ? `PDF：${fileName}` : '季刊 PDF'}
-                className="min-h-[32rem] w-full flex-1 border-0 bg-window-surface"
-              />
-              <p className="shrink-0 p-space-md text-center font-ui text-small text-ink-primary">
-                若 PDF 沒有自動顯示，請使用下方連結開啟原始檔案。
-              </p>
+            <div
+              role="alert"
+              className="grid min-h-[16rem] w-full place-items-center gap-space-md bg-window-surface p-space-xl text-center font-ui text-small text-ink-primary"
+            >
+              <div className="grid gap-space-sm">
+                <strong className="font-medium">PDF 載入失敗</strong>
+                <span>目前無法在此視窗顯示這份 PDF，請稍後再試。</span>
+              </div>
+              <a
+                href={url}
+                target="_blank"
+                rel="noreferrer"
+                className="text-action-link underline decoration-action-link underline-offset-2"
+              >
+                開啟原始 PDF
+              </a>
             </div>
           ) : (
             Array.from({ length: safePageCount }, (_, index) => index + 1).map((pageNumber) => (
