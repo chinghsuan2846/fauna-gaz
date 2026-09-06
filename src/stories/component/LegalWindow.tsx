@@ -38,7 +38,7 @@ function renderLegalBlock(block: LegalBlock, index: number) {
 
 function LegalWindow({
   mode = 'desktop',
-  initialDocument = 'privacy',
+  initialDocument = mode === 'mobile' ? 'faq' : 'privacy',
   standalone = false,
   className = '',
   initialPosition,
@@ -47,7 +47,7 @@ function LegalWindow({
   const [activeDocument, setActiveDocument] = useState<LegalDocument>(initialDocument)
   const selectedDocument = documentCopy[activeDocument]
   const isMobile = mode === 'mobile'
-  const availableDocumentIds: LegalDocument[] = isMobile ? [...legalDocumentIds, 'faq'] : legalDocumentIds
+  const availableDocumentIds: LegalDocument[] = isMobile ? ['faq', ...legalDocumentIds] : legalDocumentIds
 
   return (
     <Window

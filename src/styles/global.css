@@ -121,6 +121,12 @@
     @apply pointer-events-auto;
   }
 
+  @media (min-width: 64rem) {
+    .desktop-icon--mouse-hole > span:first-child {
+      transform: scale(1.15);
+    }
+  }
+
   .desktop-icon-group--leaf {
     top: theme('spacing.space-4xl');
     left: theme('spacing.space-2xl');

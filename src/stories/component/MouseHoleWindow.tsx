@@ -22,16 +22,14 @@ function MouseHoleWindow({
   return (
     <Window
       mode={mode}
-      title="老鼠洞"
+      title="發現一個老鼠洞"
       initialPosition={initialPosition}
       onClose={onClose}
       className="mouse-hole-window"
     >
       <div className={`grid gap-space-xl text-ink-primary ${isMobile ? 'p-space-md text-small' : 'p-space-lg text-body'}`}>
         <p>
-          發現一個老鼠洞
-          <br />
-          「你是人類嗎？」
+          是否為人類？
         </p>
         <div className="flex justify-center gap-space-md">
           <Button

@@ -54,21 +54,21 @@ const TOUR_STEPS: readonly TooltipTourStep[] = [
     id: 'desk',
     targetId: 'tour-welcome',
     title: '歡迎來到動物公報',
-    description: '這裡是動物公報的桌面。你可以從季刊、角色圖示與頁尾工具開始探索。',
+    description: '這裡是動物公報的網站，接下來跟著我們一起盡情探索 ANIVERSITY 這片大森林中發生的好玩故事吧！',
     placement: 'center',
   },
   {
     id: 'quarterly',
     targetId: 'tour-quarterly',
-    title: '從季刊開始閱讀',
-    description: '點擊季刊圖示，依年份、季度與目錄閱讀動物行為學文章。',
+    title: '閱讀季刊',
+    description: '點擊季刊圖示，閱讀歷年來的所有刊物中的文章',
     placement: 'auto',
   },
   {
     id: 'characters',
     targetId: 'tour-characters',
-    title: '認識公報裡的角色',
-    description: '點擊桌面上的角色圖示，開啟對話視窗，和編輯們聊聊。',
+    title: '認識 ANIVERSITY 編輯部成員',
+    description: '點擊角色圖示，開啟對話視窗，和牠們聊聊。',
     placement: 'auto',
   },
 ]
@@ -341,14 +341,12 @@ function DesktopExperience({ articles = [], quarterlyPdfs = [], characters = [],
   const [openWindows, setOpenWindows] = useState<DesktopWindow[]>(defaultOpenWindows)
   const [selectedArticleId, setSelectedArticleId] = useState<string | null>(articles[0]?._id ?? null)
   const [isLoading, setIsLoading] = useState(false)
-  const [musicEnabled, setMusicEnabled] = useState(true)
   const [isTourOpen, setIsTourOpen] = useState(false)
   const [hasVisitedTour, setHasVisitedTour] = useState(readTourVisitedState)
   const [windowZIndices, setWindowZIndices] = useState<Record<string, number>>(() => Object.fromEntries(
     defaultOpenWindows.map((window, index) => [window.id, 100 + index]),
   ))
   const viewportMode = useViewportMode()
-  const audioRef = useRef<HTMLAudioElement | null>(null)
   const loadingTimerRef = useRef<number | null>(null)
   const windowPositionsRef = useRef(new Map<string, { x: number; y: number }>([
     ['contact', { x: 0, y: 0 }],
@@ -378,31 +376,6 @@ function DesktopExperience({ articles = [], quarterlyPdfs = [], characters = [],
   const isMobileViewport = viewportMode === 'mobile'
   const backgroundFit = 'cover'
 
-  const tryStartAudio = () => {
-    if (!musicEnabled) return
-    audioRef.current?.play().catch(() => {})
-  }
-
-  const toggleMusic = () => {
-    setMusicEnabled((enabled) => !enabled)
-  }
-
-  useEffect(() => {
-    const audio = audioRef.current
-    if (!audio) return
-
-    audio.muted = !musicEnabled
-    if (musicEnabled) {
-      audio.play().catch(() => {})
-    } else {
-      audio.pause()
-    }
-  }, [musicEnabled])
-
-  useEffect(() => {
-    tryStartAudio()
-  }, [])
-
   useEffect(() => {
     return () => {
       if (loadingTimerRef.current !== null) window.clearTimeout(loadingTimerRef.current)
@@ -418,7 +391,6 @@ function DesktopExperience({ articles = [], quarterlyPdfs = [], characters = [],
     if (isLoading) return
 
     setIsLoading(true)
-    tryStartAudio()
     loadingTimerRef.current = window.setTimeout(() => {
       loadingTimerRef.current = null
       setIsLoading(false)
@@ -487,24 +459,8 @@ function DesktopExperience({ articles = [], quarterlyPdfs = [], characters = [],
     setIsTourOpen(true)
   }
 
-  const backgroundAudio = (
-    <audio
-      ref={audioRef}
-      autoPlay
-      loop
-      playsInline
-      preload="auto"
-      onCanPlay={tryStartAudio}
-      aria-hidden="true"
-    >
-      <source src="/assets/alex-morgan-autumn-leaves-falling-517092.mp3" type="audio/mpeg" />
-    </audio>
-  )
-
   return (
     <div className="experience-shell">
-      {backgroundAudio}
-
       <div
         className={`experience-background${viewportMode === 'desktop' ? ' experience-background--wide' : ''}${isDesktopVisible ? ' experience-background--desktop' : ''}`}
         aria-hidden="true"
@@ -580,6 +536,8 @@ function DesktopExperience({ articles = [], quarterlyPdfs = [], characters = [],
                 label="老鼠洞"
                 size="large"
                 labelGap="tight"
+                showLabel={false}
+                className="desktop-icon--mouse-hole"
                 onActivate={openMouseHole}
               />
             </div>
@@ -742,12 +700,10 @@ function DesktopExperience({ articles = [], quarterlyPdfs = [], characters = [],
 
         <Footer
           mode={viewportMode === 'mobile' ? 'mobile' : viewportMode === 'tablet' ? 'tablet' : 'desktop'}
-          musicEnabled={musicEnabled}
           onHome={returnToEntry}
           onLegal={openLegal}
           onFaq={openFaq}
           onContact={openContact}
-          onMusicToggle={toggleMusic}
           onTour={openTour}
         />
       </main>

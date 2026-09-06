@@ -239,8 +239,8 @@ const articleDrafts = [
   ['recipe', '食譜', '一份給觀察者的簡單食譜：耐心、距離，以及一點好奇心。', '第一步，找一個不打擾動物的位置。第二步，把時間放慢，讓原本不明顯的聲音與動作逐漸浮現。', '最後，記下你看到的事，也記下你沒有看到的事。好的觀察，總會為下一次提問留下空間。'],
   ['reader-mail', '讀者回函', '讀者分享一段在陽台上遇見麻雀的午後。', '「我原本以為麻雀只是來找食物，後來發現牠每天都會停在同一條曬衣桿上，像是在確認這個地方還在。」', '謝謝讀者提醒我們，觀察不一定要發生在遙遠的森林。家門口也有一整座值得慢慢閱讀的世界。'],
   [
-    'references-and-notes',
-    '引用來源與備註',
+    'references',
+    '引用來源',
     '本期文章所引用的研究資料如下。',
     [
       '[1] Mildener A, Buchman D, Ragir S, Reiss D (2026) Evidence for mirror self-recognition in beluga whales (Delphinapterus leucas). PLoS One 21(5): e0348287. https://doi.org/10.1371/journal.pone.0348287',
@@ -255,7 +255,7 @@ const articleDrafts = [
   ],
 ]
 
-const extendedContentSlugs = new Set(['reader-mail', 'references-and-notes'])
+const extendedContentSlugs = new Set(['reader-mail', 'references'])
 const articles = articleDrafts.map(([slug, title, excerpt, firstParagraph, secondParagraph], index) => ({
   _id: `mock-article-${slug}`,
   _type: 'article',

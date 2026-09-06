@@ -339,7 +339,7 @@ function QuarterlyContent({
   const articleSpacingClass = mobile ? 'p-space-md' : 'p-space-lg'
   const titleMarginClass = mobile ? 'mt-space-md' : 'mt-space-lg'
   const paragraphSpacingClass = mobile ? 'mt-space-md gap-space-md' : 'mt-space-lg gap-space-lg'
-  const isReferenceArticle = article.title === '引用來源與備註'
+  const isReferenceArticle = article.title.includes('引用')
   const articleTextClass = mobile || isReferenceArticle ? 'text-small' : 'text-body'
 
   useEffect(() => {

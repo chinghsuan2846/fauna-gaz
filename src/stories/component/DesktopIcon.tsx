@@ -12,6 +12,7 @@ export type DesktopIconProps = {
   imageAlt?: string
   size?: DesktopIconSize
   labelGap?: 'default' | 'tight'
+  showLabel?: boolean
   onActivate?: MouseEventHandler<HTMLButtonElement>
   className?: string
 }
@@ -49,6 +50,7 @@ export function DesktopIcon({
   imageAlt = '',
   size = 'medium',
   labelGap = 'default',
+  showLabel = true,
   onActivate,
   className = '',
 }: DesktopIconProps) {
@@ -58,8 +60,8 @@ export function DesktopIcon({
     <button
       type="button"
       className={`group inline-grid justify-items-center ${labelGapClass} bg-transparent px-space-sm py-space-xs font-ui text-caption text-ink-inverse transition-transform hover:scale-95 focus-visible:outline-2 focus-visible:outline-ink-primary ${className}`}
-      aria-label={label}
-      title={label}
+      aria-label={label || name}
+      title={showLabel ? label || name : undefined}
       onClick={onActivate}
     >
       <span className={`${iconSizeClasses[size]} grid place-items-center`}>
@@ -70,7 +72,7 @@ export function DesktopIcon({
           draggable="false"
         />
       </span>
-      <span className="max-w-full truncate bg-overlay-label px-space-sm py-space-xs text-ink-inverse">{label}</span>
+      {showLabel && <span className="max-w-full truncate bg-overlay-label px-space-sm py-space-xs text-ink-inverse">{label}</span>}
     </button>
   )
 }
