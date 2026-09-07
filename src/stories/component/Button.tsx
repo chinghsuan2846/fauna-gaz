@@ -16,6 +16,8 @@ export type PixelIconName =
   | 'music-off'
   | 'volume-on'
   | 'volume-off'
+  | 'plus'
+  | 'minus'
   | 'close'
   | 'box-empty'
   | 'alert-triangle'
@@ -146,6 +148,13 @@ const iconShapes: Record<PixelIconName, ReactNode> = {
       <rect x="10" y="10" width="1" height="2" />
     </>
   ),
+  plus: (
+    <>
+      <rect x="7" y="2" width="2" height="12" />
+      <rect x="2" y="7" width="12" height="2" />
+    </>
+  ),
+  minus: <rect x="2" y="7" width="12" height="2" />,
   loading: (
     <>
       <rect x="7" y="1" width="2" height="3" />

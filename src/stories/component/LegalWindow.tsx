@@ -1,7 +1,7 @@
 import { useState } from 'react'
 
 import { faqContent, privacyPolicy, termsOfUse, type LegalBlock, type LegalDocumentContent } from '../../lib/legalContent'
-import { Button } from './Button'
+import { Button, PixelIcon } from './Button'
 import type { WindowMode, WindowPosition, WindowProps } from './Window'
 import Window from './Window'
 
@@ -45,6 +45,7 @@ function LegalWindow({
   onClose,
 }: LegalWindowProps) {
   const [activeDocument, setActiveDocument] = useState<LegalDocument>(initialDocument)
+  const [expandedFaqIndex, setExpandedFaqIndex] = useState<number | null>(null)
   const selectedDocument = documentCopy[activeDocument]
   const isMobile = mode === 'mobile'
   const availableDocumentIds: LegalDocument[] = isMobile ? ['faq', ...legalDocumentIds] : legalDocumentIds
@@ -75,7 +76,10 @@ function LegalWindow({
                   size="small"
                   textSize="small"
                   ariaLabel={`查看${document.label}`}
-                  onClick={() => setActiveDocument(documentId)}
+                  onClick={() => {
+                    setActiveDocument(documentId)
+                    if (documentId !== 'faq') setExpandedFaqIndex(null)
+                  }}
                 />
               )
             })}
@@ -90,13 +94,51 @@ function LegalWindow({
               {selectedDocument.intro && <p className="legal-document-intro">{selectedDocument.intro}</p>}
             </header>
 
-            <div className="legal-document-sections">
-              {selectedDocument.sections.map((section, sectionIndex) => (
-                <section key={section.heading ?? `section-${sectionIndex}`} className="legal-document-section">
-                  {section.heading && <h4>{section.heading}</h4>}
-                  <div className="legal-document-blocks">{section.blocks.map(renderLegalBlock)}</div>
-                </section>
-              ))}
+            <div className={`legal-document-sections${activeDocument === 'faq' ? ' faq-document-sections' : ''}`}>
+              {selectedDocument.sections.map((section, sectionIndex) => {
+                if (activeDocument === 'faq') {
+                  const isExpanded = expandedFaqIndex === sectionIndex
+                  const questionId = `faq-question-${sectionIndex}`
+                  const answerId = `faq-answer-${sectionIndex}`
+
+                  return (
+                    <section key={section.heading ?? `section-${sectionIndex}`} className="legal-document-section faq-document-section">
+                      <h4 className="faq-question">
+                        <button
+                          id={questionId}
+                          type="button"
+                          className="faq-question-button"
+                          aria-expanded={isExpanded}
+                          aria-controls={answerId}
+                          onClick={() => setExpandedFaqIndex((currentIndex) => currentIndex === sectionIndex ? null : sectionIndex)}
+                        >
+                          <span className="faq-question-number" aria-hidden="true">{String(sectionIndex + 1).padStart(2, '0')}</span>
+                          <span className="faq-question-label">{section.heading}</span>
+                          <span className="faq-question-indicator" aria-hidden="true">
+                            <PixelIcon name={isExpanded ? 'minus' : 'plus'} size="small" className="faq-question-indicator-icon" />
+                          </span>
+                        </button>
+                      </h4>
+                      <div
+                        id={answerId}
+                        className="faq-answer"
+                        role="region"
+                        aria-labelledby={questionId}
+                        hidden={!isExpanded}
+                      >
+                        <div className="legal-document-blocks">{section.blocks.map(renderLegalBlock)}</div>
+                      </div>
+                    </section>
+                  )
+                }
+
+                return (
+                  <section key={section.heading ?? `section-${sectionIndex}`} className="legal-document-section">
+                    {section.heading && <h4>{section.heading}</h4>}
+                    <div className="legal-document-blocks">{section.blocks.map(renderLegalBlock)}</div>
+                  </section>
+                )
+              })}
             </div>
           </article>
         </div>

@@ -476,8 +476,8 @@ function DesktopExperience({ articles = [], quarterlyPdfs = [], characters = [],
           }`}
         >
           <section className="relative z-10 grid justify-items-center px-space-md">
-            <h1 className="text-display font-medium">動物公報</h1>
-            <p className="mt-space-md text-lead">一本動物行為學季刊</p>
+            <h1 className="entry-title">動物公報</h1>
+            <p className="entry-subtitle mt-space-lg">一本動物行為學季刊</p>
             <button
               className="entry-enter-button mt-space-2xl inline-flex items-center justify-center gap-space-xs px-space-md py-space-sm text-button font-medium text-ink-primary focus-visible:outline-2 focus-visible:outline-line lg:text-title"
               type="button"
@@ -501,7 +501,7 @@ function DesktopExperience({ articles = [], quarterlyPdfs = [], characters = [],
           <div className="desktop-icon-layer" aria-label="動物公報桌面圖示">
             <div
               className="desktop-icon-group desktop-icon-group--leaf"
-              data-tour-id={birdCharacters.length > 0 ? 'tour-characters' : undefined}
+              data-tour-id={viewportMode !== 'tablet' && birdCharacters.length > 0 ? 'tour-characters' : undefined}
             >
               {birdCharacters.map((character) => (
                   <DesktopIcon
@@ -518,7 +518,7 @@ function DesktopExperience({ articles = [], quarterlyPdfs = [], characters = [],
 
             <div
               className="desktop-icon-group desktop-icon-group--grass"
-              data-tour-id={birdCharacters.length === 0 && grassCharacters.length > 0 ? 'tour-characters' : undefined}
+              data-tour-id={viewportMode !== 'tablet' && birdCharacters.length === 0 && grassCharacters.length > 0 ? 'tour-characters' : undefined}
             >
               {grassCharacters.map((character) => (
                   <DesktopIcon
@@ -528,6 +528,7 @@ function DesktopExperience({ articles = [], quarterlyPdfs = [], characters = [],
                     imageSrc={character.imageUrl}
                     imageAlt={character.imageAlt}
                     size="large"
+                    tourId={viewportMode === 'tablet' && ['老莫', '四月'].includes(iconNameForCharacter(character)) ? 'tour-characters' : undefined}
                     onActivate={() => openCharacterChat(character)}
                   />
                 ))}
