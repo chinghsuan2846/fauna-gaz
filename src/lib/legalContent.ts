@@ -317,14 +317,14 @@ export const faqContent: LegalDocumentContent = {
   title: '常見問題',
   sections: [
     {
-      heading: '一、動物公報是什麼？',
+      heading: '動物公報是什麼？',
       blocks: [
         { type: 'paragraph', text: '動物公報，也就是Fauna Gaz，是一本獨立出刊，以動物行為學為主的季刊，我們旨在將艱澀難懂的論文內容，轉化為一篇篇簡單好讀的動物小故事。' },
         { type: 'paragraph', text: '雜誌目前為一人團隊，創辦人Valerie是一名大學生，正就讀動物學系（Zoology），這本雜誌，同時也是為慶祝她大學生涯的開端所創立，期許能夠利用自己的所學，將更多的知識，傳遞給社會大眾，讓大家都能夠（不帶有任何困難地）理解更多的動物，跨越物種間的高牆。' },
       ],
     },
     {
-      heading: '二、紙本刊物發刊時間？',
+      heading: '紙本刊物發刊時間？',
       blocks: [
         { type: 'paragraph', text: '發刊時間為每年的3/15，6/15，9/15，12/15。' },
       ],

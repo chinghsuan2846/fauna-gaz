@@ -24,6 +24,7 @@ const socialImage = image ? new URL(image, canonicalUrl) : undefined
     <meta property="og:url" content={canonicalUrl} />
     {socialImage && <meta property="og:image" content={socialImage} />}
     <meta name="twitter:card" content={socialImage ? 'summary_large_image' : 'summary'} />
+    <link rel="icon" type="image/png" href="/favicon.png" />
     <link rel="preload" href="/fonts/Cubic-11.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
     <link rel="preload" href="/fonts/Source-Han-Mono-TC-Regular.otf" as="font" type="font/otf" crossorigin="anonymous" />
     <link rel="preload" href="/fonts/Source-Han-Mono-TC-Bold.otf" as="font" type="font/otf" crossorigin="anonymous" />
