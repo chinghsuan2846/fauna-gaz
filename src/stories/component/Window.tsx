@@ -8,6 +8,11 @@ import WindowHeader from './WindowHeader'
 
 export type WindowMode = 'desktop' | 'tablet' | 'mobile'
 
+const SUPPORT_LINKS = {
+  international: 'https://ko-fi.com/ningc77',
+  taiwan: 'https://portaly.cc/ningc77',
+} as const
+
 export type WindowPosition = {
   x: number
   y: number
@@ -230,7 +235,7 @@ function Window({
               appearance="outline"
               label="Support Us"
               subLabel="International Readers"
-              href={contact.supportLinkUrl}
+              href={SUPPORT_LINKS.international}
               size="small"
               textSize="small"
               padding="footer-hug"
@@ -242,7 +247,7 @@ function Window({
               appearance="outline"
               label="支持我們"
               subLabel="台灣讀者"
-              href={contact.supportLinkUrl}
+              href={SUPPORT_LINKS.taiwan}
               size="small"
               textSize="small"
               padding="footer-hug"

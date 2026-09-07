@@ -13,6 +13,7 @@ export type DesktopIconProps = {
   size?: DesktopIconSize
   labelGap?: 'default' | 'tight'
   showLabel?: boolean
+  tourId?: string
   onActivate?: MouseEventHandler<HTMLButtonElement>
   className?: string
 }
@@ -51,6 +52,7 @@ export function DesktopIcon({
   size = 'medium',
   labelGap = 'default',
   showLabel = true,
+  tourId,
   onActivate,
   className = '',
 }: DesktopIconProps) {
@@ -60,6 +62,7 @@ export function DesktopIcon({
     <button
       type="button"
       className={`group inline-grid justify-items-center ${labelGapClass} bg-transparent px-space-sm py-space-xs font-ui text-caption text-ink-inverse transition-transform hover:scale-95 focus-visible:outline-2 focus-visible:outline-ink-primary ${className}`}
+      data-tour-id={tourId}
       aria-label={label || name}
       title={showLabel ? label || name : undefined}
       onClick={onActivate}
