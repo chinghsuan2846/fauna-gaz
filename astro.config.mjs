@@ -6,16 +6,19 @@ import { loadEnv } from 'vite'
 const env = loadEnv(process.env.NODE_ENV || 'development', process.cwd(), '')
 const projectId = env.PUBLIC_SANITY_PROJECT_ID || 'replace-me'
 const dataset = env.PUBLIC_SANITY_DATASET || 'production'
+const defaultSiteUrl = 'https://faunagaz.com'
 const rawSiteUrl =
   env.PUBLIC_SITE_URL ||
   process.env.PUBLIC_SITE_URL ||
   process.env.VERCEL_PROJECT_PRODUCTION_URL ||
   process.env.VERCEL_URL
-const site = rawSiteUrl
+const configuredSiteUrl = rawSiteUrl
   ? /^https?:\/\//.test(rawSiteUrl)
     ? rawSiteUrl
     : `https://${rawSiteUrl}`
-  : undefined
+  : defaultSiteUrl
+const configuredHostname = new URL(configuredSiteUrl).hostname
+const site = configuredHostname === 'fauna-gaz.pages.dev' ? defaultSiteUrl : configuredSiteUrl
 
 export default defineConfig({
   site,
