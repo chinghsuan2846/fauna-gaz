@@ -32,7 +32,7 @@ if (!article) {
   throw new Error(`Article not found for slug: ${slug}`)
 }
 
-const description = article.excerpt || 'Fauna Gaz quarterly journal article.'
+const description = article.excerpt || '閱讀動物公報以動物行為學為主題的季刊文章，從研究中認識動物的生活與行為。'
 const coverImageUrl = sanityImageUrl(article.coverImage, { width: 1600 })
 const articleIndex = visibleArticles.findIndex((candidate) => candidate._id === article._id)
 const contentArticle = toQuarterlyContentArticle(
@@ -44,12 +44,12 @@ const contentArticle = toQuarterlyContentArticle(
 ---
 
 <BaseLayout
-  title={`${displayArticleTitle(article.title)} — Fauna Gaz`}
+  title={`${displayArticleTitle(article.title)}｜動物公報`}
   description={description}
   image={coverImageUrl}
 >
   <main class="flex h-screen min-h-0 flex-col gap-space-md overflow-hidden bg-window-surface p-space-md font-body text-body text-ink-primary sm:p-space-xl lg:p-space-2xl">
-    <a class="shrink-0 font-ui text-action-link underline decoration-action-link underline-offset-2" href="/">← Fauna Gaz</a>
+    <a class="shrink-0 font-ui text-action-link underline decoration-action-link underline-offset-2" href="/">← 動物公報</a>
     <div class="mx-auto flex min-h-0 w-full max-w-viewport-tablet flex-1">
       <QuarterlyContent client:load article={contentArticle} />
     </div>

@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import type { PointerEvent as ReactPointerEvent } from 'react'
 import {
   findReferenceArticle,
@@ -18,7 +18,7 @@ import DesktopIcon, { desktopIconNames, type DesktopIconName } from '../stories/
 import LegalWindow from '../stories/component/LegalWindow'
 import MouseHoleWindow from '../stories/component/MouseHoleWindow'
 import { PixelIcon } from '../stories/component/Button'
-import Window, { type WindowMode, type WindowPosition } from '../stories/component/Window'
+import Window, { type WindowMode, type WindowPosition, type WindowProps } from '../stories/component/Window'
 import type { WindowStateKind } from '../stories/component/WindowState'
 import TooltipTour, { type TooltipTourStep } from '../stories/component/TooltipTour'
 import PixelForest from './PixelForest'
@@ -332,6 +332,36 @@ function WindowInteractionOverlay({
         }}
       />
     </div>
+  )
+}
+
+type CharacterChatWindowProps = {
+  character: SanityCharacter
+  viewport: WindowMode
+  initialPosition?: WindowPosition
+  onClose?: WindowProps['onClose']
+}
+
+function CharacterChatWindow({ character, viewport, initialPosition, onClose }: CharacterChatWindowProps) {
+  const dialogue = useMemo(() => toCharacterDialogue(character), [character])
+
+  return (
+    <ChatWindows
+      viewport={viewport}
+      initialPosition={initialPosition}
+      title={`Message from : ${character.name}`}
+      profile={{
+        imageSrc: character.imageUrl ?? '',
+        imageAlt: character.imageAlt,
+        name: character.name,
+        role: character.role,
+        species: character.species,
+        imageScale: 'large',
+      }}
+      dialogue={dialogue}
+      submit={{ placeholder: '寫點什麼吧', submitLabel: '送出' }}
+      onClose={onClose}
+    />
   )
 }
 
@@ -662,20 +692,10 @@ function DesktopExperience({ articles = [], quarterlyPdfs = [], characters = [],
                   data-window-shell-id={window.id}
                   className="desktop-window-shell desktop-window-shell--chat"
                 >
-                  <ChatWindows
+                  <CharacterChatWindow
+                    character={character}
                     viewport={viewportMode}
                     initialPosition={initialPosition}
-                    title={`Message from : ${character.name}`}
-                    profile={{
-                      imageSrc: character.imageUrl ?? '',
-                      imageAlt: character.imageAlt,
-                      name: character.name,
-                      role: character.role,
-                      species: character.species,
-                      imageScale: 'large',
-                    }}
-                    dialogue={toCharacterDialogue(character)}
-                    submit={{ placeholder: '寫點什麼吧', submitLabel: '送出' }}
                     onClose={() => closeWindow(window.id)}
                   />
                 </div>

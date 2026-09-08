@@ -996,6 +996,12 @@
   .portable-text blockquote {
     @apply mt-space-xl;
   }
+
+  @media (min-width: 37.5rem) and (max-width: 63.999rem) {
+    .quarterly-content-subheading {
+      @apply text-lead;
+    }
+  }
 }
 
 @keyframes pixel-flicker {

@@ -317,7 +317,10 @@ function renderParagraph(
   const isHeading = paragraph.style && paragraph.style !== 'normal'
 
   return (
-    <Tag key={paragraph.id} className={isHeading ? 'font-medium leading-body' : undefined}>
+    <Tag
+      key={paragraph.id}
+      className={isHeading ? 'quarterly-content-subheading font-medium leading-body' : undefined}
+    >
       {paragraph.segments.map((segment, index) => (
         <span key={`${paragraph.id}-${index}`}>{renderSegment(segment, citations, interactionMode)}</span>
       ))}
