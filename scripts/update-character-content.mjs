@@ -62,37 +62,78 @@ const characters = [
       {
         _key: 'intro',
         id: 'intro',
-        text: '大家好，我是老莫。我最喜歡的東西大概是身上的這件背心吧，這是我媽媽過世前織給我的。',
-        options: [{ _key: 'dislike', label: '那你最討厭什麼？', nextNode: 'dislike' }],
+        text: '你們好，我是老莫。',
+        options: [{ _key: 'dislike', label: '你最喜歡什麼東西呢？', nextNode: 'fav' }],
+      },
+      {
+        _key: 'fav',
+        id: 'fav',
+        text: '大概是身上的這件背心吧，這是我媽媽過世前織給我的。',
+        options: [{ _key: 'dislike', label: '那你有討厭的東西嗎？', nextNode: 'dislike' }],
       },
       {
         _key: 'dislike',
         id: 'dislike',
-        text: '最討厭的東西？黃鼠狼！一群奸詐的鼠輩！',
-        options: [{ _key: 'word-choice', label: '你不該這樣稱呼牠們嗎？', nextNode: 'word-choice' }],
+        text: '黃鼠狼！一群奸詐的鼠輩！',
+        options: [{ _key: 'word-choice', label: '但是黃鼠狼不是老鼠，你才是', nextNode: 'word-choice' }],
       },
       {
         _key: 'word-choice',
         id: 'word-choice',
-        text: '什麼？我不應該用什麼這個詞？妳說話可得大聲點親愛的，真可憐，是沒能吃上什麼飯嗎？',
-        options: [{ _key: 'peanut', label: '那你背上的花生是怎麼回事？', nextNode: 'peanut' }],
+        text: '你說什麼？',
+        options: [
+          { _key: 'peanut', label: '算了...' },
+          { _key: 'peanut-story', label: '你背上的花生是怎麼來的？', nextNode: 'peanut' },
+        ],
       },
       {
         _key: 'peanut',
         id: 'peanut',
-        text: '喔？妳問我背上這顆花生？是的！這是來自一位我西方好友的贈禮，去年可是我的兩歲大壽呢！',
-        options: [{ _key: 'peanut-memory', label: '你真的不會吃掉它嗎？', nextNode: 'peanut-memory' }],
+        text: '這是來自一位我西方好友的贈禮，去年可是我的兩歲大壽呢！這真是好東西，可不是嗎？我在家裡可從沒見過的好東西！',
+        choiceGroup: 'lao-mo-peanut',
+        options: [
+          { _key: 'peanut-memory', label: '你不會想吃掉它嗎？', nextNode: 'peanut-memory', choiceId: 'eat' },
+          { _key: 'taste', label: '你沒有吃過花生嗎？', nextNode: 'living-area', choiceId: 'taste' },
+          { _key: 'age', label: '你很老了嗎？', nextNode: 'age', choiceId: 'age' },
+        ],
       },
       {
         _key: 'peanut-memory',
         id: 'peanut-memory',
-        text: '這真是好東西，可不是嗎？我在家裡可從沒見過的好東西！什麼？吃它？喔，不不不，我想我不會吃它的。',
-        options: [{ _key: 'closing', label: '為什麼不吃？', nextNode: 'closing' }],
+        text: '什麼？吃它？喔，不不不，我想我不會吃它的。這可是珍貴的回憶啊！',
+        choiceGroup: 'lao-mo-peanut',
+        options: [
+          { _key: 'taste', label: '你沒有吃過花生嗎？', nextNode: 'living-area', choiceId: 'taste' },
+          { _key: 'age', label: '你很老了嗎？', nextNode: 'age', choiceId: 'age' },
+          { _key: 'bye', label: '再見', nextNode: 'bye', requiresAllChoices: true },
+        ],
       },
       {
-        _key: 'closing',
-        id: 'closing',
-        text: '這可是珍貴的回憶啊！',
+        _key: 'living-area',
+        id: 'living-area',
+        text: '是的，我可從來沒在我們山上看過呢！',
+        choiceGroup: 'lao-mo-peanut',
+        options: [
+          { _key: 'eat', label: '你不會想吃掉它嗎？', nextNode: 'peanut-memory', choiceId: 'eat' },
+          { _key: 'age', label: '你很老了嗎？', nextNode: 'age', choiceId: 'age' },
+          { _key: 'bye', label: '再見', nextNode: 'bye', requiresAllChoices: true },
+        ],
+      },
+      {
+        _key: 'age',
+        id: 'age',
+        text: '喔...',
+        choiceGroup: 'lao-mo-peanut',
+        options: [
+          { _key: 'taste', label: '你沒有吃過花生嗎？', nextNode: 'living-area', choiceId: 'taste' },
+          { _key: 'eat', label: '你不會想吃掉它嗎？', nextNode: 'peanut-memory', choiceId: 'eat' },
+          { _key: 'bye', label: '再見', nextNode: 'bye', requiresAllChoices: true },
+        ],
+      },
+      {
+        _key: 'bye',
+        id: 'bye',
+        text: '下次見！',
         options: [],
       },
     ],
@@ -105,7 +146,29 @@ const characters = [
     role: '編輯2',
     species: '渡鴉',
     characterType: 'bird',
-    dialogue: dialogue('我沒有什麼好說的。', '你確定嗎？', '那我先不打擾了。', '……嗯。', '再見。', '就這樣。'),
+    dialogue: [
+      {
+        _key: 'intro',
+        id: 'intro',
+        text: '您撥的電話將轉接到語音信箱，嘟聲後開始計費，如不留言請掛斷，快速留言請按兩次井字鍵。',
+        options: [{ _key: 'field-notes', label: '##', nextNode: '##' }],
+      },
+      {
+        _key: 'repeat',
+        id: '##',
+        text: '您撥的電話將轉接到語音信箱，嘟聲後開始計費，如不留言請掛斷，快速留言請按兩次井字鍵。',
+        options: [
+          { _key: 'repeat', label: '##', nextNode: '##' },
+          { _key: 'bye', label: '...', nextNode: 'bye' },
+        ],
+      },
+      {
+        _key: 'bye',
+        id: 'bye',
+        text: '您撥的電話未開機，請稍候再撥。',
+        options: [],
+      },
+    ],
   },
   {
     names: ['阿雀'],
@@ -162,7 +225,57 @@ const characters = [
     role: '貓咪',
     species: '家貓',
     characterType: 'cat',
-    dialogue: dialogue('我是四月，正在草地邊追蹤一條很有意思的線索。', '線索是什麼？', '今天順利嗎？'),
+    dialogue: [
+      {
+        _key: 'intro',
+        id: 'intro',
+        text: '喵',
+        options: [
+          { _key: 'field-notes', label: '你好呀', nextNode: 'meow' },
+          { _key: 'speak', label: '你會說話嗎？', nextNode: 'speak' },
+          { _key: 'weather', label: '今天天氣真好', nextNode: 'weather' },
+        ],
+      },
+      {
+        _key: 'meow',
+        id: 'meow',
+        text: '喵',
+        options: [
+          { _key: 'weather', label: '今天天氣真好', nextNode: 'weather' },
+          { _key: 'speak', label: '你會說話嗎？', nextNode: 'speak' },
+        ],
+      },
+      {
+        _key: 'speak',
+        id: 'speak',
+        text: '喵',
+        options: [
+          { _key: 'weather', label: '今天天氣真好', nextNode: 'weather' },
+          { _key: 'bye', label: '再見', nextNode: 'bye' },
+        ],
+      },
+      {
+        _key: 'weather',
+        id: 'weather',
+        text: '喵',
+        options: [
+          { _key: 'speak', label: '你會說話嗎？', nextNode: 'speak' },
+          { _key: 'bye', label: '再見', nextNode: 'bye' },
+        ],
+      },
+      {
+        _key: 'bye',
+        id: 'bye',
+        text: '再見',
+        options: [{ _key: 'question', label: '？', nextNode: '？' }],
+      },
+      {
+        _key: 'question',
+        id: '？',
+        text: '喵',
+        options: [],
+      },
+    ],
   },
   {
     names: ['一五', '二號'],
@@ -172,7 +285,41 @@ const characters = [
     role: '貓咪',
     species: '家貓',
     characterType: 'cat',
-    dialogue: dialogue('我是一五，專門研究門打開之後，究竟要不要立刻走出去。', '研究有結果嗎？', '你喜歡哪裡？'),
+    dialogue: [
+      {
+        _key: 'meow',
+        id: 'meow',
+        text: '喵！',
+        options: [
+          { _key: 'weather', label: '今天天氣真好', nextNode: 'weather' },
+          { _key: 'speak', label: '你會說話嗎？', nextNode: 'speak' },
+        ],
+      },
+      {
+        _key: 'speak',
+        id: 'speak',
+        text: '喵喵！',
+        options: [
+          { _key: 'weather', label: '今天天氣真好', nextNode: 'weather' },
+          { _key: 'bye', label: '再見', nextNode: 'bye' },
+        ],
+      },
+      {
+        _key: 'weather',
+        id: 'weather',
+        text: '喵喵喵！',
+        options: [
+          { _key: 'speak', label: '你會說話嗎？', nextNode: 'speak' },
+          { _key: 'bye', label: '再見', nextNode: 'bye' },
+        ],
+      },
+      {
+        _key: 'bye',
+        id: 'bye',
+        text: '喵嗷',
+        options: [],
+      },
+    ],
   },
 ]
 

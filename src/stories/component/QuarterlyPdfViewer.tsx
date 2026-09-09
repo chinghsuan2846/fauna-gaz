@@ -6,6 +6,7 @@ export type QuarterlyPdfViewerProps = {
   pageCount: number
   fileName?: string
   mobile?: boolean
+  onLoadingChange?: (isLoading: boolean) => void
 }
 
 type PdfJsModule = typeof import('pdfjs-dist')
@@ -23,7 +24,7 @@ function getPdfSource(url: string) {
   }
 }
 
-function QuarterlyPdfViewer({ url, pageCount, fileName, mobile = false }: QuarterlyPdfViewerProps) {
+function QuarterlyPdfViewer({ url, pageCount, fileName, mobile = false, onLoadingChange }: QuarterlyPdfViewerProps) {
   const [pdfDocument, setPdfDocument] = useState<PDFDocumentProxy | null>(null)
   const [loadedPageCount, setLoadedPageCount] = useState<number | null>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -35,6 +36,10 @@ function QuarterlyPdfViewer({ url, pageCount, fileName, mobile = false }: Quarte
   const renderGenerationRef = useRef(0)
   const safePageCount = Math.max(1, loadedPageCount ?? pageCount)
   const pdfSource = getPdfSource(url)
+
+  useEffect(() => {
+    onLoadingChange?.(isLoading)
+  }, [isLoading, onLoadingChange])
 
   useEffect(() => {
     let cancelled = false
@@ -201,11 +206,6 @@ function QuarterlyPdfViewer({ url, pageCount, fileName, mobile = false }: Quarte
           )}
         </div>
 
-        {isLoading && (
-          <div className="pointer-events-none absolute inset-0 grid place-items-center bg-ink-primary/80 px-space-xl text-center font-ui text-small text-ink-inverse">
-            <span role="status">PDF 載入中…</span>
-          </div>
-        )}
       </div>
 
       <div className="flex shrink-0 items-center justify-center gap-space-sm border-t-thin border-line-strong bg-window-surface px-space-sm py-space-xs font-ui text-caption text-ink-primary">

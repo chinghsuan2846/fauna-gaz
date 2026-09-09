@@ -35,6 +35,176 @@ const dialogue = (
   },
 ]
 
+const voicemailDialogue = [
+  {
+    id: 'intro',
+    text: '您撥的電話將轉接到語音信箱，嘟聲後開始計費，如不留言請掛斷，快速留言請按兩次井字鍵。',
+    options: [{ label: '##', nextNode: '##' }],
+  },
+  {
+    id: '##',
+    text: '您撥的電話將轉接到語音信箱，嘟聲後開始計費，如不留言請掛斷，快速留言請按兩次井字鍵。',
+    options: [
+      { label: '##', nextNode: '##' },
+      { label: '...', nextNode: 'bye' },
+    ],
+  },
+  {
+    id: 'bye',
+    text: '您撥的電話未開機，請稍候再撥。',
+    options: [],
+  },
+]
+
+const aprilDialogue = [
+  {
+    id: 'intro',
+    text: '喵',
+    options: [
+      { label: '你好呀', nextNode: 'meow' },
+      { label: '你會說話嗎？', nextNode: 'speak' },
+      { label: '今天天氣真好', nextNode: 'weather' },
+    ],
+  },
+  {
+    id: 'meow',
+    text: '喵',
+    options: [
+      { label: '今天天氣真好', nextNode: 'weather' },
+      { label: '你會說話嗎？', nextNode: 'speak' },
+    ],
+  },
+  {
+    id: 'speak',
+    text: '喵',
+    options: [
+      { label: '今天天氣真好', nextNode: 'weather' },
+      { label: '再見', nextNode: 'bye' },
+    ],
+  },
+  {
+    id: 'weather',
+    text: '喵',
+    options: [
+      { label: '你會說話嗎？', nextNode: 'speak' },
+      { label: '再見', nextNode: 'bye' },
+    ],
+  },
+  {
+    id: 'bye',
+    text: '再見',
+    options: [{ label: '？', nextNode: '？' }],
+  },
+  {
+    id: '？',
+    text: '喵',
+    options: [],
+  },
+]
+
+const fifteenDialogue = [
+  {
+    id: 'meow',
+    text: '喵！',
+    options: [
+      { label: '今天天氣真好', nextNode: 'weather' },
+      { label: '你會說話嗎？', nextNode: 'speak' },
+    ],
+  },
+  {
+    id: 'speak',
+    text: '喵喵！',
+    options: [
+      { label: '今天天氣真好', nextNode: 'weather' },
+      { label: '再見', nextNode: 'bye' },
+    ],
+  },
+  {
+    id: 'weather',
+    text: '喵喵喵！',
+    options: [
+      { label: '你會說話嗎？', nextNode: 'speak' },
+      { label: '再見', nextNode: 'bye' },
+    ],
+  },
+  {
+    id: 'bye',
+    text: '喵嗷',
+    options: [],
+  },
+]
+
+const laoMoDialogue = [
+  {
+    id: 'intro',
+    text: '你們好，我是老莫。',
+    options: [{ label: '你最喜歡什麼東西呢？', nextNode: 'fav' }],
+  },
+  {
+    id: 'fav',
+    text: '大概是身上的這件背心吧，這是我媽媽過世前織給我的。',
+    options: [{ label: '那你有討厭的東西嗎？', nextNode: 'dislike' }],
+  },
+  {
+    id: 'dislike',
+    text: '黃鼠狼！一群奸詐的鼠輩！',
+    options: [{ label: '但是黃鼠狼不是老鼠，你才是', nextNode: 'word-choice' }],
+  },
+  {
+    id: 'word-choice',
+    text: '你說什麼？',
+    options: [
+      { label: '算了...', nextNode: undefined },
+      { label: '你背上的花生是怎麼來的？', nextNode: 'peanut' },
+    ],
+  },
+  {
+    id: 'peanut',
+    text: '這是來自一位我西方好友的贈禮，去年可是我的兩歲大壽呢！這真是好東西，可不是嗎？我在家裡可從沒見過的好東西！',
+    choiceGroup: 'lao-mo-peanut',
+    options: [
+      { label: '你不會想吃掉它嗎？', nextNode: 'peanut-memory', choiceId: 'eat' },
+      { label: '你沒有吃過花生嗎？', nextNode: 'living-area', choiceId: 'taste' },
+      { label: '你很老了嗎？', nextNode: 'age', choiceId: 'age' },
+    ],
+  },
+  {
+    id: 'peanut-memory',
+    text: '什麼？吃它？喔，不不不，我想我不會吃它的。這可是珍貴的回憶啊！',
+    choiceGroup: 'lao-mo-peanut',
+    options: [
+      { label: '你沒有吃過花生嗎？', nextNode: 'living-area', choiceId: 'taste' },
+      { label: '你很老了嗎？', nextNode: 'age', choiceId: 'age' },
+      { label: '再見', nextNode: 'bye', requiresAllChoices: true },
+    ],
+  },
+  {
+    id: 'living-area',
+    text: '是的，我可從來沒在我們山上看過呢！',
+    choiceGroup: 'lao-mo-peanut',
+    options: [
+      { label: '你不會想吃掉它嗎？', nextNode: 'peanut-memory', choiceId: 'eat' },
+      { label: '你很老了嗎？', nextNode: 'age', choiceId: 'age' },
+      { label: '再見', nextNode: 'bye', requiresAllChoices: true },
+    ],
+  },
+  {
+    id: 'age',
+    text: '喔...',
+    choiceGroup: 'lao-mo-peanut',
+    options: [
+      { label: '你沒有吃過花生嗎？', nextNode: 'living-area', choiceId: 'taste' },
+      { label: '你不會想吃掉它嗎？', nextNode: 'peanut-memory', choiceId: 'eat' },
+      { label: '再見', nextNode: 'bye', requiresAllChoices: true },
+    ],
+  },
+  {
+    id: 'bye',
+    text: '下次見！',
+    options: [],
+  },
+]
+
 export const demoCharacters: SanityCharacter[] = [
   {
     _id: 'demo-character-mouse',
@@ -46,38 +216,7 @@ export const demoCharacters: SanityCharacter[] = [
     imageUrl: image('老莫'),
     imageAlt: '像素風老莫角色插圖',
     dialogueStart: 'intro',
-    dialogue: [
-      {
-        id: 'intro',
-        text: '大家好，我是老莫。我最喜歡的東西大概是身上的這件背心吧，這是我媽媽過世前織給我的。',
-        options: [{ label: '那你最討厭什麼？', nextNode: 'dislike' }],
-      },
-      {
-        id: 'dislike',
-        text: '最討厭的東西？黃鼠狼！一群奸詐的鼠輩！',
-        options: [{ label: '你不該這樣稱呼牠們嗎？', nextNode: 'word-choice' }],
-      },
-      {
-        id: 'word-choice',
-        text: '什麼？我不應該用什麼這個詞？妳說話可得大聲點親愛的，真可憐，是沒能吃上什麼飯嗎？',
-        options: [{ label: '那你背上的花生是怎麼回事？', nextNode: 'peanut' }],
-      },
-      {
-        id: 'peanut',
-        text: '喔？妳問我背上這顆花生？是的！這是來自一位我西方好友的贈禮，去年可是我的兩歲大壽呢！',
-        options: [{ label: '你真的不會吃掉它嗎？', nextNode: 'peanut-memory' }],
-      },
-      {
-        id: 'peanut-memory',
-        text: '這真是好東西，可不是嗎？我在家裡可從沒見過的好東西！什麼？吃它？喔，不不不，我想我不會吃它的。',
-        options: [{ label: '為什麼不吃？', nextNode: 'closing' }],
-      },
-      {
-        id: 'closing',
-        text: '這可是珍貴的回憶啊！',
-        options: [],
-      },
-    ],
+    dialogue: laoMoDialogue,
   },
   {
     _id: 'demo-character-raven',
@@ -89,14 +228,7 @@ export const demoCharacters: SanityCharacter[] = [
     imageUrl: image('R先生'),
     imageAlt: '像素風 R 先生角色插圖',
     dialogueStart: 'intro',
-    dialogue: dialogue(
-      '我沒有什麼好說的。',
-      '你確定嗎？',
-      '那我先不打擾了。',
-      '……嗯。',
-      '再見。',
-      '就這樣。',
-    ),
+    dialogue: voicemailDialogue,
   },
   {
     _id: 'demo-character-sparrow',
@@ -151,7 +283,7 @@ export const demoCharacters: SanityCharacter[] = [
     imageUrl: image('一號'),
     imageAlt: '像素風四月角色插圖',
     dialogueStart: 'intro',
-    dialogue: dialogue('我是四月，正在草地邊追蹤一條很有意思的線索。', '線索是什麼？', '今天順利嗎？'),
+    dialogue: aprilDialogue,
   },
   {
     _id: 'demo-character-cat-fifteen',
@@ -163,7 +295,7 @@ export const demoCharacters: SanityCharacter[] = [
     imageUrl: image('二號'),
     imageAlt: '像素風一五角色插圖',
     dialogueStart: 'intro',
-    dialogue: dialogue('我是一五，專門研究門打開之後，究竟要不要立刻走出去。', '研究有結果嗎？', '你喜歡哪裡？'),
+    dialogue: fifteenDialogue,
   },
 ]
 

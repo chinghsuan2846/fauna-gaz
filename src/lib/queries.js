@@ -71,9 +71,12 @@ export const characterProjection = `
   dialogue[]{
     id,
     text,
+    choiceGroup,
     options[]{
       label,
-      nextNode
+      nextNode,
+      choiceId,
+      requiresAllChoices
     }
   }
 `

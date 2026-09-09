@@ -377,6 +377,13 @@
     line-height: 1.35;
   }
 
+  @media (min-width: 37.5rem) and (max-width: 63.999rem) {
+    .site-info-content {
+      font-size: theme('fontSize.small.0');
+      line-height: theme('fontSize.small.1.lineHeight');
+    }
+  }
+
   .citation-marker {
     position: relative;
     display: inline-block;
@@ -995,6 +1002,10 @@
   .portable-text h3,
   .portable-text blockquote {
     @apply mt-space-xl;
+  }
+
+  .quarterly-content-article {
+    overflow-wrap: anywhere;
   }
 
   @media (min-width: 37.5rem) and (max-width: 63.999rem) {

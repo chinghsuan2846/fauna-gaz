@@ -12,7 +12,9 @@
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "sanity:seed": "node scripts/seed-sanity.mjs",
-    "sanity:update-characters": "node scripts/update-character-content.mjs"
+    "sanity:update-characters": "node scripts/update-character-content.mjs",
+    "sanity:update-lao-mo": "node --env-file=.env scripts/update-lao-mo-dialogue.mjs",
+    "sanity:update-april-r-fifteen": "node --env-file=.env scripts/update-april-r-fifteen-dialogues.mjs"
   },
   "dependencies": {
     "@portabletext/to-html": "^6.0.0",

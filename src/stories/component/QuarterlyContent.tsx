@@ -4,11 +4,12 @@ import type { ButtonProps } from './Button'
 import { Button } from './Button'
 import QuarterlyPdfViewer from './QuarterlyPdfViewer'
 
-export type QuarterlyContentSegmentKind = 'text' | 'strong' | 'quote' | 'emphasis'
+export type QuarterlyContentSegmentKind = 'text' | 'strong' | 'quote' | 'emphasis' | 'link'
 
 export type QuarterlyContentSegment = {
   kind?: QuarterlyContentSegmentKind
   text: string
+  href?: string
 }
 
 export type QuarterlyContentCitation = {
@@ -296,6 +297,18 @@ function renderSegment(
   interactionMode: CitationInteractionMode = 'hover',
 ) {
   const text = renderTextWithCitations(segment.text, citations, interactionMode)
+  if (segment.kind === 'link' && segment.href) {
+    return (
+      <a
+        className="w-fit max-w-full break-words font-body text-action-link underline"
+        href={segment.href}
+        target="_blank"
+        rel="noreferrer"
+      >
+        {text}
+      </a>
+    )
+  }
   if (segment.kind === 'strong') return <strong className="font-medium">{text}</strong>
   if (segment.kind === 'quote') return <q>{text}</q>
   if (segment.kind === 'emphasis') return <em>{text}</em>
@@ -319,7 +332,9 @@ function renderParagraph(
   return (
     <Tag
       key={paragraph.id}
-      className={isHeading ? 'quarterly-content-subheading font-medium leading-body' : undefined}
+      className={isHeading
+        ? 'quarterly-content-subheading min-w-0 max-w-full font-medium leading-body'
+        : 'min-w-0 max-w-full'}
     >
       {paragraph.segments.map((segment, index) => (
         <span key={`${paragraph.id}-${index}`}>{renderSegment(segment, citations, interactionMode)}</span>
@@ -339,6 +354,7 @@ function QuarterlyContent({
   const [citationInteractionMode, setCitationInteractionMode] = useState<CitationInteractionMode>(() => (
     typeof window !== 'undefined' && window.innerWidth < 1024 ? 'click' : 'hover'
   ))
+  const [isPdfLoading, setIsPdfLoading] = useState(() => Boolean(article.pdf))
   const articleSpacingClass = mobile ? 'p-space-md' : 'p-space-lg'
   const titleMarginClass = mobile ? 'mt-space-md' : 'mt-space-lg'
   const paragraphSpacingClass = mobile ? 'mt-space-md gap-space-md' : 'mt-space-lg gap-space-lg'
@@ -354,6 +370,10 @@ function QuarterlyContent({
     return () => window.removeEventListener('resize', updateInteractionMode)
   }, [])
 
+  useEffect(() => {
+    setIsPdfLoading(Boolean(article.pdf))
+  }, [article.pdf?.url])
+
   return (
     <section
       aria-label={`文章內容：${article.title}`}
@@ -361,14 +381,10 @@ function QuarterlyContent({
         borderless ? '' : ' border-thin border-line-strong'
       } ${className}`}
     >
-      <div
-        className={article.pdf
-          ? 'retroScrollArea min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto'
-          : 'retroScrollArea flex min-h-0 min-w-0 flex-1 flex-col overflow-x-hidden overflow-y-auto'}
-      >
+      <div className="relative flex min-h-0 min-w-0 flex-1 flex-col">
         {article.pdf ? (
           <>
-            <header className={articleSpacingClass}>
+            <header className={`${articleSpacingClass} shrink-0`}>
               <nav aria-label="文章位置" className="flex min-w-0 flex-wrap items-center gap-space-xs text-caption text-ink-muted">
                 {article.breadcrumb.map((item, index) => (
                   <span key={`${item}-${index}`} className="inline-flex min-w-0 max-w-full items-center gap-space-xs break-words">
@@ -378,30 +394,44 @@ function QuarterlyContent({
                 ))}
               </nav>
             </header>
-            <QuarterlyPdfViewer
-              url={article.pdf.url}
-              pageCount={article.pdf.pageCount}
-              fileName={article.pdf.fileName}
-              mobile={mobile}
-            />
+
+            <div className="relative min-h-0 min-w-0 flex-1">
+              <div className="retroScrollArea h-full min-w-0 overflow-x-hidden overflow-y-auto">
+                <QuarterlyPdfViewer
+                  url={article.pdf.url}
+                  pageCount={article.pdf.pageCount}
+                  fileName={article.pdf.fileName}
+                  mobile={mobile}
+                  onLoadingChange={setIsPdfLoading}
+                />
+              </div>
+
+              {isPdfLoading && (
+                <div className="pointer-events-none absolute inset-0 z-10 grid place-items-center bg-ink-primary/80 px-space-xl text-center font-ui text-small text-ink-inverse">
+                  <span role="status">PDF 載入中…</span>
+                </div>
+              )}
+            </div>
           </>
         ) : (
-          <article className={`min-w-0 break-words font-body ${articleTextClass} ${articleSpacingClass}`}>
-            <nav aria-label="文章位置" className="flex min-w-0 flex-wrap items-center gap-space-xs text-caption text-ink-muted">
-              {article.breadcrumb.map((item, index) => (
-                <span key={`${item}-${index}`} className="inline-flex min-w-0 max-w-full items-center gap-space-xs break-words">
-                  {index > 0 && <span aria-hidden="true">›</span>}
-                  <span className="min-w-0 break-words">{item}</span>
-                </span>
-              ))}
-            </nav>
+          <div className="retroScrollArea flex min-h-0 min-w-0 flex-1 flex-col overflow-x-hidden overflow-y-auto">
+            <article className={`quarterly-content-article min-w-0 max-w-full font-body ${articleTextClass} ${articleSpacingClass}`}>
+              <nav aria-label="文章位置" className="flex min-w-0 flex-wrap items-center gap-space-xs text-caption text-ink-muted">
+                {article.breadcrumb.map((item, index) => (
+                  <span key={`${item}-${index}`} className="inline-flex min-w-0 max-w-full items-center gap-space-xs break-words">
+                    {index > 0 && <span aria-hidden="true">›</span>}
+                    <span className="min-w-0 break-words">{item}</span>
+                  </span>
+                ))}
+              </nav>
 
-            <h1 className={`${titleMarginClass} break-words text-title font-medium text-ink-primary`}>{article.title}</h1>
+              <h1 className={`${titleMarginClass} break-words text-title font-medium text-ink-primary`}>{article.title}</h1>
 
-            <div className={`${paragraphSpacingClass} grid`}>
-              {article.paragraphs.map((paragraph) => renderParagraph(paragraph, article.citations, citationInteractionMode))}
-            </div>
-          </article>
+              <div className={`${paragraphSpacingClass} grid min-w-0 max-w-full`}>
+                {article.paragraphs.map((paragraph) => renderParagraph(paragraph, article.citations, citationInteractionMode))}
+              </div>
+            </article>
+          </div>
         )}
       </div>
 

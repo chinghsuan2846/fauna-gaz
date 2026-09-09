@@ -186,7 +186,14 @@ function Window({
   const renderCopy = (copy: string) =>
     copy.split(/\r?\n/).map((line, index, lines) => (
       <span key={`${line}-${index}`}>
-        {line}
+        {line.split(/(\*\*[^*]+\*\*)/g).map((part, partIndex) => {
+          const boldMatch = part.match(/^\*\*(.+)\*\*$/)
+          return boldMatch ? (
+            <strong key={`${part}-${partIndex}`} className="font-medium">{boldMatch[1]}</strong>
+          ) : (
+            <span key={`${part}-${partIndex}`}>{part}</span>
+          )
+        })}
         {index < lines.length - 1 && <br />}
       </span>
     ))

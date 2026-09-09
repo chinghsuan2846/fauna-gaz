@@ -23,6 +23,19 @@ const dialogueOption = defineType({
       type: 'string',
       description: 'Leave empty when this option ends the conversation.',
     }),
+    defineField({
+      name: 'choiceId',
+      title: 'Choice ID',
+      type: 'string',
+      description: 'Identifies a choice that can only be selected once within its group.',
+    }),
+    defineField({
+      name: 'requiresAllChoices',
+      title: 'Requires all choices',
+      type: 'boolean',
+      initialValue: false,
+      description: 'Only show this option after every choice in the node group has been selected.',
+    }),
   ],
 })
 
@@ -43,6 +56,12 @@ const dialogueNode = defineType({
       type: 'text',
       rows: 3,
       validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: 'choiceGroup',
+      title: 'Choice group ID',
+      type: 'string',
+      description: 'Use the same value on nodes that share one-time choices.',
     }),
     defineField({
       name: 'options',

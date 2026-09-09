@@ -16,12 +16,15 @@ export type ChatWindowsMessage = ComponentProps<typeof ChatBubble> & {
 export type ChatWindowsDialogueOption = {
   label: string
   nextNodeId?: string
+  choiceId?: string
+  requiresAllChoices?: boolean
 }
 
 export type ChatWindowsDialogueNode = {
   id: string
   text: string
   options: readonly ChatWindowsDialogueOption[]
+  choiceGroupId?: string
 }
 
 export type ChatWindowsDialogue = {
@@ -100,16 +103,33 @@ function ChatWindowsContent({
   const [dialogueMessages, setDialogueMessages] = useState<ChatWindowsMessage[]>([])
   const [submittedMessages, setSubmittedMessages] = useState<ChatWindowsMessage[]>([])
   const [activeNodeId, setActiveNodeId] = useState<string | null>(null)
+  const [selectedDialogueChoices, setSelectedDialogueChoices] = useState<Record<string, string[]>>({})
   const dialogueNodeMap = useMemo(
     () => new Map((dialogue?.nodes ?? []).map((node) => [node.id, node])),
     [dialogue],
   )
+  const dialogueChoiceGroupSizes = useMemo(() => {
+    const groupChoices = new Map<string, Set<string>>()
+
+    for (const node of dialogue?.nodes ?? []) {
+      if (!node.choiceGroupId) continue
+
+      const choices = groupChoices.get(node.choiceGroupId) ?? new Set<string>()
+      for (const option of node.options) {
+        if (option.choiceId) choices.add(option.choiceId)
+      }
+      groupChoices.set(node.choiceGroupId, choices)
+    }
+
+    return new Map([...groupChoices].map(([groupId, choices]) => [groupId, choices.size]))
+  }, [dialogue])
 
   useEffect(() => {
     if (!dialogue) {
       setDialogueMessages([])
       setActiveNodeId(null)
       setSubmittedMessages([])
+      setSelectedDialogueChoices({})
       return
     }
 
@@ -117,6 +137,7 @@ function ChatWindowsContent({
     if (!startNode) {
       setDialogueMessages([])
       setActiveNodeId(null)
+      setSelectedDialogueChoices({})
       return
     }
 
@@ -131,6 +152,7 @@ function ChatWindowsContent({
     ])
     setSubmittedMessages([])
     setActiveNodeId(startNode.id)
+    setSelectedDialogueChoices({})
   }, [dialogue, dialogueNodeMap, profile.imageAlt, profile.imageSrc])
 
   const visibleMessages = dialogue ? dialogueMessages : [...messages, ...submittedMessages]
@@ -138,6 +160,10 @@ function ChatWindowsContent({
 
   const chooseDialogueOption = (option: ChatWindowsDialogueOption) => {
     if (!dialogue || !activeNode) return
+
+    const choiceGroupId = activeNode.choiceGroupId
+    const selectedChoices = choiceGroupId ? selectedDialogueChoices[choiceGroupId] ?? [] : []
+    if (choiceGroupId && option.choiceId && selectedChoices.includes(option.choiceId)) return
 
     const nextNode = option.nextNodeId ? dialogueNodeMap.get(option.nextNodeId) : undefined
     const nextMessages: ChatWindowsMessage[] = [
@@ -153,6 +179,13 @@ function ChatWindowsContent({
         message: nextNode.text,
         speaker: 'character',
       })
+    }
+
+    if (choiceGroupId && option.choiceId) {
+      setSelectedDialogueChoices((current) => ({
+        ...current,
+        [choiceGroupId]: [...selectedChoices, option.choiceId as string],
+      }))
     }
 
     setDialogueMessages(nextMessages)
@@ -175,11 +208,27 @@ function ChatWindowsContent({
     }
   }
 
-  const quickReplies = dialogue && activeNode
-    ? activeNode.options.map((option) => ({
-        label: option.label,
-        onSelect: () => chooseDialogueOption(option),
-      }))
+  const quickReplies = dialogue
+    ? activeNode
+      ? activeNode.options
+          .filter((option) => {
+            if (!activeNode.choiceGroupId) return true
+
+            const selectedChoices = selectedDialogueChoices[activeNode.choiceGroupId] ?? []
+            if (option.choiceId && selectedChoices.includes(option.choiceId)) return false
+
+            if (option.requiresAllChoices) {
+              const totalChoices = dialogueChoiceGroupSizes.get(activeNode.choiceGroupId) ?? 0
+              return totalChoices > 0 && selectedChoices.length >= totalChoices
+            }
+
+            return true
+          })
+          .map((option) => ({
+            label: option.label,
+            onSelect: () => chooseDialogueOption(option),
+          }))
+      : []
     : providedQuickReplies
 
   return (

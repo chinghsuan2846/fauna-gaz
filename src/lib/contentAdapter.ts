@@ -26,10 +26,17 @@ export type SanityBodySpan = {
   marks?: string[]
 }
 
+export type SanityBodyMarkDef = {
+  _key?: string
+  _type?: string
+  href?: string
+}
+
 export type SanityBodyBlock = {
   _type?: string
   style?: string
   children?: SanityBodySpan[]
+  markDefs?: SanityBodyMarkDef[]
 }
 
 export type SanityArticle = {
@@ -79,11 +86,14 @@ export type SanitySiteSettings = {
 export type SanityDialogueOption = {
   label?: string
   nextNode?: string
+  choiceId?: string
+  requiresAllChoices?: boolean
 }
 
 export type SanityDialogueNode = {
   id?: string
   text?: string
+  choiceGroup?: string
   options?: SanityDialogueOption[]
 }
 
@@ -119,6 +129,7 @@ const HIDDEN_QUARTERLY_ARTICLE_SLUGS = new Set(['isbn', 'chelseas-diet'])
 const EXTENDED_CONTENT_ARTICLE_SLUGS = new Set(['reader-mail', 'references', 'references-and-notes'])
 const REFERENCE_ARTICLE_SLUGS = new Set(['references', 'references-and-notes'])
 const CITATION_MARKER_PATTERN = /(?:\[(\d+)\]|［(\d+)］)/
+const READER_MAIL_FORM_URL = 'https://forms.gle/dkKFvMX3KCLy7EnB6'
 
 function quarterlyPdfDisplayTitle(pdf: Pick<SanityQuarterlyPdf, 'title'>) {
   const title = textValue(pdf.title)
@@ -153,6 +164,10 @@ function isExtendedContentArticle(article: Pick<SanityArticle, 'slug' | 'title'>
 function isReferenceArticle(article: Pick<SanityArticle, 'slug' | 'title'>) {
   const slug = textValue(article.slug).toLowerCase()
   return REFERENCE_ARTICLE_SLUGS.has(slug) || normalizedArticleTitle(textValue(article.title)).includes('引用')
+}
+
+function isReaderMailArticle(article: Pick<SanityArticle, 'slug' | 'title'>) {
+  return textValue(article.slug).toLowerCase() === 'reader-mail' || normalizedArticleTitle(textValue(article.title)) === '讀者回函'
 }
 
 function sameIssue(left: Pick<SanityArticle, 'issue'>, right: Pick<SanityArticle, 'issue'>) {
@@ -310,12 +325,15 @@ function toParagraphs(article: SanityArticle): readonly QuarterlyContentParagrap
     }))
   }
 
-  return (article.body ?? [])
+  const paragraphs = (article.body ?? [])
     .filter((block) => block._type === 'block')
     .map((block, index) => {
       const segments: QuarterlyContentSegment[] = (block.children ?? [])
         .filter((span) => textValue(span.text))
         .map((span) => {
+          const linkMark = (span.marks ?? [])
+            .map((mark) => block.markDefs?.find((markDef) => markDef._key === mark))
+            .find((markDef) => markDef?._type === 'link' && textValue(markDef.href))
           const kind = block.style === 'blockquote'
             ? 'quote'
             : span.marks?.includes('strong')
@@ -324,7 +342,11 @@ function toParagraphs(article: SanityArticle): readonly QuarterlyContentParagrap
                 ? 'emphasis'
                 : 'text'
 
-          return { kind, text: span.text ?? '' }
+          return {
+            kind: linkMark ? 'link' : kind,
+            text: span.text ?? '',
+            ...(linkMark?.href ? { href: linkMark.href } : {}),
+          }
         })
 
       return {
@@ -334,6 +356,24 @@ function toParagraphs(article: SanityArticle): readonly QuarterlyContentParagrap
       }
     })
     .filter((paragraph) => paragraph.segments.length > 0)
+
+  if (!isReaderMailArticle(article)) return paragraphs
+
+  const hasReaderMailFormLink = paragraphs.some((paragraph) => paragraph.segments.some((segment) => (
+    segment.href === READER_MAIL_FORM_URL || segment.text.includes(READER_MAIL_FORM_URL)
+  )))
+  if (hasReaderMailFormLink) return paragraphs
+
+  return [
+    ...paragraphs,
+    {
+      id: `${article._id}-reader-mail-form`,
+      segments: [
+        { kind: 'text', text: '讀者回函表單：' },
+        { kind: 'link', text: READER_MAIL_FORM_URL, href: READER_MAIL_FORM_URL },
+      ],
+    },
+  ]
 }
 
 export function toQuarterlyContentArticle(
@@ -408,7 +448,13 @@ export type CharacterDialogue = {
   nodes: Array<{
     id: string
     text: string
-    options: Array<{ label: string; nextNodeId?: string }>
+    choiceGroupId?: string
+    options: Array<{
+      label: string
+      nextNodeId?: string
+      choiceId?: string
+      requiresAllChoices?: boolean
+    }>
   }>
 }
 
@@ -417,8 +463,14 @@ export function toCharacterDialogue(character: SanityCharacter): CharacterDialog
     .map((node) => ({
       id: textValue(node.id),
       text: textValue(node.text),
+      choiceGroupId: textValue(node.choiceGroup) || undefined,
       options: (node.options ?? [])
-        .map((option) => ({ label: textValue(option.label), nextNodeId: textValue(option.nextNode) || undefined }))
+        .map((option) => ({
+          label: textValue(option.label),
+          nextNodeId: textValue(option.nextNode) || undefined,
+          choiceId: textValue(option.choiceId) || undefined,
+          requiresAllChoices: option.requiresAllChoices === true,
+        }))
         .filter((option) => option.label),
     }))
     .filter((node) => node.id && node.text)

@@ -371,12 +371,14 @@ function DesktopExperience({ articles = [], quarterlyPdfs = [], characters = [],
   const [openWindows, setOpenWindows] = useState<DesktopWindow[]>(defaultOpenWindows)
   const [selectedArticleId, setSelectedArticleId] = useState<string | null>(articles[0]?._id ?? null)
   const [isLoading, setIsLoading] = useState(false)
+  const [musicEnabled, setMusicEnabled] = useState(false)
   const [isTourOpen, setIsTourOpen] = useState(false)
   const [hasVisitedTour, setHasVisitedTour] = useState(readTourVisitedState)
   const [windowZIndices, setWindowZIndices] = useState<Record<string, number>>(() => Object.fromEntries(
     defaultOpenWindows.map((window, index) => [window.id, 100 + index]),
   ))
   const viewportMode = useViewportMode()
+  const audioRef = useRef<HTMLAudioElement | null>(null)
   const loadingTimerRef = useRef<number | null>(null)
   const windowPositionsRef = useRef(new Map<string, { x: number; y: number }>([
     ['contact', { x: 0, y: 0 }],
@@ -405,6 +407,21 @@ function DesktopExperience({ articles = [], quarterlyPdfs = [], characters = [],
   const transitionStage = experienceState === 'covering' || experienceState === 'revealing' ? experienceState : null
   const isMobileViewport = viewportMode === 'mobile'
   const backgroundFit = 'cover'
+
+  const toggleMusic = () => {
+    const audio = audioRef.current
+    if (!audio) return
+
+    if (musicEnabled) {
+      audio.pause()
+      setMusicEnabled(false)
+      return
+    }
+
+    audio.play()
+      .then(() => setMusicEnabled(true))
+      .catch(() => setMusicEnabled(false))
+  }
 
   useEffect(() => {
     return () => {
@@ -489,8 +506,21 @@ function DesktopExperience({ articles = [], quarterlyPdfs = [], characters = [],
     setIsTourOpen(true)
   }
 
+  const backgroundAudio = (
+    <audio
+      ref={audioRef}
+      loop
+      playsInline
+      preload="auto"
+      aria-hidden="true"
+    >
+      <source src="/assets/alex-morgan-autumn-leaves-falling-517092.mp3" type="audio/mpeg" />
+    </audio>
+  )
+
   return (
-    <div className="experience-shell">
+    <div className="experience-shell" data-nosnippet>
+      {backgroundAudio}
       <div
         className={`experience-background${viewportMode === 'desktop' ? ' experience-background--wide' : ''}${isDesktopVisible ? ' experience-background--desktop' : ''}`}
         aria-hidden="true"
@@ -675,7 +705,7 @@ function DesktopExperience({ articles = [], quarterlyPdfs = [], characters = [],
                       onClose={() => closeWindow(window.id)}
                       onHuman={() => closeWindow(window.id)}
                       onNotHuman={() => {
-                        globalThis.location.assign('/donate')
+                        globalThis.location.assign('https://portaly.cc/ningc77')
                       }}
                     />
                   </div>
@@ -721,10 +751,12 @@ function DesktopExperience({ articles = [], quarterlyPdfs = [], characters = [],
 
         <Footer
           mode={viewportMode === 'mobile' ? 'mobile' : viewportMode === 'tablet' ? 'tablet' : 'desktop'}
+          musicEnabled={musicEnabled}
           onHome={returnToEntry}
           onLegal={openLegal}
           onFaq={openFaq}
           onContact={openContact}
+          onMusicToggle={toggleMusic}
           onTour={openTour}
         />
       </main>
