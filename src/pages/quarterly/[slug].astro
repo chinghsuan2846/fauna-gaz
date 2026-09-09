@@ -44,12 +44,12 @@ const contentArticle = toQuarterlyContentArticle(
 ---
 
 <BaseLayout
-  title={`${displayArticleTitle(article.title)}｜動物公報`}
+  title={`${displayArticleTitle(article.title)}｜動物公報 Fauna Gaz`}
   description={description}
   image={coverImageUrl}
 >
   <main class="flex h-screen min-h-0 flex-col gap-space-md overflow-hidden bg-window-surface p-space-md font-body text-body text-ink-primary sm:p-space-xl lg:p-space-2xl">
-    <a class="shrink-0 font-ui text-action-link underline decoration-action-link underline-offset-2" href="/">← 動物公報</a>
+    <a class="shrink-0 font-ui text-action-link underline decoration-action-link underline-offset-2" href="/">← 動物公報 Fauna Gaz</a>
     <div class="mx-auto flex min-h-0 w-full max-w-viewport-tablet flex-1">
       <QuarterlyContent client:load article={contentArticle} />
     </div>
