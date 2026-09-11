@@ -38,6 +38,7 @@ export type QuarterlyContentArticle = {
   id: string
   breadcrumb: readonly string[]
   title: string
+  scientificName?: string
   paragraphs: readonly QuarterlyContentParagraph[]
   citations?: readonly QuarterlyContentCitation[]
   pdf?: QuarterlyContentPdf
@@ -426,6 +427,12 @@ function QuarterlyContent({
               </nav>
 
               <h1 className={`${titleMarginClass} break-words text-title font-medium text-ink-primary`}>{article.title}</h1>
+
+              {article.scientificName && (
+                <p className="quarterly-content-scientific-name mt-space-xs break-words text-small text-ink-secondary">
+                  <em>{article.scientificName}</em>
+                </p>
+              )}
 
               <div className={`${paragraphSpacingClass} grid min-w-0 max-w-full`}>
                 {article.paragraphs.map((paragraph) => renderParagraph(paragraph, article.citations, citationInteractionMode))}

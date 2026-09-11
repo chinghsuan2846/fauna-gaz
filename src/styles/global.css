@@ -1008,6 +1008,11 @@
     overflow-wrap: anywhere;
   }
 
+  .quarterly-content-scientific-name {
+    font-style: italic;
+    font-synthesis: style;
+  }
+
   @media (min-width: 37.5rem) and (max-width: 63.999rem) {
     .quarterly-content-subheading {
       @apply text-lead;

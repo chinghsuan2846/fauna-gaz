@@ -59,6 +59,25 @@ export type SanityArticle = {
   }>
 }
 
+const QUARTERLY_SCIENTIFIC_NAMES: Record<string, string> = {
+  'white-whale': 'Delphinapterus leucas',
+  'bottlenose-dolphin': 'Tursiops truncatus',
+  'asian-elephant': 'Elephas maximus',
+  ants: 'Myrmica sabuleti, Myrmica rubra, Myrmica ruginodis',
+  magpie: 'Pica pica',
+  dog: 'Canis lupus familiaris',
+}
+
+const QUARTERLY_SCIENTIFIC_NAMES_BY_TITLE: Record<string, string> = {
+  '白鯨': 'Delphinapterus leucas',
+  '寬吻海豚': 'Tursiops truncatus',
+  '瓶鼻海豚': 'Tursiops truncatus',
+  '亞洲象': 'Elephas maximus',
+  '螞蟻': 'Myrmica sabuleti, Myrmica rubra, Myrmica ruginodis',
+  '喜鵲': 'Pica pica',
+  '狗': 'Canis lupus familiaris',
+}
+
 export type SanityQuarterlyPdf = {
   _id: string
   slug: string
@@ -138,6 +157,11 @@ function quarterlyPdfDisplayTitle(pdf: Pick<SanityQuarterlyPdf, 'title'>) {
 
 function normalizedArticleTitle(title: string) {
   return title.replace(/[’‘]/g, "'").replace(/\s+/g, '').toLowerCase()
+}
+
+function quarterlyScientificName(article: Pick<SanityArticle, 'slug' | 'title'>) {
+  return QUARTERLY_SCIENTIFIC_NAMES[textValue(article.slug).toLowerCase()]
+    ?? QUARTERLY_SCIENTIFIC_NAMES_BY_TITLE[textValue(article.title)]
 }
 
 export function isQuarterlyArticleHidden(article: Pick<SanityArticle, 'slug'> & Partial<Pick<SanityArticle, 'title'>>) {
@@ -390,6 +414,7 @@ export function toQuarterlyContentArticle(
     id: article._id,
     breadcrumb: [year, quarter, displayArticleTitle(article.title)].filter(Boolean),
     title: displayArticleTitle(article.title),
+    scientificName: quarterlyScientificName(article),
     paragraphs: toParagraphs(article),
     citations: isReferenceArticle(article) ? [] : citationEntries(citationSource),
     previous: previous ? { id: previous._id, title: displaySidebarArticleTitle(previous.title) } : null,
