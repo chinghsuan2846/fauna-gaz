@@ -212,7 +212,11 @@
   }
 
   .desktop-window-shell {
-    @apply pointer-events-auto absolute;
+    @apply pointer-events-none absolute;
+  }
+
+  .desktop-window-shell > * {
+    @apply pointer-events-auto;
   }
 
   .desktop-window-interaction-overlay {
@@ -549,6 +553,78 @@
 
   .faq-answer[hidden] {
     display: none;
+  }
+
+  .faq-partner-groups {
+    display: grid;
+    gap: theme('spacing.space-lg');
+  }
+
+  .faq-partner-group {
+    display: grid;
+    gap: theme('spacing.space-xs');
+  }
+
+  .faq-partner-group-label {
+    margin: 0;
+    padding: 0 theme('spacing.space-md');
+    color: theme('colors.ink.secondary');
+    font-family: theme('fontFamily.body');
+    font-size: inherit;
+    font-weight: 500;
+    line-height: inherit;
+  }
+
+  .faq-partner-items {
+    border-top: theme('borderWidth.thin') solid theme('colors.line.faint');
+  }
+
+  .faq-partner-item {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: theme('spacing.space-sm');
+    padding: theme('spacing.space-sm') theme('spacing.space-md');
+    border-bottom: theme('borderWidth.thin') solid theme('colors.line.faint');
+    color: theme('colors.ink.primary');
+    font-family: theme('fontFamily.body');
+    font-size: inherit;
+    line-height: inherit;
+    text-decoration: none;
+    transition: background-color 120ms ease;
+  }
+
+  .faq-partner-item:hover,
+  .faq-partner-item:focus-visible {
+    background: theme('colors.ink.primary-hover');
+  }
+
+  .faq-partner-item:focus-visible {
+    outline: theme('borderWidth.thin') solid theme('colors.action.link');
+    outline-offset: -1px;
+  }
+
+  .faq-partner-copy {
+    display: flex;
+    min-width: 0;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0 theme('spacing.space-sm');
+  }
+
+  .faq-partner-name {
+    font-family: theme('fontFamily.body');
+  }
+
+  .faq-partner-address {
+    color: theme('colors.ink.secondary');
+    overflow-wrap: anywhere;
+  }
+
+  .faq-partner-map-icon {
+    display: inline-grid;
+    place-items: center;
+    color: theme('colors.action.link');
   }
 
   .legal-document-section {

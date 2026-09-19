@@ -149,6 +149,10 @@ const EXTENDED_CONTENT_ARTICLE_SLUGS = new Set(['reader-mail', 'references', 're
 const REFERENCE_ARTICLE_SLUGS = new Set(['references', 'references-and-notes'])
 const CITATION_MARKER_PATTERN = /(?:\[(\d+)\]|［(\d+)］)/
 const READER_MAIL_FORM_URL = 'https://forms.gle/dkKFvMX3KCLy7EnB6'
+const READER_MAIL_REMOVED_PARAGRAPHS = new Set([
+  '「我原本以為麻雀只是來找食物，後來發現牠每天都會停在同一條曬衣桿上，像是在確認這個地方還在。」',
+  '謝謝讀者提醒我們，觀察不一定要發生在遙遠的森林。家門口也有一整座值得慢慢閱讀的世界。',
+])
 
 function quarterlyPdfDisplayTitle(pdf: Pick<SanityQuarterlyPdf, 'title'>) {
   const title = textValue(pdf.title)
@@ -351,6 +355,11 @@ function toParagraphs(article: SanityArticle): readonly QuarterlyContentParagrap
 
   const paragraphs = (article.body ?? [])
     .filter((block) => block._type === 'block')
+    .filter((block) => {
+      if (!isReaderMailArticle(article)) return true
+      const blockText = (block.children ?? []).map((span) => span.text ?? '').join('').trim()
+      return !READER_MAIL_REMOVED_PARAGRAPHS.has(blockText)
+    })
     .map((block, index) => {
       const segments: QuarterlyContentSegment[] = (block.children ?? [])
         .filter((span) => textValue(span.text))

@@ -48,6 +48,7 @@ const LEGAL_WINDOW: DesktopWindow = { id: 'legal', type: 'legal' }
 const FAQ_WINDOW: DesktopWindow = { id: 'faq', type: 'faq' }
 const QUARTERLY_WINDOW: DesktopWindow = { id: 'quarterly', type: 'quarterly' }
 const MOUSE_HOLE_WINDOW: DesktopWindow = { id: 'mouse-hole', type: 'mouse-hole' }
+const FAQ_DESKTOP_OFFSET_X = 26 * 16
 const GRASS_CHARACTER_ORDER: DesktopIconName[] = ['老莫', '四月', '一五']
 const TOUR_STEPS: readonly TooltipTourStep[] = [
   {
@@ -492,7 +493,20 @@ function DesktopExperience({ articles = [], quarterlyPdfs = [], characters = [],
   const openQuarterly = () => openWindow(QUARTERLY_WINDOW)
   const openContact = () => openWindow(CONTACT_WINDOW)
   const openLegal = () => openWindow(LEGAL_WINDOW)
-  const openFaq = () => openWindow(FAQ_WINDOW)
+  const openFaq = () => {
+    if (viewportMode === 'desktop') {
+      const currentPosition = windowPositionsRef.current.get(FAQ_WINDOW.id)
+      if (currentPosition && currentPosition.x === 0) {
+        windowPositionsRef.current.set(FAQ_WINDOW.id, {
+          ...currentPosition,
+          x: FAQ_DESKTOP_OFFSET_X,
+        })
+        setWindowPositionRevision((revision) => revision + 1)
+      }
+    }
+
+    openWindow(FAQ_WINDOW)
+  }
   const openMouseHole = () => openWindow(MOUSE_HOLE_WINDOW)
   const openCharacterChat = (character: SanityCharacter) => {
     openWindow({ id: `chat-${character._id}`, type: 'chat', characterId: character._id })

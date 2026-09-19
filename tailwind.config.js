@@ -19,6 +19,7 @@ export default {
           DEFAULT: '#38342E',
           strong: '#988F7F',
           subtle: '#A49D93',
+          faint: '#D8CDBA',
         },
         scrollbar: {
           track: '#F3ECE1',

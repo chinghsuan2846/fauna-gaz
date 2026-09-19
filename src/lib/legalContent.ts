@@ -1,6 +1,18 @@
 export type LegalBlock =
   | { readonly type: 'paragraph'; readonly text: string }
   | { readonly type: 'list'; readonly items: readonly string[] }
+  | { readonly type: 'partner-list'; readonly groups: readonly PartnerGroup[] }
+
+export type PartnerListing = {
+  readonly name: string
+  readonly address: string
+  readonly mapUrl: string
+}
+
+export type PartnerGroup = {
+  readonly label: string
+  readonly items: readonly PartnerListing[]
+}
 
 export type LegalSection = {
   readonly heading?: string
@@ -13,6 +25,10 @@ export type LegalDocumentContent = {
   readonly updatedAt?: string
   readonly intro?: string
   readonly sections: readonly LegalSection[]
+}
+
+function googleMapsSearchUrl(name: string, address: string) {
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${name} ${address}`)}`
 }
 
 function formatUpdatedAt(date: Date) {
@@ -349,6 +365,56 @@ export const faqContent: LegalDocumentContent = {
       blocks: [
         { type: 'paragraph', text: '任何地方都有可能！' },
         { type: 'paragraph', text: '我們目前的合作夥伴為：' },
+        {
+          type: 'partner-list',
+          groups: [
+            {
+              label: '北部',
+              items: [
+                {
+                  name: '浮光書店',
+                  address: '103臺北市大同區光能里赤峰街47巷16號2樓',
+                  mapUrl: googleMapsSearchUrl('浮光書店', '103臺北市大同區光能里赤峰街47巷16號2樓'),
+                },
+                {
+                  name: '不只是圖書館',
+                  address: '110臺北市信義區新仁里光復南路133號',
+                  mapUrl: googleMapsSearchUrl('不只是圖書館', '110臺北市信義區新仁里光復南路133號'),
+                },
+                {
+                  name: '小小書房／小寫出版',
+                  address: '234新北市永和區新廍里文化路192巷4弄2-1號1樓',
+                  mapUrl: googleMapsSearchUrl('小小書房／小寫出版', '234新北市永和區新廍里文化路192巷4弄2-1號1樓'),
+                },
+                {
+                  name: '慢食堂',
+                  address: '330桃園市桃園區青溪里鎮三街52號',
+                  mapUrl: googleMapsSearchUrl('慢食堂', '330桃園市桃園區青溪里鎮三街52號'),
+                },
+              ],
+            },
+            {
+              label: '南部',
+              items: [
+                {
+                  name: '渺渺書店',
+                  address: '600嘉義市東區仁義里嘉北街101號',
+                  mapUrl: googleMapsSearchUrl('渺渺書店', '600嘉義市東區仁義里嘉北街101號'),
+                },
+              ],
+            },
+            {
+              label: '東部',
+              items: [
+                {
+                  name: '晃晃二手書店',
+                  address: '950臺東縣臺東市豐盛里漢陽南路139-1號',
+                  mapUrl: googleMapsSearchUrl('晃晃二手書店', '950臺東縣臺東市豐盛里漢陽南路139-1號'),
+                },
+              ],
+            },
+          ],
+        },
         { type: 'paragraph', text: '如果有店家認同我們的理念，希望自己的店面能夠發放這樣一本刊物，在數量允許的情況下，我們都十分樂意與您詳談合作模式！歡迎使用以下的信箱聯絡我們：partner@faunagaz.com' },
       ],
     },

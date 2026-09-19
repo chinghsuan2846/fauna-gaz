@@ -384,7 +384,7 @@ const articleDrafts = [
   ['dog', '狗', '狗如何讀懂人的表情、聲音與那些沒有說出口的事？', '狗和人一起生活了很長的時間。牠們會看向人的眼睛，也會根據語氣與姿勢，猜測下一個動作。', '對狗來說，理解一個人也許不只是辨認指令，而是持續觀察一段關係正在如何變化。'],
   ['conclusion', '總結', '自我不是一道答案，而是一連串持續發生的關係。', '我們很難用單一測驗證明另一個物種是否擁有自我意識。每個物種都有自己的身體、感官與生活歷史。', '也許更好的問題不是「牠們像不像人」，而是「牠們如何成為牠們自己」。'],
   ['recipe', '食譜', '一份給觀察者的簡單食譜：耐心、距離，以及一點好奇心。', '第一步，找一個不打擾動物的位置。第二步，把時間放慢，讓原本不明顯的聲音與動作逐漸浮現。', '最後，記下你看到的事，也記下你沒有看到的事。好的觀察，總會為下一次提問留下空間。'],
-  ['reader-mail', '讀者回函', '讀者分享一段在陽台上遇見麻雀的午後。', '「我原本以為麻雀只是來找食物，後來發現牠每天都會停在同一條曬衣桿上，像是在確認這個地方還在。」', '謝謝讀者提醒我們，觀察不一定要發生在遙遠的森林。家門口也有一整座值得慢慢閱讀的世界。'],
+  ['reader-mail', '讀者回函', '讀者分享一段在陽台上遇見麻雀的午後。', '', ''],
   [
     'references',
     '引用來源',
@@ -412,7 +412,7 @@ const articles = articleDrafts.map(([slug, title, excerpt, firstParagraph, secon
   publishedAt: `2026-08-${String(30 - Math.min(index, 12)).padStart(2, '0')}T00:00:00.000Z`,
   issue: { _type: 'reference', _ref: issue._id },
   categories: [{ _type: 'reference', _ref: extendedContentSlugs.has(slug) ? extendedContentCategory._id : category._id }],
-  body: body([firstParagraph, ...(Array.isArray(secondParagraph) ? secondParagraph : [secondParagraph])]),
+  body: body([firstParagraph, ...(Array.isArray(secondParagraph) ? secondParagraph : [secondParagraph])].filter(Boolean)),
 }))
 
 const siteSettings = {

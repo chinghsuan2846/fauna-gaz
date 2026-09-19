@@ -33,6 +33,38 @@ function renderLegalBlock(block: LegalBlock, index: number) {
     )
   }
 
+  if (block.type === 'partner-list') {
+    return (
+      <div key={`partner-list-${index}`} className="faq-partner-groups">
+        {block.groups.map((group) => (
+          <section key={group.label} className="faq-partner-group" aria-labelledby={`faq-partner-group-${group.label}`}>
+            <h5 id={`faq-partner-group-${group.label}`} className="faq-partner-group-label">{group.label}</h5>
+            <div className="faq-partner-items">
+              {group.items.map((partner) => (
+                <a
+                  key={partner.name}
+                  className="faq-partner-item"
+                  href={partner.mapUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`在 Google Maps 開啟${partner.name}`}
+                >
+                  <span className="faq-partner-copy">
+                    <span className="faq-partner-name">{partner.name}</span>
+                    <span className="faq-partner-address">{partner.address}</span>
+                  </span>
+                  <span className="faq-partner-map-icon" aria-hidden="true">
+                    <PixelIcon name="map-pin" size="small" />
+                  </span>
+                </a>
+              ))}
+            </div>
+          </section>
+        ))}
+      </div>
+    )
+  }
+
   return <p key={`paragraph-${index}`}>{block.text}</p>
 }
 

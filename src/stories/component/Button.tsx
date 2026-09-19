@@ -18,6 +18,7 @@ export type PixelIconName =
   | 'volume-off'
   | 'plus'
   | 'minus'
+  | 'map-pin'
   | 'close'
   | 'box-empty'
   | 'alert-triangle'
@@ -155,6 +156,9 @@ const iconShapes: Record<PixelIconName, ReactNode> = {
     </>
   ),
   minus: <rect x="2" y="7" width="12" height="2" />,
+  'map-pin': (
+    <path d="M8 1C4.7 1 2 3.7 2 7c0 4 6 8 6 8s6-4 6-8c0-3.3-2.7-6-6-6Zm0 2c2.2 0 4 1.8 4 4 0 2.1-2.6 5-4 6.4C6.6 12 4 9.1 4 7c0-2.2 1.8-4 4-4Zm0 2C6.9 5 6 5.9 6 7s.9 2 2 2 2-.9 2-2-.9-2-2-2Z" />
+  ),
   loading: (
     <>
       <rect x="7" y="1" width="2" height="3" />
