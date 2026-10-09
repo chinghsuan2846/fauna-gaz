@@ -263,6 +263,15 @@
     max-height: calc(100% - theme('spacing.space-4xl') - theme('spacing.space-lg'));
   }
 
+  .desktop-window-shell--newsletter {
+    top: theme('spacing.space-4xl');
+    left: 50%;
+    z-index: 30;
+    width: min(calc(100% - theme('spacing.space-2xl') - theme('spacing.space-2xl')), theme('maxWidth.viewport-newsletter'));
+    max-height: calc(100% - theme('spacing.space-4xl') - theme('spacing.space-lg'));
+    transform: translateX(-50%);
+  }
+
   .desktop-window-shell--quarterly {
     top: theme('spacing.space-lg');
     left: 50%;
@@ -751,6 +760,7 @@
     }
 
     .desktop-window-shell--contact,
+    .desktop-window-shell--newsletter,
     .desktop-window-shell--quarterly,
     .desktop-window-shell--chat,
     .desktop-window-shell--legal {

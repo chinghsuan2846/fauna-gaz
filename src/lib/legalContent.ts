@@ -377,6 +377,11 @@ export const faqContent: LegalDocumentContent = {
                   mapUrl: googleMapsSearchUrl('浮光書店', '103臺北市大同區光能里赤峰街47巷16號2樓'),
                 },
                 {
+                  name: '見書店',
+                  address: '200基隆市仁愛區仁德里仁二路236號',
+                  mapUrl: googleMapsSearchUrl('見書店', '200基隆市仁愛區仁德里仁二路236號'),
+                },
+                {
                   name: '不只是圖書館',
                   address: '110臺北市信義區新仁里光復南路133號',
                   mapUrl: googleMapsSearchUrl('不只是圖書館', '110臺北市信義區新仁里光復南路133號'),
@@ -390,6 +395,16 @@ export const faqContent: LegalDocumentContent = {
                   name: '慢食堂',
                   address: '330桃園市桃園區青溪里鎮三街52號',
                   mapUrl: googleMapsSearchUrl('慢食堂', '330桃園市桃園區青溪里鎮三街52號'),
+                },
+              ],
+            },
+            {
+              label: '中部',
+              items: [
+                {
+                  name: '梓書房',
+                  address: '403臺中市西區土庫里福人街89號',
+                  mapUrl: googleMapsSearchUrl('梓書房', '403臺中市西區土庫里福人街89號'),
                 },
               ],
             },

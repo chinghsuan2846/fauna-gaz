@@ -3,15 +3,10 @@ import type { PointerEvent as ReactPointerEvent, ReactNode } from 'react'
 
 import type { ContactInfo } from '../../lib/contentAdapter'
 import type { ButtonProps, PixelIconName } from './Button'
-import { Button } from './Button'
+import ContactContent from './ContactContent'
 import WindowHeader from './WindowHeader'
 
 export type WindowMode = 'desktop' | 'tablet' | 'mobile'
-
-const SUPPORT_LINKS = {
-  international: 'https://ko-fi.com/ningc77',
-  taiwan: 'https://portaly.cc/ningc77',
-} as const
 
 export type WindowPosition = {
   x: number
@@ -180,24 +175,7 @@ function Window({
     ...(isMobile ? {} : { transform: `translate(${position.x}px, ${position.y}px)` }),
     ...(isMobile || !dimensions ? {} : { width: dimensions.x, height: dimensions.y }),
   }
-  const contentTextClass = isMobile ? 'text-small' : 'text-body'
-  const contentPaddingClass = isMobile ? 'p-space-md' : 'p-space-lg'
   const interactionCursor = isMobile ? '' : isDragging ? 'cursor-grabbing' : 'cursor-grab'
-  const renderCopy = (copy: string) =>
-    copy.split(/\r?\n/).map((line, index, lines) => (
-      <span key={`${line}-${index}`}>
-        {line.split(/(\*\*[^*]+\*\*)/g).map((part, partIndex) => {
-          const boldMatch = part.match(/^\*\*(.+)\*\*$/)
-          return boldMatch ? (
-            <strong key={`${part}-${partIndex}`} className="font-medium">{boldMatch[1]}</strong>
-          ) : (
-            <span key={`${part}-${partIndex}`}>{part}</span>
-          )
-        })}
-        {index < lines.length - 1 && <br />}
-      </span>
-    ))
-
   return (
     <article
       ref={windowRef}
@@ -223,47 +201,7 @@ function Window({
       {hasCustomContent ? (
         <div className="flex min-h-0 min-w-0 flex-1 flex-col font-body text-ink-primary">{children}</div>
       ) : contact ? (
-        <div className={`flex min-h-0 min-w-0 flex-1 flex-col font-body ${contentTextClass} text-ink-primary`}>
-          <div className="retroScrollArea min-h-0 min-w-0 flex-1 overflow-x-auto overflow-y-auto">
-            <div className={`grid min-w-0 gap-space-md ${contentPaddingClass} break-words`}>
-              <p>{renderCopy(contact.contactCopy)}</p>
-              <a className="w-fit max-w-full break-words font-body text-action-link underline" href={`mailto:${contact.email}`}>
-                {contact.email}
-              </a>
-
-              <div role="separator" className="border-t-thin border-dashed border-line-subtle" />
-
-              <p>{renderCopy(contact.supportCopy)}</p>
-            </div>
-          </div>
-
-          <div className="window-footer grid min-h-[3rem] shrink-0 grid-cols-2 gap-space-md p-space-md">
-            <Button
-              appearance="outline"
-              label="Support Us"
-              subLabel="International Readers"
-              href={SUPPORT_LINKS.international}
-              size="small"
-              textSize="small"
-              padding="footer-hug"
-              className="window-footer-action w-full min-w-0 whitespace-normal"
-              ariaLabel="Support Us, International Readers"
-              onClick={onSupport}
-            />
-            <Button
-              appearance="outline"
-              label="支持我們"
-              subLabel="台灣讀者"
-              href={SUPPORT_LINKS.taiwan}
-              size="small"
-              textSize="small"
-              padding="footer-hug"
-              className="window-footer-action w-full min-w-0 whitespace-normal"
-              ariaLabel="支持我們，台灣讀者"
-              onClick={onSupport}
-            />
-          </div>
-        </div>
+        <ContactContent contact={contact} isMobile={isMobile} onSupport={onSupport} />
       ) : (
         <div className="flex min-h-0 min-w-0 flex-1" aria-hidden="true" />
       )}

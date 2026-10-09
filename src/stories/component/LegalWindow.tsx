@@ -119,60 +119,60 @@ function LegalWindow({
         )}
 
         <div className="retroScrollArea min-h-0 min-w-0 flex-1 overflow-y-auto p-space-md">
-          <article className={`site-info-content legal-document font-body${isMobile ? ' text-small' : ''}`}>
-            <header className="legal-document-header">
-              <h3 className="font-medium">{selectedDocument.title}</h3>
-              {selectedDocument.updatedAt && <p className="legal-document-updated">{selectedDocument.updatedAt}</p>}
-              {selectedDocument.intro && <p className="legal-document-intro">{selectedDocument.intro}</p>}
-            </header>
+            <article className={`site-info-content legal-document font-body${isMobile ? ' text-small' : ''}`}>
+              <header className="legal-document-header">
+                <h3 className="font-medium">{selectedDocument.title}</h3>
+                {selectedDocument.updatedAt && <p className="legal-document-updated">{selectedDocument.updatedAt}</p>}
+                {selectedDocument.intro && <p className="legal-document-intro">{selectedDocument.intro}</p>}
+              </header>
 
-            <div className={`legal-document-sections${activeDocument === 'faq' ? ' faq-document-sections' : ''}`}>
-              {selectedDocument.sections.map((section, sectionIndex) => {
-                if (activeDocument === 'faq') {
-                  const isExpanded = expandedFaqIndex === sectionIndex
-                  const questionId = `faq-question-${sectionIndex}`
-                  const answerId = `faq-answer-${sectionIndex}`
+              <div className={`legal-document-sections${activeDocument === 'faq' ? ' faq-document-sections' : ''}`}>
+                {selectedDocument.sections.map((section, sectionIndex) => {
+                  if (activeDocument === 'faq') {
+                    const isExpanded = expandedFaqIndex === sectionIndex
+                    const questionId = `faq-question-${sectionIndex}`
+                    const answerId = `faq-answer-${sectionIndex}`
+
+                    return (
+                      <section key={section.heading ?? `section-${sectionIndex}`} className="legal-document-section faq-document-section">
+                        <h4 className="faq-question">
+                          <button
+                            id={questionId}
+                            type="button"
+                            className="faq-question-button"
+                            aria-expanded={isExpanded}
+                            aria-controls={answerId}
+                            onClick={() => setExpandedFaqIndex((currentIndex) => currentIndex === sectionIndex ? null : sectionIndex)}
+                          >
+                            <span className="faq-question-number" aria-hidden="true">{String(sectionIndex + 1).padStart(2, '0')}</span>
+                            <span className="faq-question-label">{section.heading}</span>
+                            <span className="faq-question-indicator" aria-hidden="true">
+                              <PixelIcon name={isExpanded ? 'minus' : 'plus'} size="small" className="faq-question-indicator-icon" />
+                            </span>
+                          </button>
+                        </h4>
+                        <div
+                          id={answerId}
+                          className="faq-answer"
+                          role="region"
+                          aria-labelledby={questionId}
+                          hidden={!isExpanded}
+                        >
+                          <div className="legal-document-blocks">{section.blocks.map(renderLegalBlock)}</div>
+                        </div>
+                      </section>
+                    )
+                  }
 
                   return (
-                    <section key={section.heading ?? `section-${sectionIndex}`} className="legal-document-section faq-document-section">
-                      <h4 className="faq-question">
-                        <button
-                          id={questionId}
-                          type="button"
-                          className="faq-question-button"
-                          aria-expanded={isExpanded}
-                          aria-controls={answerId}
-                          onClick={() => setExpandedFaqIndex((currentIndex) => currentIndex === sectionIndex ? null : sectionIndex)}
-                        >
-                          <span className="faq-question-number" aria-hidden="true">{String(sectionIndex + 1).padStart(2, '0')}</span>
-                          <span className="faq-question-label">{section.heading}</span>
-                          <span className="faq-question-indicator" aria-hidden="true">
-                            <PixelIcon name={isExpanded ? 'minus' : 'plus'} size="small" className="faq-question-indicator-icon" />
-                          </span>
-                        </button>
-                      </h4>
-                      <div
-                        id={answerId}
-                        className="faq-answer"
-                        role="region"
-                        aria-labelledby={questionId}
-                        hidden={!isExpanded}
-                      >
-                        <div className="legal-document-blocks">{section.blocks.map(renderLegalBlock)}</div>
-                      </div>
+                    <section key={section.heading ?? `section-${sectionIndex}`} className="legal-document-section">
+                      {section.heading && <h4>{section.heading}</h4>}
+                      <div className="legal-document-blocks">{section.blocks.map(renderLegalBlock)}</div>
                     </section>
                   )
-                }
-
-                return (
-                  <section key={section.heading ?? `section-${sectionIndex}`} className="legal-document-section">
-                    {section.heading && <h4>{section.heading}</h4>}
-                    <div className="legal-document-blocks">{section.blocks.map(renderLegalBlock)}</div>
-                  </section>
-                )
-              })}
-            </div>
-          </article>
+                })}
+              </div>
+            </article>
         </div>
       </div>
     </Window>

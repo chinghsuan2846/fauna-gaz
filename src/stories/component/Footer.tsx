@@ -13,6 +13,7 @@ export type FooterProps = {
   onLegal?: ButtonProps['onClick']
   onFaq?: ButtonProps['onClick']
   onContact?: ButtonProps['onClick']
+  onNewsletter?: ButtonProps['onClick']
   onMusicToggle?: () => void
   onTour?: ButtonProps['onClick']
 }
@@ -22,6 +23,7 @@ type FooterCopy = {
   legal: string
   faq: string
   contact: string
+  newsletter: string
   tour: string
   musicOn: string
   musicOff: string
@@ -42,6 +44,7 @@ const labels: FooterCopy = {
   legal: '網站資訊',
   faq: 'FAQ',
   contact: '聯絡我',
+  newsletter: '訂閱電子報',
   tour: '系統導覽',
   musicOn: '開啟音樂',
   musicOff: '關閉音樂',
@@ -58,6 +61,7 @@ function Footer({
   onLegal,
   onFaq,
   onContact,
+  onNewsletter,
   onMusicToggle,
   onTour,
 }: FooterProps) {
@@ -145,6 +149,18 @@ function Footer({
           ariaLabel={labels.navigation}
           onClick={onContact}
         />
+        {!isCompact && (
+          <Button
+            label={labels.newsletter}
+            appearance="text"
+            size="large"
+            padding="footer-hug"
+            textSize={footerTextSize}
+            className="whitespace-nowrap border-r-thin border-ink-primary"
+            ariaLabel={labels.newsletter}
+            onClick={onNewsletter}
+          />
+        )}
       </div>
 
       <div

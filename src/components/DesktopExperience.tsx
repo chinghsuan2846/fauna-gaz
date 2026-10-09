@@ -14,9 +14,11 @@ import {
 import ChatWindows from '../stories/patterns/ChatWindows'
 import QuarterlyWindow from '../stories/patterns/QuarterlyWindow'
 import Footer from '../stories/component/Footer'
+import ContactWindow from '../stories/component/ContactWindow'
 import DesktopIcon, { desktopIconNames, type DesktopIconName } from '../stories/component/DesktopIcon'
 import LegalWindow from '../stories/component/LegalWindow'
 import MouseHoleWindow from '../stories/component/MouseHoleWindow'
+import NewsletterWindow from '../stories/component/NewsletterWindow'
 import { PixelIcon } from '../stories/component/Button'
 import Window, { type WindowMode, type WindowPosition, type WindowProps } from '../stories/component/Window'
 import type { WindowStateKind } from '../stories/component/WindowState'
@@ -37,6 +39,7 @@ type DesktopWindow =
   | { id: 'contact'; type: 'contact' }
   | { id: 'legal'; type: 'legal' }
   | { id: 'faq'; type: 'faq' }
+  | { id: 'newsletter'; type: 'newsletter' }
   | { id: 'quarterly'; type: 'quarterly' }
   | { id: 'mouse-hole'; type: 'mouse-hole' }
   | { id: string; type: 'chat'; characterId: string }
@@ -46,6 +49,7 @@ const TOUR_VISITED_STORAGE_KEY = 'fauna-gaz:tour-visited'
 const CONTACT_WINDOW: DesktopWindow = { id: 'contact', type: 'contact' }
 const LEGAL_WINDOW: DesktopWindow = { id: 'legal', type: 'legal' }
 const FAQ_WINDOW: DesktopWindow = { id: 'faq', type: 'faq' }
+const NEWSLETTER_WINDOW: DesktopWindow = { id: 'newsletter', type: 'newsletter' }
 const QUARTERLY_WINDOW: DesktopWindow = { id: 'quarterly', type: 'quarterly' }
 const MOUSE_HOLE_WINDOW: DesktopWindow = { id: 'mouse-hole', type: 'mouse-hole' }
 const FAQ_DESKTOP_OFFSET_X = 26 * 16
@@ -386,6 +390,7 @@ function DesktopExperience({ articles = [], quarterlyPdfs = [], characters = [],
     ['quarterly', { x: 0, y: 0 }],
     ['legal', { x: 0, y: 48 }],
     ['faq', { x: 0, y: 96 }],
+    ['newsletter', { x: 0, y: 48 }],
   ]))
   const nextWindowPositionRef = useRef(0)
   const nextWindowZIndexRef = useRef(100 + defaultOpenWindows.length)
@@ -493,6 +498,7 @@ function DesktopExperience({ articles = [], quarterlyPdfs = [], characters = [],
   const openQuarterly = () => openWindow(QUARTERLY_WINDOW)
   const openContact = () => openWindow(CONTACT_WINDOW)
   const openLegal = () => openWindow(LEGAL_WINDOW)
+  const openNewsletter = () => openWindow(NEWSLETTER_WINDOW)
   const openFaq = () => {
     if (viewportMode === 'desktop') {
       const currentPosition = windowPositionsRef.current.get(FAQ_WINDOW.id)
@@ -640,11 +646,37 @@ function DesktopExperience({ articles = [], quarterlyPdfs = [], characters = [],
                     data-window-shell-id={window.id}
                     className="desktop-window-shell desktop-window-shell--contact"
                   >
-                    <Window
+                    {viewportMode === 'mobile' ? (
+                      <ContactWindow
+                        mode={viewportMode}
+                        initialPosition={initialPosition}
+                        contact={contact ?? undefined}
+                        onClose={() => closeWindow(window.id)}
+                      />
+                    ) : (
+                      <Window
+                        mode={viewportMode}
+                        initialPosition={initialPosition}
+                        contact={contact ?? undefined}
+                        showClose
+                        onClose={() => closeWindow(window.id)}
+                      />
+                    )}
+                  </div>
+                )
+              }
+
+              if (window.type === 'newsletter') {
+                return (
+                  <div
+                    key={window.id}
+                    {...focusProps}
+                    data-window-shell-id={window.id}
+                    className="desktop-window-shell desktop-window-shell--newsletter"
+                  >
+                    <NewsletterWindow
                       mode={viewportMode}
                       initialPosition={initialPosition}
-                      contact={contact ?? undefined}
-                      showClose
                       onClose={() => closeWindow(window.id)}
                     />
                   </div>
@@ -770,6 +802,7 @@ function DesktopExperience({ articles = [], quarterlyPdfs = [], characters = [],
           onLegal={openLegal}
           onFaq={openFaq}
           onContact={openContact}
+          onNewsletter={openNewsletter}
           onMusicToggle={toggleMusic}
           onTour={openTour}
         />
