@@ -25,6 +25,10 @@ const meta = {
       control: 'text',
       description: '送出按鈕文字。',
     },
+    errorMessage: {
+      control: 'text',
+      description: '錯誤狀態提示文字。',
+    },
     className: {
       table: {
         disable: true,
@@ -54,6 +58,15 @@ export const Desktop = {
   name: 'Desktop',
   args: {
     ...userSubmitArgs,
+  },
+  render: (args) => <UserSubmitPreview args={args} viewport="desktop" />,
+} satisfies Story
+
+export const Error = {
+  name: 'Error',
+  args: {
+    ...userSubmitArgs,
+    errorMessage: '請輸入內容後再送出',
   },
   render: (args) => <UserSubmitPreview args={args} viewport="desktop" />,
 } satisfies Story

@@ -23,6 +23,7 @@ function isValidEmail(value: string) {
 export function NewsletterForm({ mode = 'desktop' }: NewsletterFormProps) {
   const [email, setEmail] = useState('')
   const [status, setStatus] = useState<NewsletterStatus>('idle')
+  const isInvalid = status === 'invalid'
 
   const previewEmail = () => {
     if (!isValidEmail(email)) {
@@ -44,7 +45,9 @@ export function NewsletterForm({ mode = 'desktop' }: NewsletterFormProps) {
 
           <div className="grid gap-space-sm">
             <label htmlFor="newsletter-email">電子信箱</label>
-            <div className="flex w-full min-w-0 items-center gap-space-sm border-thin border-line-strong bg-window-surface p-space-sm font-ui text-small">
+            <div
+              className={`flex w-full min-w-0 items-center gap-space-sm border-thin ${isInvalid ? 'border-action-close-hover' : 'border-line-strong'} bg-window-surface p-space-sm font-ui text-small`}
+            >
               <input
                 id="newsletter-email"
                 type="email"
@@ -52,7 +55,7 @@ export function NewsletterForm({ mode = 'desktop' }: NewsletterFormProps) {
                 autoComplete="email"
                 value={email}
                 placeholder="name@example.com"
-                aria-invalid={status === 'invalid'}
+                aria-invalid={isInvalid}
                 aria-describedby="newsletter-status"
                 className="min-w-0 flex-1 bg-transparent text-ink-primary outline-none placeholder:text-ink-secondary"
                 onChange={(event) => {
@@ -72,12 +75,17 @@ export function NewsletterForm({ mode = 'desktop' }: NewsletterFormProps) {
                 onClick={previewEmail}
               />
             </div>
-            <p id="newsletter-status" className="min-h-5 text-small text-ink-secondary" role="status" aria-live="polite">
-              {status === 'invalid'
-                ? '請輸入有效的 Email。'
+            <p
+              id="newsletter-status"
+              className={`min-h-5 text-caption ${isInvalid ? 'text-action-close-hover' : 'text-ink-secondary'}`}
+              role="status"
+              aria-live="polite"
+            >
+              {isInvalid
+                ? '請輸入有效的 Email'
                 : status === 'preview'
                   ? '已完成填寫預覽；目前尚未送出 Email。'
-                  : '目前先完成填寫介面，尚未連接寄送服務。'}
+                  : null}
             </p>
           </div>
         </div>
